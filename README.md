@@ -41,6 +41,6 @@ executed after the timer expires but any executable can be launched.
 
 ## Savers
 
-### Game of life
+### `screensaver-game-of-life`
 
 ![](screen/saver/game_of_life/preview.png)
