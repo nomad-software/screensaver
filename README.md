@@ -38,3 +38,9 @@ screensaver-launcher -timer 15m -saver screensaver-game-of-life > /dev/null 2>&1
 
 In this example you can see the `screensaver-game-of-life` saver is being
 executed after the timer expires but any executable can be launched.
+
+## Savers
+
+### Game of life
+
+![](screen/saver/game_of_life/preview.png)
