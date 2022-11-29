@@ -4,10 +4,11 @@ A simple Linux screensaver framework
 
 ## Prerequisites
 
-You will need a working Go compiler and Ebiten Linux packages installing.
-
-* https://go.dev
-* https://ebitengine.org/en/documents/install.html?os=linux
+* You will need a X11 based Linux distribution.
+    * The launcher does not support [Wayland](https://wayland.freedesktop.org/) yet.
+* You will need a working Go compiler and Ebiten Linux packages installing.
+    * https://go.dev
+    * https://ebitengine.org/en/documents/install.html?os=linux
 
 ## How it works
 
