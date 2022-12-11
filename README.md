@@ -42,6 +42,10 @@ executed after the timer expires but any executable can be launched.
 
 ## Savers
 
+### `screensaver-digital-rain`
+
+![](screen/saver/digital_rain/assets/preview.gif)
+
 ### `screensaver-game-of-life`
 
-![](screen/saver/game_of_life/preview.png)
+![](screen/saver/game_of_life/assets/preview.gif)
