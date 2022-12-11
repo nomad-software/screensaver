@@ -11,7 +11,7 @@ const (
 	deleteColumnChance = 40
 
 	switchGlyphChance             = 50
-	highlightedGlyphChance        = 3
+	highlightedGlyphChance        = 5
 	highlightedGlyphStutterChance = 10
 )
 
