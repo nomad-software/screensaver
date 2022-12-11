@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	//go:embed images/*
+	//go:embed assets/*
 	fs embed.FS
 
 	store      = asset.NewStore(fs)
-	cell       = store.LoadImage("images/cell.png")
+	cell       = store.LoadImage("assets/cell.png")
 	cellWidth  = cell.Bounds().Dx()
 	cellHeight = cell.Bounds().Dy()
 
