@@ -25,7 +25,7 @@ type DigitalRain struct {
 func (g *DigitalRain) Update() error {
 	if view == nil {
 		asset = assets.NewCollection()
-		view = matrix.New(g.ScreenWidth/asset.GlyphWidth(), g.ScreenHeight/asset.GlyphHeight())
+		view = matrix.New(g.ScreenWidth/asset.GlyphWidth(), (g.ScreenHeight/asset.GlyphHeight())+1)
 	}
 
 	tick++
