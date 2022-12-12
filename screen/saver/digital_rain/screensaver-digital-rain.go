@@ -55,7 +55,7 @@ func (g *DigitalRain) Draw(screen *ebiten.Image) {
 
 				// Alter the colour if the glyph is highlighted.
 				if glyph.IsHighlighted() {
-					opt.ColorM.Scale(2.0, 2.0, 2.0, 1.0)
+					opt.ColorM.Scale(2.5, 2.0, 2.5, 1.25)
 				}
 
 				buffer.DrawImage(asset.Images[glyph.Index()], opt)
