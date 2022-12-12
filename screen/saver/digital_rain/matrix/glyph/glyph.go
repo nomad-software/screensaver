@@ -29,6 +29,11 @@ func (g *Glyph) IsEmpty() bool {
 	return g.isEmpty
 }
 
+// IsNotEmpty returns true if the glyph is not empty.
+func (g *Glyph) IsNotEmpty() bool {
+	return !g.isEmpty
+}
+
 // Index returns the index of the glyph.
 func (g *Glyph) Index() int {
 	return g.index

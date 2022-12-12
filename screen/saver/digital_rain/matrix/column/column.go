@@ -70,7 +70,7 @@ func (c *Column) AppendGlyphs() {
 			// If we're at the bottom and the glyph is not empty and
 			// highlighted, remove the highlight.
 			if i == c.depth-1 {
-				if !c.GlyphAtIndex(i).IsEmpty() {
+				if c.GlyphAtIndex(i).IsNotEmpty() {
 					if c.GlyphAtIndex(i).IsHighlighted() {
 						c.GlyphAtIndex(i).RemoveHighlight()
 					}
@@ -78,7 +78,7 @@ func (c *Column) AppendGlyphs() {
 			}
 
 			// Continue appending glyphs to the column.
-			if c.GlyphAtIndex(i).IsEmpty() && !c.GlyphBeforeIndex(i).IsEmpty() {
+			if c.GlyphAtIndex(i).IsEmpty() && c.GlyphBeforeIndex(i).IsNotEmpty() {
 				if c.GlyphBeforeIndex(i).IsHighlighted() {
 					// If the glyph is highlighted and if chance favours it,
 					// skip adding a new one.
@@ -99,7 +99,7 @@ func (c *Column) DeleteGlyphs() {
 	for i := c.depth - 1; i >= 0; i-- {
 		// Start deleting at the start of the column if chance favours it.
 		if i == 0 {
-			if !c.GlyphAtIndex(i).IsEmpty() {
+			if c.GlyphAtIndex(i).IsNotEmpty() {
 				if rand.Intn(deleteColumnChance) == 0 {
 					c.SetGlyphAtIndex(i, glyph.NewEmptyGlyph())
 				}
@@ -107,7 +107,7 @@ func (c *Column) DeleteGlyphs() {
 		} else {
 			// Once a column is deleting, we continue, deleting the glyph at the
 			// end of the deleted run of glyphs.
-			if !c.GlyphAtIndex(i).IsEmpty() && c.GlyphBeforeIndex(i).IsEmpty() {
+			if c.GlyphAtIndex(i).IsNotEmpty() && c.GlyphBeforeIndex(i).IsEmpty() {
 				c.SetGlyphAtIndex(i, glyph.NewEmptyGlyph())
 			}
 		}
