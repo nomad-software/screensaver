@@ -4,7 +4,7 @@ import "math/rand"
 
 const (
 	numberOfGlyphs    = 64
-	switchGlyphChance = 32
+	switchGlyphChance = 16
 )
 
 // Glyph is a type that holds an individual glyph of the matrix code.
