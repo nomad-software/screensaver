@@ -5,14 +5,14 @@ import (
 	"image"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/nomad-software/screensaver/asset"
+	"github.com/nomad-software/screensaver/assets"
 )
 
 var (
 	//go:embed *.png
 	fs embed.FS
 
-	store = asset.NewStore(fs)
+	store = assets.NewStore(fs)
 	sheet = store.LoadImage("glyphs.png")
 )
 

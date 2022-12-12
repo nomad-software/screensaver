@@ -5,7 +5,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/nomad-software/screensaver/asset"
+	"github.com/nomad-software/screensaver/assets"
 	"github.com/nomad-software/screensaver/screen"
 	"github.com/nomad-software/screensaver/screen/saver/game_of_life/colony"
 )
@@ -14,7 +14,7 @@ var (
 	//go:embed assets/*
 	fs embed.FS
 
-	store      = asset.NewStore(fs)
+	store      = assets.NewStore(fs)
 	cell       = store.LoadImage("assets/cell.png")
 	cellWidth  = cell.Bounds().Dx()
 	cellHeight = cell.Bounds().Dy()
