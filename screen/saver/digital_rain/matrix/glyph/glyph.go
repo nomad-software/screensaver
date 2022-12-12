@@ -3,11 +3,13 @@ package glyph
 import "math/rand"
 
 const (
-	numberOfGlyphs = 64
+	numberOfGlyphs    = 64
+	switchGlyphChance = 32
 )
 
 // Glyph is a type that holds an individual glyph of the matrix code.
 type Glyph struct {
+	iteration     int  // The number of interations for this glyph.
 	isEmpty       bool // A flag that defines if this glyph is empty.
 	index         int  // The index of the glyph. The index is an integer between 0 and maximum-1 glyphs.
 	isHighlighted bool // A flag that defines if this glyph is highlighted.
@@ -55,4 +57,17 @@ func NewRandomHighlightedGlyph() *Glyph {
 // NewEmptyGlyph creates a new empty glyph.
 func NewEmptyGlyph() *Glyph {
 	return NewGlyph(true, 0, false)
+}
+
+// Iterate moves the glyph to the next state.
+func (g *Glyph) Iterate() {
+	if !g.IsEmpty() {
+		if g.iteration%3 == 0 {
+			if rand.Intn(switchGlyphChance) == 0 {
+				g.index = rand.Intn(numberOfGlyphs)
+			}
+		}
+	}
+
+	g.iteration++
 }

@@ -10,7 +10,6 @@ const (
 	startColumnChance  = 50
 	deleteColumnChance = 40
 
-	switchGlyphChance             = 50
 	highlightedGlyphChance        = 5
 	highlightedGlyphStutterChance = 10
 )
@@ -95,23 +94,6 @@ func (c *Column) AppendGlyphs() {
 	}
 }
 
-// SwitchGlyphs switches glyphs if chance favours it.
-func (c *Column) SwitchGlyphs() {
-	for i := 0; i < c.depth; i++ {
-		if !c.GlyphAtIndex(i).IsEmpty() {
-			if c.iteration%3 == 0 {
-				if rand.Intn(switchGlyphChance) == 0 {
-					if c.GlyphAtIndex(i).IsHighlighted() {
-						c.SetGlyphAtIndex(i, glyph.NewRandomHighlightedGlyph())
-					} else {
-						c.SetGlyphAtIndex(i, glyph.NewRandomGlyph())
-					}
-				}
-			}
-		}
-	}
-}
-
 // DeleteGlyphs deletes glyphs starting from the top of a column.
 func (c *Column) DeleteGlyphs() {
 	for i := c.depth - 1; i >= 0; i-- {
@@ -134,8 +116,11 @@ func (c *Column) DeleteGlyphs() {
 
 // Iterate moves the column to the next state.
 func (c *Column) Iterate() {
+	for _, g := range c.glyphs {
+		g.Iterate()
+	}
+
 	c.AppendGlyphs()
-	c.SwitchGlyphs()
 	c.DeleteGlyphs()
 
 	c.iteration++
