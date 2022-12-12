@@ -21,7 +21,7 @@ func New(width int, height int) *Matrix {
 	}
 
 	for i := 0; i < width; i++ {
-		m.SetColumnAtIndex(i, column.NewColumn(height))
+		m.columns[i] = column.NewColumn(height)
 	}
 
 	return m
@@ -40,11 +40,6 @@ func (g *Matrix) Height() int {
 // ColumnAtIndex gets the column at the specified index.
 func (m *Matrix) ColumnAtIndex(index int) *column.Column {
 	return m.columns[index]
-}
-
-// SetColumnAtIndex sets the column at the specified index.
-func (m *Matrix) SetColumnAtIndex(index int, c *column.Column) {
-	m.columns[index] = c
 }
 
 // Iterate moves the matrix along one step.
