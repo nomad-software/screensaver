@@ -8,7 +8,7 @@ const (
 	numberOfGlyphs          = 64
 	highlightedGlyphChance  = 4
 	switchGlyphChance       = 8
-	switchGlyphSpreadChance = 32
+	switchGlyphSpreadChance = 16
 )
 
 // Glyph is a type that holds an individual glyph of the matrix code.
