@@ -1,26 +1,29 @@
 package glyph
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 const (
 	numberOfGlyphs    = 64
-	switchGlyphChance = 16
+	switchGlyphChance = 8
 )
 
 // Glyph is a type that holds an individual glyph of the matrix code.
 type Glyph struct {
-	iteration     int  // The number of interations for this glyph.
 	isEmpty       bool // A flag that defines if this glyph is empty.
 	index         int  // The index of the glyph. The index is an integer between 0 and maximum-1 glyphs.
 	isHighlighted bool // A flag that defines if this glyph is highlighted.
+	isSwitcher    bool // A flag that defines if this glyph switches.
 }
 
 // NewGlyph creates a new matrix code glyph.
-func NewGlyph(isEmpty bool, index int, isHighlighted bool) *Glyph {
+func NewGlyph(isEmpty bool, index int, isHighlighted bool, isSwitcher bool) *Glyph {
 	return &Glyph{
 		isEmpty:       isEmpty,
 		index:         index,
 		isHighlighted: isHighlighted,
+		isSwitcher:    isSwitcher,
 	}
 }
 
@@ -44,6 +47,16 @@ func (g *Glyph) IsHighlighted() bool {
 	return g.isHighlighted
 }
 
+// IsSwitcher returns true if the glyph is a switcher.
+func (g *Glyph) IsSwitcher() bool {
+	return g.isSwitcher
+}
+
+// Switch switches the glyph.
+func (g *Glyph) Switch() {
+	g.index = rand.Intn(numberOfGlyphs)
+}
+
 // RemoveHighlight removes the highlight from the glyph.
 func (g *Glyph) RemoveHighlight() {
 	g.isHighlighted = false
@@ -51,28 +64,15 @@ func (g *Glyph) RemoveHighlight() {
 
 // NewRandomGlyph creates a new random glyph.
 func NewRandomGlyph() *Glyph {
-	return NewGlyph(false, rand.Intn(numberOfGlyphs), false)
+	return NewGlyph(false, rand.Intn(numberOfGlyphs), false, rand.Intn(switchGlyphChance) == 0)
 }
 
 // NewRandomHighlightedGlyph creates a new random highlighted glyph.
 func NewRandomHighlightedGlyph() *Glyph {
-	return NewGlyph(false, rand.Intn(numberOfGlyphs), true)
+	return NewGlyph(false, rand.Intn(numberOfGlyphs), true, rand.Intn(switchGlyphChance) == 0)
 }
 
 // NewEmptyGlyph creates a new empty glyph.
 func NewEmptyGlyph() *Glyph {
-	return NewGlyph(true, 0, false)
-}
-
-// Iterate moves the glyph to the next state.
-func (g *Glyph) Iterate() {
-	if !g.IsEmpty() {
-		if g.iteration%3 == 0 {
-			if rand.Intn(switchGlyphChance) == 0 {
-				g.index = rand.Intn(numberOfGlyphs)
-			}
-		}
-	}
-
-	g.iteration++
+	return NewGlyph(true, 0, false, false)
 }
