@@ -10,7 +10,6 @@ const (
 	startColumnChance  = 50
 	deleteColumnChance = 40
 
-	highlightedGlyphChance        = 4
 	highlightedGlyphStutterChance = 10
 )
 
@@ -59,11 +58,7 @@ func (c *Column) AppendGlyphs() {
 			// Always append one to the start of the column if chance favours it.
 			if c.GlyphAtIndex(i).IsEmpty() {
 				if rand.Intn(startColumnChance) == 0 {
-					if rand.Intn(highlightedGlyphChance) == 0 {
-						c.SetGlyphAtIndex(i, glyph.NewRandomHighlightedGlyph())
-					} else {
-						c.SetGlyphAtIndex(i, glyph.NewRandomGlyph())
-					}
+					c.SetGlyphAtIndex(i, glyph.NewRandomGlyph())
 				}
 			}
 		} else {
@@ -84,10 +79,10 @@ func (c *Column) AppendGlyphs() {
 					// skip adding a new one.
 					if rand.Intn(highlightedGlyphStutterChance) != 0 {
 						c.GlyphBeforeIndex(i).RemoveHighlight()
-						c.SetGlyphAtIndex(i, glyph.NewRandomHighlightedGlyph())
+						c.SetGlyphAtIndex(i, glyph.NewRandomHighlightedGlyph(c.GlyphBeforeIndex(i).IsSwitcherSpreader()))
 					}
 				} else {
-					c.SetGlyphAtIndex(i, glyph.NewRandomGlyph())
+					c.SetGlyphAtIndex(i, glyph.NewRandomStandardGlyph(c.GlyphBeforeIndex(i).IsSwitcherSpreader()))
 				}
 			}
 		}
