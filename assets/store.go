@@ -15,8 +15,8 @@ type Store struct {
 	fs embed.FS
 }
 
-// NewStore creates a new asset store.
-func NewStore(fs embed.FS) *Store {
+// New creates a new asset store.
+func New(fs embed.FS) *Store {
 	return &Store{
 		fs: fs,
 	}

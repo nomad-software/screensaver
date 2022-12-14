@@ -8,6 +8,7 @@ import (
 
 // Options contain the command line options passed to the program.
 type Options struct {
+	Port          string
 	Timer         string
 	TimerDuration time.Duration
 	Saver         string
@@ -18,6 +19,7 @@ type Options struct {
 func ParseOptions() (*Options, error) {
 	var opt Options
 
+	flag.StringVar(&opt.Port, "port", "1337", "Communication port. Other tools can interact with this launcher.")
 	flag.StringVar(&opt.Timer, "timer", "15m", "Timer duration. Screensaver will show after timer runs out.")
 	flag.StringVar(&opt.Saver, "saver", "", "The screensaver to show when the timer runs out.")
 	flag.Parse()

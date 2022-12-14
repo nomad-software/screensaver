@@ -6,7 +6,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/nomad-software/screensaver/assets"
-	"github.com/nomad-software/screensaver/screen"
+	"github.com/nomad-software/screensaver/screen/saver"
 	"github.com/nomad-software/screensaver/screen/saver/game_of_life/colony"
 )
 
@@ -14,7 +14,7 @@ var (
 	//go:embed assets/*
 	fs embed.FS
 
-	store      = assets.NewStore(fs)
+	store      = assets.New(fs)
 	cell       = store.LoadImage("assets/cell.png")
 	cellWidth  = cell.Bounds().Dx()
 	cellHeight = cell.Bounds().Dy()
@@ -29,7 +29,7 @@ var (
 )
 
 type GameOfLife struct {
-	screen.Saver
+	saver.Saver
 }
 
 func (g *GameOfLife) Update() error {
@@ -90,6 +90,5 @@ func main() {
 	ebiten.SetFullscreen(true)
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 
-	saver := &GameOfLife{}
-	screen.Run(saver)
+	saver.Run(&GameOfLife{})
 }

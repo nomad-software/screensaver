@@ -12,7 +12,7 @@ var (
 	//go:embed *.png
 	fs embed.FS
 
-	store = assets.NewStore(fs)
+	store = assets.New(fs)
 	sheet = store.LoadImage("glyphs.png")
 )
 

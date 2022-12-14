@@ -4,7 +4,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/nomad-software/screensaver/screen"
+	"github.com/nomad-software/screensaver/screen/saver"
 	"github.com/nomad-software/screensaver/screen/saver/digital_rain/assets"
 	"github.com/nomad-software/screensaver/screen/saver/digital_rain/matrix"
 )
@@ -19,7 +19,7 @@ var (
 )
 
 type DigitalRain struct {
-	screen.Saver
+	saver.Saver
 }
 
 func (g *DigitalRain) Update() error {
@@ -75,6 +75,5 @@ func main() {
 	ebiten.SetFullscreen(true)
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 
-	saver := &DigitalRain{}
-	screen.Run(saver)
+	saver.Run(&DigitalRain{})
 }

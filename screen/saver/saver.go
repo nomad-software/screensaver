@@ -1,4 +1,4 @@
-package screen
+package saver
 
 import (
 	"errors"
