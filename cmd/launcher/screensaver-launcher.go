@@ -18,22 +18,24 @@ func main() {
 		output.OnError(err, "options are not valid")
 	}
 
-	reset := make(chan input.Signal)
-	activate := make(chan input.Signal)
-
 	server, err := server.New(opt.Port)
-	output.OnError(err, "server failed to run")
-	server.RegisterCommandSignal("activate", activate)
-	server.RegisterCommandSignal("reset", reset)
-	go server.Listen()
+	output.OnError(err, "server failed")
 
-	go input.GetXInput(reset)
+	activate := server.CreateSignal("activate")
+	reset := server.CreateSignal("reset")
 
-	timer := timer.New(opt.TimerDuration)
+	server.Listen()
+
+	input := input.GetInput()
+
 	tick := time.Tick(time.Second)
+	timer := timer.New(opt.TimerDuration)
 
 	for {
 		select {
+
+		case <-input:
+			timer.Reset()
 
 		case <-reset:
 			timer.Reset()

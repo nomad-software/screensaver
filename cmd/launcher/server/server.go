@@ -1,6 +1,7 @@
 package server
 
 import (
+	"io"
 	"net"
 
 	"github.com/nomad-software/screensaver/cmd/launcher/input"
@@ -28,22 +29,26 @@ func New(port string) (*Server, error) {
 	return server, nil
 }
 
-// RegisterCommandSignal registers a signal channel to be used when a particular
+// CreateSignal registers a signal channel to be used when a particular
 // command is received.
-func (s *Server) RegisterCommandSignal(command string, c chan input.Signal) {
+func (s *Server) CreateSignal(command string) chan input.Signal {
+	c := make(chan input.Signal)
 	s.signals[command] = c
+	return c
 }
 
 // Listen starts the server and listens for command.
 func (s *Server) Listen() {
-	defer s.listener.Close()
+	go func() {
+		defer s.listener.Close()
 
-	for {
-		conn, err := s.listener.Accept()
-		output.OnError(err, "server failed")
+		for {
+			conn, err := s.listener.Accept()
+			output.OnError(err, "server listening failed")
 
-		go s.handleRequest(conn)
-	}
+			go s.handleRequest(conn)
+		}
+	}()
 }
 
 // handleRequest handles an individual command.
@@ -53,8 +58,13 @@ func (s *Server) handleRequest(conn net.Conn) {
 	buffer := make([]byte, 1024)
 
 	_, err := conn.Read(buffer)
-	output.OnError(err, "server failed to read command")
+	// If the error is 'end of file' it basically means no command was sent from
+	// a client, so ignore it.
+	if err == io.EOF {
+		return
+	}
 
+	output.OnError(err, "server failed to read command")
 	output.LaunchInfo("command received: %s", buffer)
 
 	for cmd, c := range s.signals {

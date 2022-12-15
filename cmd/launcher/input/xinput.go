@@ -31,8 +31,16 @@ import (
 type Signal struct{}
 
 // StartXInput checks for keyboard and mouse events and when triggered sends a
+// signal on the returned channel.
+func GetInput() chan Signal {
+	c := make(chan Signal)
+	go getXInput(c)
+	return c
+}
+
+// StartXInput checks for keyboard and mouse events and when triggered sends a
 // signal on the provided channel.
-func GetXInput(c chan Signal) {
+func getXInput(c chan Signal) {
 	display := C.XOpenDisplay(nil)
 
 	var majorOpcodeReturn C.int
