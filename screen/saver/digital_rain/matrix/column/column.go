@@ -6,30 +6,34 @@ import (
 	"github.com/nomad-software/screensaver/screen/saver/digital_rain/matrix/glyph"
 )
 
-const (
-	startColumnChance  = 50
-	deleteColumnChance = 40
-
-	highlightedGlyphStutterChance = 10
-)
-
 // Column is a type that holds an individual column of the matrix code.
 type Column struct {
 	iteration int // The number of interations for this column.
-	depth     int // The depth (number of glyphs) of this column.
+	width     int // The number of columns used overall. This helps determine random chances.
+	height    int // The height (number of glyphs) of this column.
+
+	startColumnChance             int
+	deleteColumnChance            int
+	highlightedGlyphStutterChance int
 
 	glyphs []*glyph.Glyph // The collection of glyphs in this column.
 }
 
 // NewColumn creates a new matrix code column.
-func NewColumn(depth int) *Column {
+func NewColumn(width, height int) *Column {
 	col := &Column{
 		iteration: 0,
-		depth:     depth,
-		glyphs:    make([]*glyph.Glyph, depth),
+		height:    height,
+		width:     width,
+
+		startColumnChance:             int(float64(width) / 2.5),
+		deleteColumnChance:            int(float64(width) / 3.0),
+		highlightedGlyphStutterChance: int(float64(width) / 12.5),
+
+		glyphs: make([]*glyph.Glyph, height),
 	}
 
-	for i := 0; i < depth; i++ {
+	for i := 0; i < height; i++ {
 		col.SetGlyphAtIndex(i, glyph.NewEmptyGlyph())
 	}
 
@@ -53,18 +57,18 @@ func (c *Column) GlyphBeforeIndex(index int) *glyph.Glyph {
 
 // AppendGlyphs add new glyphs to columns.
 func (c *Column) AppendGlyphs() {
-	for i := c.depth - 1; i > -1; i-- {
+	for i := c.height - 1; i > -1; i-- {
 		if i == 0 {
 			// Always append one to the start of the column if chance favours it.
 			if c.GlyphAtIndex(i).IsEmpty() {
-				if rand.Intn(startColumnChance) == 0 {
+				if rand.Intn(c.startColumnChance) == 0 {
 					c.SetGlyphAtIndex(i, glyph.NewRandomGlyph())
 				}
 			}
 		} else {
 			// If we're at the bottom and the glyph is not empty and
 			// highlighted, remove the highlight.
-			if i == c.depth-1 {
+			if i == c.height-1 {
 				if c.GlyphAtIndex(i).IsNotEmpty() {
 					if c.GlyphAtIndex(i).IsHighlighted() {
 						c.GlyphAtIndex(i).RemoveHighlight()
@@ -77,7 +81,7 @@ func (c *Column) AppendGlyphs() {
 				if c.GlyphBeforeIndex(i).IsHighlighted() {
 					// If the glyph is highlighted and if chance favours it,
 					// skip adding a new one.
-					if rand.Intn(highlightedGlyphStutterChance) != 0 {
+					if rand.Intn(c.highlightedGlyphStutterChance) != 0 {
 						c.GlyphBeforeIndex(i).RemoveHighlight()
 						c.SetGlyphAtIndex(i, glyph.NewRandomHighlightedGlyph(c.GlyphBeforeIndex(i).IsSwitcherSpreader()))
 					}
@@ -91,7 +95,7 @@ func (c *Column) AppendGlyphs() {
 
 // SwitchGlyphs switches glyphs if glyph is a switcher.
 func (c *Column) SwitchGlyphs() {
-	for i := 0; i < c.depth; i++ {
+	for i := 0; i < c.height; i++ {
 		if !c.GlyphAtIndex(i).IsEmpty() {
 			if c.GlyphAtIndex(i).IsSwitcher() && c.iteration%3 == 0 {
 				c.GlyphAtIndex(i).Switch()
@@ -102,11 +106,11 @@ func (c *Column) SwitchGlyphs() {
 
 // DeleteGlyphs deletes glyphs starting from the top of a column.
 func (c *Column) DeleteGlyphs() {
-	for i := c.depth - 1; i >= 0; i-- {
+	for i := c.height - 1; i >= 0; i-- {
 		// Start deleting at the start of the column if chance favours it.
 		if i == 0 {
 			if c.GlyphAtIndex(i).IsNotEmpty() {
-				if rand.Intn(deleteColumnChance) == 0 {
+				if rand.Intn(c.deleteColumnChance) == 0 {
 					c.SetGlyphAtIndex(i, glyph.NewEmptyGlyph())
 				}
 			}

@@ -21,7 +21,7 @@ func New(width int, height int) *Matrix {
 	}
 
 	for i := 0; i < width; i++ {
-		m.columns[i] = column.NewColumn(height)
+		m.columns[i] = column.NewColumn(width, height)
 	}
 
 	return m
