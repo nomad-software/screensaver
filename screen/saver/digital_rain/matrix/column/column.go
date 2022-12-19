@@ -55,12 +55,17 @@ func (c *Column) GlyphBeforeIndex(index int) *glyph.Glyph {
 	return c.glyphs[index-1]
 }
 
+// GlyphAfterIndex gets the glyph after the specified index from the top down.
+func (c *Column) GlyphAfterIndex(index int) *glyph.Glyph {
+	return c.glyphs[index+1]
+}
+
 // AppendGlyphs add new glyphs to columns.
 func (c *Column) AppendGlyphs() {
 	for i := c.height - 1; i > -1; i-- {
 		if i == 0 {
 			// Always append one to the start of the column if chance favours it.
-			if c.GlyphAtIndex(i).IsEmpty() {
+			if c.GlyphAtIndex(i).IsEmpty() && c.GlyphAfterIndex(i).IsEmpty() {
 				if rand.Intn(c.startColumnChance) == 0 {
 					c.SetGlyphAtIndex(i, glyph.NewRandomGlyph())
 				}
