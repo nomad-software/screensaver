@@ -54,22 +54,46 @@ func getXInput(c chan Signal) {
 
 	screen := C.XDefaultScreen(display)
 	window := C.XRootWindow(display, screen)
-	masks := make([]C.XIEventMask, 1)
+	masks := make([]C.XIEventMask, 2)
 
+	// Mask 1
 	masks[0].deviceid = C.XIAllDevices
 	masks[0].mask_len = C.Macro_XIMaskLen(C.XI_LASTEVENT)
 	masks[0].mask = C.allocate_mask(masks[0].mask_len)
 	C.Macro_XISetMask(masks[0].mask, C.XI_ButtonPress)
+	C.Macro_XISetMask(masks[0].mask, C.XI_ButtonRelease)
 	C.Macro_XISetMask(masks[0].mask, C.XI_KeyPress)
+	C.Macro_XISetMask(masks[0].mask, C.XI_KeyRelease)
 	C.Macro_XISetMask(masks[0].mask, C.XI_Motion)
 	C.Macro_XISetMask(masks[0].mask, C.XI_DeviceChanged)
+	C.Macro_XISetMask(masks[0].mask, C.XI_Enter)
+	C.Macro_XISetMask(masks[0].mask, C.XI_Leave)
+	C.Macro_XISetMask(masks[0].mask, C.XI_FocusIn)
+	C.Macro_XISetMask(masks[0].mask, C.XI_FocusOut)
+	C.Macro_XISetMask(masks[0].mask, C.XI_TouchBegin)
+	C.Macro_XISetMask(masks[0].mask, C.XI_TouchUpdate)
+	C.Macro_XISetMask(masks[0].mask, C.XI_TouchEnd)
 	C.Macro_XISetMask(masks[0].mask, C.XI_HierarchyChanged)
 	C.Macro_XISetMask(masks[0].mask, C.XI_PropertyEvent)
+
+	// Mask 2
+	masks[1].deviceid = C.XIAllMasterDevices
+	masks[1].mask_len = C.Macro_XIMaskLen(C.XI_LASTEVENT)
+	masks[1].mask = C.allocate_mask(masks[1].mask_len)
+	C.Macro_XISetMask(masks[1].mask, C.XI_RawKeyPress)
+	C.Macro_XISetMask(masks[1].mask, C.XI_RawKeyRelease)
+	C.Macro_XISetMask(masks[1].mask, C.XI_RawButtonPress)
+	C.Macro_XISetMask(masks[1].mask, C.XI_RawButtonRelease)
+	C.Macro_XISetMask(masks[1].mask, C.XI_RawMotion)
+	C.Macro_XISetMask(masks[1].mask, C.XI_RawTouchBegin)
+	C.Macro_XISetMask(masks[1].mask, C.XI_RawTouchUpdate)
+	C.Macro_XISetMask(masks[1].mask, C.XI_RawTouchEnd)
 
 	C.XISelectEvents(display, window, &masks[0], (C.int)(len(masks)))
 	C.XSync(display, 0)
 
 	C.free(unsafe.Pointer(masks[0].mask))
+	C.free(unsafe.Pointer(masks[1].mask))
 
 	for {
 		ev := C.XEvent{}
