@@ -71,23 +71,27 @@ func (c *Column) AppendGlyphs() {
 				}
 			}
 		} else {
+			// If the current glyph is fading, remove the highlight altogether.
+			if c.GlyphBeforeIndex(i).IsHighlightFading() {
+				c.GlyphBeforeIndex(i).RemoveHighlight()
+			}
+
 			// If we're at the bottom and the glyph is not empty and
-			// highlighted, remove the highlight.
+			// highlighted, fade the highlight.
 			if i == c.height-1 {
 				if c.GlyphAtIndex(i).IsNotEmpty() {
 					if c.GlyphAtIndex(i).IsHighlighted() {
-						c.GlyphAtIndex(i).RemoveHighlight()
+						c.GlyphAtIndex(i).FadeHighlight()
 					}
 				}
 			}
-
 			// Continue appending glyphs to the column.
 			if c.GlyphAtIndex(i).IsEmpty() && c.GlyphBeforeIndex(i).IsNotEmpty() {
 				if c.GlyphBeforeIndex(i).IsHighlighted() {
 					// If the glyph is highlighted and if chance favours it,
 					// skip adding a new one.
 					if rand.Intn(c.highlightedGlyphStutterChance) != 0 {
-						c.GlyphBeforeIndex(i).RemoveHighlight()
+						c.GlyphBeforeIndex(i).FadeHighlight()
 						c.SetGlyphAtIndex(i, glyph.NewRandomHighlightedGlyph(c.GlyphBeforeIndex(i).IsSwitcherSpreader()))
 					}
 				} else {

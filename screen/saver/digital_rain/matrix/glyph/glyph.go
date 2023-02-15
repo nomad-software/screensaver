@@ -13,11 +13,12 @@ const (
 
 // Glyph is a type that holds an individual glyph of the matrix code.
 type Glyph struct {
-	isEmpty          bool // A flag that defines if this glyph is empty.
-	index            int  // The index of the glyph. The index is an integer between 0 and maximum-1 glyphs.
-	isHighlighted    bool // A flag that defines if this glyph is highlighted.
-	isSwitcher       bool // A flag that defines if this glyph switches.
-	isSwitchSpreader bool // A flag that defines if this glyph spreads its switching to others.
+	isEmpty           bool // A flag that defines if this glyph is empty.
+	index             int  // The index of the glyph. The index is an integer between 0 and maximum-1 glyphs.
+	isHighlighted     bool // A flag that defines if this glyph is highlighted.
+	isHighlightFading bool // A flag that defines if this glyph's highlight is fading.
+	isSwitcher        bool // A flag that defines if this glyph switches.
+	isSwitchSpreader  bool // A flag that defines if this glyph spreads its switching to others.
 }
 
 // NewRandomGlyph creates a new random glyph.
@@ -71,6 +72,17 @@ func (g *Glyph) Index() int {
 	return g.index
 }
 
+// IsHighlightFading returns true if the glyph's highlight is fading.
+func (g *Glyph) IsHighlightFading() bool {
+	return g.isHighlightFading
+}
+
+// FadeHighlight fades the highlight on the glyph.
+func (g *Glyph) FadeHighlight() {
+	g.isHighlighted = false
+	g.isHighlightFading = true
+}
+
 // IsHighlighted returns true if the glyph is highlighted.
 func (g *Glyph) IsHighlighted() bool {
 	return g.isHighlighted
@@ -79,6 +91,7 @@ func (g *Glyph) IsHighlighted() bool {
 // RemoveHighlight removes the highlight from the glyph.
 func (g *Glyph) RemoveHighlight() {
 	g.isHighlighted = false
+	g.isHighlightFading = false
 }
 
 // IsSwitcher returns true if the glyph is a switcher.

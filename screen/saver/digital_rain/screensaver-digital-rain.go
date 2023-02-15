@@ -58,6 +58,11 @@ func (g *DigitalRain) Draw(screen *ebiten.Image) {
 					opt.ColorM.Scale(2.5, 2.0, 2.5, 1.25)
 				}
 
+				// Alter the colour if the glyph's highlight is fading.
+				if glyph.IsHighlightFading() {
+					opt.ColorM.Scale(1.5, 1.5, 1.5, 1.25)
+				}
+
 				buffer.DrawImage(asset.Images[glyph.Index()], opt)
 			}
 		}
