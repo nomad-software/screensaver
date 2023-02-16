@@ -41,7 +41,11 @@ func main() {
 			timer.Reset()
 
 		case <-activate:
-			timer.Expire()
+			err := cli.Launch(opt.Saver)
+			if err != nil {
+				output.LaunchErr("screensaver error: %s", err)
+			}
+			timer.Reset()
 
 		case <-tick:
 			if timer.Expired() {
