@@ -7,8 +7,9 @@ import (
 	"github.com/nomad-software/screensaver/output"
 )
 
-// Launch launches a screensaver by its command name.
-func Launch(saver string, args ...string) error {
+// Launch launches a screensaver by its command line name.
+// This function will block until the launched screensaver exits.
+func Launch(saver string, args ...string) {
 	output.LaunchInfo("launching screensaver: %s", saver)
 
 	cmd := exec.Command(saver, args...)
@@ -16,5 +17,9 @@ func Launch(saver string, args ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	return cmd.Run()
+	err := cmd.Run()
+
+	if err != nil {
+		output.LaunchErr("screensaver launch error: %s", err)
+	}
 }
