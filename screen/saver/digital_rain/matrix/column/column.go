@@ -105,7 +105,7 @@ func (c *Column) AppendGlyphs() {
 // SwitchGlyphs switches glyphs if glyph is a switcher.
 func (c *Column) SwitchGlyphs() {
 	for i := 0; i < c.height; i++ {
-		if !c.GlyphAtIndex(i).IsEmpty() {
+		if c.GlyphAtIndex(i).IsNotEmpty() {
 			if c.GlyphAtIndex(i).IsSwitcher() && c.iteration%3 == 0 {
 				c.GlyphAtIndex(i).Switch()
 			}
@@ -113,7 +113,7 @@ func (c *Column) SwitchGlyphs() {
 	}
 }
 
-// DeleteGlyphs deletes glyphs starting from the top of a column.
+// DeleteGlyphs deletes glyphs starting from the bottom of a column.
 func (c *Column) DeleteGlyphs() {
 	for i := c.height - 1; i >= 0; i-- {
 		// Start deleting at the start of the column if chance favours it.
