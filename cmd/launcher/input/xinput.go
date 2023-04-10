@@ -33,7 +33,7 @@ type Signal struct{}
 // StartXInput checks for keyboard and mouse events and when triggered sends a
 // signal on the returned channel.
 func GetInput() chan Signal {
-	c := make(chan Signal)
+	c := make(chan Signal, 256)
 	go getXInput(c)
 	return c
 }
