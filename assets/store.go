@@ -1,12 +1,10 @@
 package assets
 
 import (
-	"bytes"
 	"embed"
-	"image"
 	_ "image/png"
 
-	"github.com/hajimehoshi/ebiten/v2"
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/nomad-software/screensaver/output"
 )
 
@@ -22,15 +20,17 @@ func New(fs embed.FS) *Store {
 	}
 }
 
-// LoadImage retrieves an asset from the store and creates an ebiten image from it.
-func (s Store) LoadImage(name string) *ebiten.Image {
+// LoadPngImage retrieves a png from the store and creates an image from it.
+func (s Store) LoadPngImage(name string) *rl.Image {
 	st, err := s.fs.ReadFile(name)
-	output.OnError(err, "cannot read image")
+	output.OnError(err, "cannot read embedded png image")
 
-	i, _, err := image.Decode(bytes.NewReader(st))
-	output.OnError(err, "cannot decode image")
+	image := rl.LoadImageFromMemory(".png", st, int32(len(st)))
 
-	output.ScreenInfo("loaded %s", name)
+	return image
+}
 
-	return ebiten.NewImageFromImage(i)
+// LoadPngTexture retrieves a png from the store and creates a texture from it.
+func (s Store) LoadPngTexture(name string) rl.Texture2D {
+	return rl.LoadTextureFromImage(s.LoadPngImage(name))
 }

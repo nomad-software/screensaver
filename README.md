@@ -6,9 +6,9 @@ A simple Linux screensaver framework
 
 * A [X11](https://www.x.org/wiki/) based Linux distribution to run the launcher.
     * The launcher does not support [Wayland](https://wayland.freedesktop.org/) yet.
-* A working Go and C compiler and installed Ebiten Linux dependencies.
+* A working Go and C compiler and installed Raylib dependencies.
     * https://go.dev
-    * https://ebitengine.org/en/documents/install.html?os=linux
+    * https://github.com/gen2brain/raylib-go#requirements
 
 ## How it works
 

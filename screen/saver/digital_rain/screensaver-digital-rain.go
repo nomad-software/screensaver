@@ -1,84 +1,68 @@
 package main
 
 import (
-	"image/color"
-
-	"github.com/hajimehoshi/ebiten/v2"
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/nomad-software/screensaver/screen/saver"
 	"github.com/nomad-software/screensaver/screen/saver/digital_rain/assets"
 	"github.com/nomad-software/screensaver/screen/saver/digital_rain/matrix"
 )
 
-var (
-	backgroundColour = color.NRGBA{0, 0, 0, 255}
+func main() {
+	width, height := saver.CreateWindow("screensaver - digital rain")
+	defer saver.CloseWindow()
 
-	view  *matrix.Matrix
-	asset *assets.Collection
+	rl.SetTargetFPS(15)
 
-	tick uint
-)
+	sheet := assets.NewGlyphSheet()
+	matrix := matrix.New(width/sheet.GlyphWidth(), (height/sheet.GlyphHeight())+1)
 
-type DigitalRain struct {
-	saver.Saver
-}
+	for {
+		if saver.InputDetected() {
+			break
+		}
 
-func (g *DigitalRain) Update() error {
-	if view == nil {
-		asset = assets.NewCollection()
-		view = matrix.New(g.ScreenWidth/asset.GlyphWidth(), (g.ScreenHeight/asset.GlyphHeight())+1)
-	}
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.Black)
 
-	tick++
+		for x := 0; x < matrix.Width(); x++ {
+			for y := 0; y < matrix.Height(); y++ {
+				glyph := matrix.ColumnAtIndex(x).GlyphAtIndex(y)
 
-	if tick%4 == 0 {
-		view.Iterate()
-	}
-
-	return g.Saver.Update()
-}
-
-func (g *DigitalRain) Draw(screen *ebiten.Image) {
-	buffer := g.Blit(screen)
-	buffer.Fill(backgroundColour)
-
-	for x := 0; x < view.Width(); x++ {
-		for y := 0; y < view.Height(); y++ {
-			glyph := view.ColumnAtIndex(x).GlyphAtIndex(y)
-
-			if !glyph.IsEmpty() {
-				opt := &ebiten.DrawImageOptions{}
-				// Adjust translation for the tile.
-				opt.GeoM.Translate(-float64((asset.TileWidth()-asset.GlyphWidth())/2), -float64((asset.TileHeight()-asset.GlyphHeight())/2))
-
-				// Translate for the actual glyph.
-				opt.GeoM.Translate(float64(x*asset.GlyphWidth()), float64(y*asset.GlyphHeight()))
-
-				// Alter the colour if the glyph is highlighted.
-				if glyph.IsHighlighted() {
-					opt.ColorM.Scale(2.5, 2.0, 2.5, 1.25)
+				if glyph.IsEmpty() {
+					continue
 				}
 
-				// Alter the colour if the glyph's highlight is fading.
+				offset := rl.NewVector2(
+					float32((sheet.MaskWidth()-sheet.GlyphWidth())/2),
+					float32((sheet.MaskHeight()-sheet.GlyphHeight())/2),
+				)
+
+				pos := rl.NewVector2(
+					float32(x*sheet.GlyphWidth()),
+					float32(y*sheet.GlyphHeight()),
+				)
+
+				pos = rl.Vector2Subtract(pos, offset)
+
+				rl.DrawTextureRec(sheet.Texture(), sheet.Masks[glyph.Index()], pos, rl.White)
+
+				rl.BeginBlendMode(rl.BlendAdditive)
+
 				if glyph.IsHighlightFading() {
-					opt.ColorM.Scale(1.5, 1.5, 1.5, 1.25)
+					rl.DrawTextureRec(sheet.Texture(), sheet.Masks[glyph.Index()], pos, rl.White)
 				}
 
-				buffer.DrawImage(asset.Images[glyph.Index()], opt)
+				if glyph.IsHighlighted() {
+					rl.DrawTextureRec(sheet.Texture(), sheet.Masks[glyph.Index()], pos, rl.White)
+					rl.DrawTextureRec(sheet.Texture(), sheet.Masks[glyph.Index()], pos, rl.White)
+				}
+
+				rl.EndBlendMode()
 			}
 		}
+
+		matrix.Iterate()
+
+		rl.EndDrawing()
 	}
-}
-
-func (s *DigitalRain) Layout(width, height int) (int, int) {
-	s.ScreenWidth = width
-	s.ScreenHeight = height
-
-	return s.ScreenWidth, s.ScreenHeight
-}
-
-func main() {
-	ebiten.SetFullscreen(true)
-	ebiten.SetCursorMode(ebiten.CursorModeHidden)
-
-	saver.Run(&DigitalRain{})
 }
