@@ -2,67 +2,83 @@ package assets
 
 import (
 	"embed"
-	"image"
 
-	"github.com/hajimehoshi/ebiten/v2"
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/nomad-software/screensaver/assets"
 )
 
 var (
-	//go:embed *.png
+	//go:embed glyphs.png
 	fs embed.FS
 
 	store = assets.New(fs)
-	sheet = store.LoadImage("glyphs.png")
 )
 
-// Collection is the parsed collection of matrix glyphs.
-type Collection struct {
-	tileWidth  int // The overall width of the glyph tile.
-	tileHeight int // The overall height of the glyph tile.
+// GlyphSheet models the loaded sheet and hold dimensions of glyphs.
+type GlyphSheet struct {
+	texture       rl.Texture2D // The loaded glyph texture.
+	textureWidth  int          // The overall width of the glyph texture.
+	textureHeight int          // The overall height of the glyph texture.
 
-	glyphWidth  int // The actual width of the glyph.
-	glyphHeight int // The actual height of the glyph.
+	glyphWidth  int // The width of a glyph.
+	glyphHeight int // The height of a glyph.
 
-	Images []*ebiten.Image // A collection of glyphs taken from the overall sprite sheet.
+	maskWidth  int // The overall width of a glyph mask.
+	maskHeight int // The overall height of a glyph mask.
+
+	Masks []rl.Rectangle // A collection of glyphs taken from the overall sprite sheet.
 }
 
-// NewCollection creates a new glyph collection.
-func NewCollection() *Collection {
-	col := &Collection{
-		tileWidth:   60,
-		tileHeight:  72,
-		glyphWidth:  20,
-		glyphHeight: 32,
+// NewGlyphSheet creates a new glyph sheet.
+func NewGlyphSheet() *GlyphSheet {
+	g := &GlyphSheet{
+		texture:       store.LoadPngTexture("glyphs.png"),
+		textureWidth:  480,
+		textureHeight: 576,
+		maskWidth:     60,
+		maskHeight:    72,
+		glyphWidth:    20,
+		glyphHeight:   32,
 
-		Images: make([]*ebiten.Image, 0),
+		Masks: make([]rl.Rectangle, 0),
 	}
 
-	for y := 0; y < sheet.Bounds().Dy(); y = y + col.tileHeight {
-		for x := 0; x < sheet.Bounds().Dx(); x = x + col.tileWidth {
-			col.Images = append(col.Images, sheet.SubImage(image.Rect(x, y, x+col.tileWidth, y+col.tileHeight)).(*ebiten.Image))
+	for y := 0; y < g.textureHeight; y += g.maskHeight {
+		for x := 0; x < g.textureWidth; x += g.maskWidth {
+			mask := rl.NewRectangle(
+				float32(x),
+				float32(y),
+				float32(g.maskWidth),
+				float32(g.maskHeight),
+			)
+			g.Masks = append(g.Masks, mask)
 		}
 	}
 
-	return col
+	return g
 }
 
-// TileWidth returns the tile width of the glyph.
-func (c *Collection) TileWidth() int {
-	return c.tileWidth
+// Texture returns the texture.
+func (g *GlyphSheet) Texture() rl.Texture2D {
+	return g.texture
 }
 
-// TileHeight returns the tile height of the glyph.
-func (c *Collection) TileHeight() int {
-	return c.tileHeight
+// GlyphWidth returns the width of a glyph.
+func (g *GlyphSheet) GlyphWidth() int {
+	return g.glyphWidth
 }
 
-// GlyphWidth returns the actual width of the glyph.
-func (c *Collection) GlyphWidth() int {
-	return c.glyphWidth
+// GlyphHeight returns the height of a glyph.
+func (g *GlyphSheet) GlyphHeight() int {
+	return g.glyphHeight
 }
 
-// GlyphHeight returns the actual height of the glyph.
-func (c *Collection) GlyphHeight() int {
-	return c.glyphHeight
+// MaskWidth returns the mask width of a glyph.
+func (g *GlyphSheet) MaskWidth() int {
+	return g.maskWidth
+}
+
+// MaskHeight returns the mask height of a glyph.
+func (g *GlyphSheet) MaskHeight() int {
+	return g.maskHeight
 }
