@@ -5,8 +5,7 @@ import (
 )
 
 var (
-	mouseX int
-	mouseY int
+	mouseDelta = 0
 )
 
 // CreateWindow creates a simple screensaver window.
@@ -36,8 +35,33 @@ func CloseWindow() {
 // InputDetected will return true when any key is pressed or there is any mouse
 // movement.
 func InputDetected() bool {
+	// Check all supported keyboard keys.
 	if rl.GetKeyPressed() > 0 {
 		return true
 	}
+
+	// Check all supported mouse buttons.
+	for i := int32(0); i <= 6; i++ {
+		if rl.IsMouseButtonPressed(i) {
+			return true
+		}
+	}
+
+	// Check the mouse wheel.
+	if rl.GetMouseWheelMove() != 0 {
+		return true
+	}
+
+	// Check for mouse movement.
+	md := rl.GetMouseDelta()
+	if md.X != 0 || md.Y != 0 {
+		mouseDelta++
+		if mouseDelta > 5 {
+			return true
+		}
+	} else {
+		mouseDelta = 0
+	}
+
 	return false
 }
