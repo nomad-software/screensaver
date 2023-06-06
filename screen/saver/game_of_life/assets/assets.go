@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	//go:embed cell.png
+	//go:embed images/cell.png
 	fs embed.FS
 
 	store = assets.New(fs)
@@ -24,7 +24,7 @@ type Cell struct {
 // NewCell creates a new glyph sheet.
 func NewCell() *Cell {
 	g := &Cell{
-		texture:       store.LoadPngTexture("cell.png"),
+		texture:       store.LoadPngTexture("images/cell.png"),
 		textureWidth:  32,
 		textureHeight: 32,
 	}

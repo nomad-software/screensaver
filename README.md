@@ -51,8 +51,8 @@ You can use the command tool to send commands to the launcher to control its beh
 
 ### `screensaver-digital-rain`
 
-![](screen/saver/digital_rain/assets/preview.gif)
+![](screen/saver/digital_rain/assets/images/preview.gif)
 
 ### `screensaver-game-of-life`
 
-![](screen/saver/game_of_life/assets/preview.gif)
+![](screen/saver/game_of_life/assets/images/preview.gif)
