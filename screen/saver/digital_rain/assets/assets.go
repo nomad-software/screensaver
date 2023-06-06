@@ -8,7 +8,9 @@ import (
 )
 
 var (
-	//go:embed glyphs.png
+	//go:embed images/glyphs.png
+	//go:embed shaders/highlight.fs
+	//go:embed shaders/highlight_fading.fs
 	fs embed.FS
 
 	store = assets.New(fs)
@@ -32,7 +34,7 @@ type GlyphSheet struct {
 // NewGlyphSheet creates a new glyph sheet.
 func NewGlyphSheet() *GlyphSheet {
 	g := &GlyphSheet{
-		texture:       store.LoadPngTexture("glyphs.png"),
+		texture:       store.LoadPngTexture("images/glyphs.png"),
 		textureWidth:  480,
 		textureHeight: 576,
 		maskWidth:     60,
@@ -81,4 +83,28 @@ func (g *GlyphSheet) MaskWidth() int {
 // MaskHeight returns the mask height of a glyph.
 func (g *GlyphSheet) MaskHeight() int {
 	return g.maskHeight
+}
+
+// ShaderCollection contains all shaders used in the saver.
+type ShaderCollection struct {
+	highlight       rl.Shader
+	highlightFading rl.Shader
+}
+
+// NewShaderCollection creates a new shader collection.
+func NewShaderCollection() *ShaderCollection {
+	return &ShaderCollection{
+		highlight:       store.LoadShader("shaders/highlight.fs"),
+		highlightFading: store.LoadShader("shaders/highlight_fading.fs"),
+	}
+}
+
+// Highlight returns the highligh shader.
+func (s *ShaderCollection) Highlight() rl.Shader {
+	return s.highlight
+}
+
+// HighlightFading returns the highligh fading shader.
+func (s *ShaderCollection) HighlightFading() rl.Shader {
+	return s.highlightFading
 }

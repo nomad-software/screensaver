@@ -14,6 +14,7 @@ func main() {
 	rl.SetTargetFPS(15)
 
 	sheet := assets.NewGlyphSheet()
+	shader := assets.NewShaderCollection()
 	matrix := matrix.New(width/sheet.GlyphWidth(), (height/sheet.GlyphHeight())+1)
 
 	for {
@@ -44,20 +45,19 @@ func main() {
 
 				pos = rl.Vector2Subtract(pos, offset)
 
-				rl.DrawTextureRec(sheet.Texture(), sheet.Masks[glyph.Index()], pos, rl.White)
-
-				rl.BeginBlendMode(rl.BlendAdditive)
-
-				if glyph.IsHighlightFading() {
-					rl.DrawTextureRec(sheet.Texture(), sheet.Masks[glyph.Index()], pos, rl.White)
-				}
-
 				if glyph.IsHighlighted() {
+					rl.BeginShaderMode(shader.Highlight())
 					rl.DrawTextureRec(sheet.Texture(), sheet.Masks[glyph.Index()], pos, rl.White)
+					rl.EndShaderMode()
+
+				} else if glyph.IsHighlightFading() {
+					rl.BeginShaderMode(shader.HighlightFading())
+					rl.DrawTextureRec(sheet.Texture(), sheet.Masks[glyph.Index()], pos, rl.White)
+					rl.EndShaderMode()
+				} else {
+
 					rl.DrawTextureRec(sheet.Texture(), sheet.Masks[glyph.Index()], pos, rl.White)
 				}
-
-				rl.EndBlendMode()
 			}
 		}
 

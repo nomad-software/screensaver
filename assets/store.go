@@ -22,10 +22,10 @@ func New(fs embed.FS) *Store {
 
 // LoadPngImage retrieves a png from the store and creates an image from it.
 func (s Store) LoadPngImage(name string) *rl.Image {
-	st, err := s.fs.ReadFile(name)
+	bytes, err := s.fs.ReadFile(name)
 	output.OnError(err, "cannot read embedded png image")
 
-	image := rl.LoadImageFromMemory(".png", st, int32(len(st)))
+	image := rl.LoadImageFromMemory(".png", bytes, int32(len(bytes)))
 
 	return image
 }
@@ -33,4 +33,12 @@ func (s Store) LoadPngImage(name string) *rl.Image {
 // LoadPngTexture retrieves a png from the store and creates a texture from it.
 func (s Store) LoadPngTexture(name string) rl.Texture2D {
 	return rl.LoadTextureFromImage(s.LoadPngImage(name))
+}
+
+// LoadShader retrieves a text file from the store and creates a shader from it.
+func (s Store) LoadShader(name string) rl.Shader {
+	bytes, err := s.fs.ReadFile(name)
+	output.OnError(err, "cannot read embedded shader")
+
+	return rl.LoadShaderFromMemory("", string(bytes))
 }
