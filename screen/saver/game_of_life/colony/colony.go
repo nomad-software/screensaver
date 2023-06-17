@@ -113,7 +113,8 @@ func (g *Colony) View() [][]rune {
 
 // Seed randomises the game cells.
 func (g *Colony) Seed() {
-	rand.Seed(time.Now().Unix())
+	rand.New(rand.NewSource(time.Now().Unix()))
+
 	for i := 0; i < (g.width * g.height / 4); i++ {
 		g.output[rand.Intn(g.width)][rand.Intn(g.height)] = Alive
 	}
