@@ -1,3 +1,0 @@
-# github.com/gen2brain/raylib-go/raylib v0.0.0-20230511170620-d84e4cc82f8d
-## explicit; go 1.19
-github.com/gen2brain/raylib-go/raylib

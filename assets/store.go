@@ -2,6 +2,7 @@ package assets
 
 import (
 	"embed"
+	"encoding/json"
 	_ "image/png"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -20,6 +21,16 @@ func New(fs embed.FS) *Store {
 	}
 }
 
+// LoadJson loads the specified json file from the store and unmarshals it to
+// the passed arg.
+func (s Store) LoadJson(name string, out any) {
+	bytes, err := s.fs.ReadFile(name)
+	output.OnError(err, "cannot read embedded json file")
+
+	err = json.Unmarshal(bytes, out)
+	output.OnError(err, "cannot unmarshal json")
+}
+
 // LoadPngImage retrieves a png from the store and creates an image from it.
 func (s Store) LoadPngImage(name string) *rl.Image {
 	bytes, err := s.fs.ReadFile(name)
@@ -32,7 +43,12 @@ func (s Store) LoadPngImage(name string) *rl.Image {
 
 // LoadPngTexture retrieves a png from the store and creates a texture from it.
 func (s Store) LoadPngTexture(name string) rl.Texture2D {
-	return rl.LoadTextureFromImage(s.LoadPngImage(name))
+	img := s.LoadPngImage(name)
+	tex := rl.LoadTextureFromImage(img)
+
+	rl.UnloadImage(img)
+
+	return tex
 }
 
 // LoadShader retrieves a text file from the store and creates a shader from it.
