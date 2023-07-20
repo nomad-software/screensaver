@@ -12,12 +12,9 @@ import (
 
 var (
 	//go:embed json/stars.json
-	//go:embed images/bright_star.png
-	//go:embed images/normal_star.png
-	//go:embed images/faint_star.png
+	//go:embed images/star.png
 	//go:embed images/circle.png
 	//go:embed shaders/alpha_discard.fs
-	//go:embed shaders/highlight.fs
 	fs embed.FS
 
 	store = assets.New(fs)
@@ -74,7 +71,6 @@ func (c *JsonCollection) Prepare() {
 			minO = mag
 		}
 
-		// size := (mag * 0.000332508) + 0.01
 		size := (mag / 120) + 0.2
 		if size > maxSize {
 			maxSize = size
@@ -105,35 +101,21 @@ func (c *JsonCollection) Stars() []*sky.Star {
 
 // TextureCollection contains all textures used in the saver.
 type TextureCollection struct {
-	brightStar rl.Texture2D
-	normalStar rl.Texture2D
-	faintStar  rl.Texture2D
-	circle     rl.Texture2D
+	star   rl.Texture2D
+	circle rl.Texture2D
 }
 
 // NewTextureCollection creates a new texture collection.
 func NewTextureCollection() *TextureCollection {
 	return &TextureCollection{
-		brightStar: store.LoadPngTexture("images/bright_star.png"),
-		normalStar: store.LoadPngTexture("images/normal_star.png"),
-		faintStar:  store.LoadPngTexture("images/faint_star.png"),
-		circle:     store.LoadPngTexture("images/circle.png"),
+		star:   store.LoadPngTexture("images/star.png"),
+		circle: store.LoadPngTexture("images/circle.png"),
 	}
 }
 
-// Star returns the bright star texture.
-func (c *TextureCollection) BrightStar() rl.Texture2D {
-	return c.brightStar
-}
-
 // Star returns the normal star texture.
-func (c *TextureCollection) NormalStar() rl.Texture2D {
-	return c.normalStar
-}
-
-// Star returns the faint star texture.
-func (c *TextureCollection) FaintStar() rl.Texture2D {
-	return c.faintStar
+func (c *TextureCollection) Star() rl.Texture2D {
+	return c.star
 }
 
 // Circle returns the circle texture.
@@ -155,10 +137,5 @@ func NewShaderCollection() *ShaderCollection {
 
 // AlphaDiscard returns the alpha discard shader.
 func (s *ShaderCollection) AlphaDiscard() rl.Shader {
-	return s.alphaDiscard
-}
-
-// Highlight returns the highlight shader.
-func (s *ShaderCollection) Highlight() rl.Shader {
 	return s.alphaDiscard
 }
