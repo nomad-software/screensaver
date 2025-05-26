@@ -23,7 +23,7 @@ func New(d time.Duration) *Timer {
 
 // Reset resets the timer.
 func (t *Timer) Reset() {
-	output.LaunchInfo("resetting timer")
+	// output.LaunchInfo("resetting timer")
 	t.deadline = time.Now().Add(t.ttl)
 }
 
