@@ -4,14 +4,15 @@ import (
 	"io"
 	"net"
 
-	"github.com/nomad-software/screensaver/cmd/launcher/input"
 	"github.com/nomad-software/screensaver/output"
 )
+
+type signal struct{}
 
 // Server is the main server that receives commands.
 type Server struct {
 	listener net.Listener
-	signals  map[string]chan input.Signal
+	signals  map[string]chan signal
 }
 
 // New creates a new server.
@@ -23,7 +24,7 @@ func New(port string) (*Server, error) {
 
 	server := &Server{
 		listener: listen,
-		signals:  make(map[string]chan input.Signal),
+		signals:  make(map[string]chan signal),
 	}
 
 	return server, nil
@@ -31,8 +32,8 @@ func New(port string) (*Server, error) {
 
 // CreateSignal registers a signal channel to be used when a particular
 // command is received.
-func (s *Server) CreateSignal(command string) chan input.Signal {
-	c := make(chan input.Signal)
+func (s *Server) CreateSignal(command string) chan signal {
+	c := make(chan signal)
 	s.signals[command] = c
 	return c
 }
@@ -69,7 +70,7 @@ func (s *Server) handleRequest(conn net.Conn) {
 
 	for cmd, c := range s.signals {
 		if cmd == string(buffer[:len(cmd)]) {
-			c <- input.Signal{}
+			c <- signal{}
 		}
 	}
 }

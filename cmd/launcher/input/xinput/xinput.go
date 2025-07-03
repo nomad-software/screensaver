@@ -1,4 +1,4 @@
-package input
+package xinput
 
 /*
 #cgo LDFLAGS: -lX11 -lXi
@@ -27,20 +27,20 @@ import (
 	"github.com/nomad-software/screensaver/output"
 )
 
-// Signal is the signal sent on the channel when an event is triggered.
-type Signal struct{}
+// signal is the signal sent on the channel when an event is triggered.
+type signal struct{}
 
 // StartXInput checks for keyboard and mouse events and when triggered sends a
 // signal on the returned channel.
-func GetInput() chan Signal {
-	c := make(chan Signal, 256)
+func GetInput() chan signal {
+	c := make(chan signal, 256)
 	go getXInput(c)
 	return c
 }
 
 // StartXInput checks for keyboard and mouse events and when triggered sends a
 // signal on the provided channel.
-func getXInput(c chan Signal) {
+func getXInput(c chan signal) {
 	display := C.XOpenDisplay(nil)
 
 	var majorOpcodeReturn C.int
@@ -102,7 +102,7 @@ func getXInput(c chan Signal) {
 		C.XNextEvent(display, &ev)
 
 		if C.XGetEventData(display, cookie) == 1 && cookie._type == C.GenericEvent && cookie.extension == majorOpcodeReturn {
-			c <- Signal{}
+			c <- signal{}
 		}
 
 		C.XFreeEventData(display, cookie)
