@@ -62,6 +62,10 @@ You can use the command tool to send commands to the launcher to control its beh
 
 ## Savers
 
+### `screensaver-connection-machine`
+
+![](screen/saver/connection_machine/assets/images/preview.gif)
+
 ### `screensaver-digital-rain`
 
 ![](screen/saver/digital_rain/assets/images/preview.gif)
