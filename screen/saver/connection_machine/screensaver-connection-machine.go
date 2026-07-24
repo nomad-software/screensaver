@@ -18,6 +18,8 @@ func main() {
 	panels := []*panel.Panel{
 		panel.New((height / block.Size()) + 1),
 		panel.New((height / block.Size()) + 1),
+		panel.New((height / block.Size()) + 1),
+		panel.New((height / block.Size()) + 1),
 	}
 
 	for {
@@ -28,7 +30,8 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
-		origin := width/2 - ((panels[0].PixelWidth() * (len(panels) + 1)) / 2)
+		gap := ((width - (panels[0].PixelWidth() * len(panels))) / (len(panels) + 1))
+		origin := gap
 
 		for _, panel := range panels {
 			for x := 0; x < panel.Width(); x++ {
@@ -48,7 +51,7 @@ func main() {
 			}
 			panel.Iterate()
 
-			origin += panel.PixelWidth() * 2
+			origin += panel.PixelWidth() + gap
 		}
 
 		rl.EndDrawing()
