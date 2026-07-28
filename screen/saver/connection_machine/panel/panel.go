@@ -11,24 +11,24 @@ const (
 )
 
 type Panel struct {
-	width  int // With of the panel in blocks.
-	height int // Height of the panel in blocks.
+	columns int // With of the panel in blocks.
+	rows    int // Height of the panel in blocks.
 
-	rows []uint16 // Use bits to define the blocks.
+	panel []uint16 // Use bits to define the blocks.
 }
 
 // New creates a new panel.
-func New(height int) *Panel {
+func New(rows int) *Panel {
 	p := &Panel{
-		width:  16,
-		height: height,
-		rows:   make([]uint16, height),
+		columns: 16,
+		rows:    rows,
+		panel:   make([]uint16, rows),
 	}
 
-	for i := 0; i < height; i++ {
-		for bit := 0; bit < 16; bit++ {
+	for row := 0; row < rows; row++ {
+		for shift := 0; shift < p.columns; shift++ {
 			if rand.Intn(bitChance) == 0 {
-				p.rows[i] |= 1 << bit
+				p.panel[row] |= 1 << shift
 			}
 		}
 	}
@@ -36,32 +36,33 @@ func New(height int) *Panel {
 	return p
 }
 
-// Width retuns the panel's width in blocks.
+// Columns retuns the amount of columns in the panel.
+func (p *Panel) Columns() int {
+	return p.columns
+}
+
+// Rows retuns the amount of rows in the panel.
+func (p *Panel) Rows() int {
+	return p.rows
+}
+
+// Width returns the overall panel's width in pixels.
 func (p *Panel) Width() int {
-	return p.width
+	return p.columns * block.Size()
 }
 
-// Height retuns the panel's height in blocks.
-func (p *Panel) Height() int {
-	return p.height
-}
-
-// PixelWidth returns the panel's width in pixels.
-func (p *Panel) PixelWidth() int {
-	return p.width * block.Size()
-}
-
-// BlockOn returns true if a block is on.
-func (p *Panel) BlockOn(width, height int) bool {
-	if width > 15 {
+// IsBlockLit returns true if a block is lit.
+func (p *Panel) IsBlockLit(column, row int) bool {
+	if column > 15 {
 		return false
 	}
-	return (p.rows[height] & (uint16(1) << (15 - width))) != 0
+	return (p.panel[row] & (uint16(1) << (15 - column))) != 0
 }
 
-// Iterate takes a panel index to alternate the shifting pattern.
+// Iterate moves the pattern on one frame and takes a panel index to alternate
+// the shifting pattern.
 func (p *Panel) Iterate(panel int) {
-	for i := range p.rows {
+	for i := range p.panel {
 		bit := uint16(0)
 
 		if rand.Intn(bitChance) == 0 {
@@ -73,10 +74,11 @@ func (p *Panel) Iterate(panel int) {
 		if panel%2 != 0 {
 			shiftLeft = !shiftLeft
 		}
+
 		if shiftLeft {
-			p.rows[i] = (p.rows[i] << 1) | bit
+			p.panel[i] = (p.panel[i] << 1) | bit
 		} else {
-			p.rows[i] = (p.rows[i] >> 1) | (bit << 15)
+			p.panel[i] = (p.panel[i] >> 1) | (bit << 15)
 		}
 	}
 }

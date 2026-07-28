@@ -37,20 +37,21 @@ func main() {
 		rl.BeginTextureMode(buffer)
 		rl.ClearBackground(rl.Black)
 
-		gap := ((width - (panels[0].PixelWidth() * len(panels))) / (len(panels) + 1))
+		// Calculate equal gaps around the panels.
+		gap := ((width - (panels[0].Width() * len(panels))) / (len(panels) + 1))
 		origin := gap
 
 		for i, panel := range panels {
-			for x := 0; x < panel.Width(); x++ {
-				for y := 0; y < panel.Height(); y++ {
+			for column := 0; column < panel.Columns(); column++ {
+				for row := 0; row < panel.Rows(); row++ {
 
-					if !panel.BlockOn(x, y) {
+					if !panel.IsBlockLit(column, row) {
 						continue
 					}
 
 					pos := rl.NewVector2(
-						float32(origin+(x*block.Size())),
-						float32(y*block.Size()),
+						float32(origin+(column*block.Size())),
+						float32(row*block.Size()),
 					)
 
 					rl.DrawRectangleV(pos, block.SizeV(), block.Colour())
@@ -58,7 +59,7 @@ func main() {
 			}
 
 			panel.Iterate(i)
-			origin += panel.PixelWidth() + gap
+			origin += panel.Width() + gap
 		}
 
 		rl.EndTextureMode()
