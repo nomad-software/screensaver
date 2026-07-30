@@ -76,3 +76,6 @@ You can use the command tool to send commands to the launcher to control its beh
 
 ### `screensaver-shader-reef`
 ![](screen/saver/shader_reef/assets/images/preview.png)
+
+### `screensaver-shader-star-grid`
+![](screen/saver/shader_star_grid/assets/images/preview.png)
