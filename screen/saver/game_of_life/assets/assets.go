@@ -25,8 +25,8 @@ type Cell struct {
 func NewCell() *Cell {
 	g := &Cell{
 		texture:       store.LoadPngTexture("images/cell.png"),
-		textureWidth:  32,
-		textureHeight: 32,
+		textureWidth:  16,
+		textureHeight: 16,
 	}
 
 	return g

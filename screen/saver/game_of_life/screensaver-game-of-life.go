@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	opacityDropOff float32 = 0.2
+	opacityDropOff float32 = 0.3
 	opacity        [][]float32
 )
 
@@ -26,6 +26,8 @@ func main() {
 	for x := 0; x < substrate.Width(); x++ {
 		opacity[x] = make([]float32, substrate.Height())
 	}
+
+	var pos rl.Vector2
 
 	for {
 		if saver.InputDetected() {
@@ -46,7 +48,13 @@ func main() {
 						opacity[x][y] -= opacityDropOff
 					}
 				}
-				rl.DrawTexture(cell.Texture(), int32(x*cell.TextureWidth()), int32(y*cell.TextureHeight()), rl.ColorAlpha(rl.White, opacity[x][y]))
+
+				pos = rl.Vector2{
+					X: float32(x * cell.TextureWidth()),
+					Y: float32(y * cell.TextureHeight()),
+				}
+
+				rl.DrawTextureEx(cell.Texture(), pos, 0.0, 0.5, rl.ColorAlpha(rl.White, opacity[x][y]))
 			}
 		}
 

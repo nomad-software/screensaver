@@ -96,7 +96,7 @@ func (g *Colony) Incubate() {
 			// This is not a standard rule but we need it to prevent the colony
 			// from dying because this is a screensaver and we have to keep
 			// things moving on-screen.
-			if neighbours == 1 && rand.Intn(1000) == 500 {
+			if neighbours == 1 && rand.Intn(100) == 1 {
 				g.substrate[x][y] = Alive
 			}
 		}
