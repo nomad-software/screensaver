@@ -33,7 +33,7 @@ func (s *ShaderCollection) Blur(width, height int) rl.Shader {
 	rl.SetShaderValue(s.blur, texelSizeLoc, texelSize, rl.ShaderUniformVec2)
 
 	blurAmountLoc := rl.GetShaderLocation(s.blur, "blurAmount")
-	blurAmount := []float32{1.0}
+	blurAmount := []float32{2.0}
 	rl.SetShaderValue(s.blur, blurAmountLoc, blurAmount, rl.ShaderUniformFloat)
 
 	return s.blur
