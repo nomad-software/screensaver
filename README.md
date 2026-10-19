@@ -72,13 +72,13 @@ You can use the command tool to send commands to the launcher to control its beh
 ![](screen/saver/game_of_life/assets/images/preview.gif)
 
 ### `screensaver-shader-fire`
-![](screen/saver/shader_fire/assets/images/preview.png)
+![](screen/saver/shader_fire/assets/images/preview.gif)
 
 ### `screensaver-shader-reef`
-![](screen/saver/shader_reef/assets/images/preview.png)
+![](screen/saver/shader_reef/assets/images/preview.gif)
 
 ### `screensaver-shader-star-grid`
-![](screen/saver/shader_star_grid/assets/images/preview.png)
+![](screen/saver/shader_star_grid/assets/images/preview.gif)
 
 ### `screensaver-the-thing`
-![](screen/saver/the_thing/assets/images/preview.png)
+![](screen/saver/the_thing/assets/images/preview.gif)
