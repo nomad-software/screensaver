@@ -11,3 +11,4 @@ go install screen/saver/game_of_life/screensaver-game-of-life.go;
 go install screen/saver/shader_fire/screensaver-shader-fire.go;
 go install screen/saver/shader_reef/screensaver-shader-reef.go;
 go install screen/saver/shader_star_grid/screensaver-shader-star-grid.go;
+go install screen/saver/the_thing/screensaver-the-thing.go;
