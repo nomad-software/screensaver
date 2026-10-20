@@ -10,8 +10,8 @@ import (
 
 const (
 	sampleRate = 22050 // Samples per second of the generated sounds.
-	tickLength = 0.03  // Length of the tick in seconds.
-	tickVolume = 0.2   // Volume of the tick from 0 to 1.
+	tickLength = 0.04  // Length of the tick in seconds.
+	tickVolume = 0.18  // Volume of the tick from 0 to 1.
 )
 
 var (
@@ -63,7 +63,7 @@ func Tick() {
 // muffled burst of noise and only a hint of a click, so it sounds dull.
 func tickSamples() []int16 {
 	noise := rand.New(rand.NewSource(1))
-	samples := make([]float64, int(sampleRate*tickLength+0.5))
+	samples := make([]float64, int(math.Round(sampleRate*tickLength+0.5)))
 
 	low, lower := 0.0, 0.0
 	peak := 0.0

@@ -3,6 +3,7 @@ package simulation
 import (
 	"math"
 	"math/rand"
+	"strings"
 	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -13,11 +14,11 @@ import (
 
 const (
 	healthyCells     = 5    // Amount of healthy cells at the start.
-	margin           = 24   // Distance from the screen edge cells stay within.
+	margin           = 32   // Distance from the screen edge cells stay within.
 	driftSpeed       = 3.0  // Maximum speed of a drifting cell.
 	returnSpeed      = 5.0  // Maximum speed of a cell returning to the screen.
 	huntSpeed        = 4.5  // Speed of a cell moving in on its target.
-	huntAcceleration = 0.6  // How quickly a hunter reaches its full speed.
+	huntAcceleration = 0.5  // How quickly a hunter reaches its full speed.
 	dragSpeed        = 3.0  // Speed of a cell dragged in by the spear.
 	spearTime        = 0.8  // Seconds taken for the spear to reach its target.
 	spearGap         = 5    // Gap between cells the spear can reach across.
@@ -43,9 +44,10 @@ const (
 // label is text typed beside a cell, underlined with a line from the cell.
 type label struct {
 	text  *typewriter.Typewriter
+	line  *typewriter.Typewriter // Typed after the text to draw the underline.
 	cell  *cell.Cell
 	right bool    // True if the label is drawn to the right of the cell.
-	read  float32 // Time since the label finished typing.
+	read  float32 // Time since the label and underline finished typing.
 }
 
 // Simulation is the cell assimilation scene.
@@ -141,8 +143,15 @@ func (s *Simulation) setLabel(c *cell.Cell, text string) {
 		}
 	}
 
+	// The underline is typed as a row of characters, so it takes as many
+	// keystrokes as characters would fit along it.
+	advance := display.MeasureText("__") - display.MeasureText("_")
+	length := int(c.Radius) + labelGap + width
+	chars := max(1, (length+advance/2)/advance)
+
 	s.label = &label{
 		text:  t,
+		line:  typewriter.New(strings.Repeat("_", chars)),
 		cell:  c,
 		right: right,
 	}
@@ -220,8 +229,11 @@ func (s *Simulation) Update(dt float32) {
 	s.timer += dt
 
 	if s.label != nil {
-		if s.label.text.Done() {
+		if s.label.line.Done() {
 			s.label.read += dt
+		}
+		if s.label.text.Done() {
+			s.label.line.Update(dt)
 		}
 		s.label.text.Update(dt)
 	}
@@ -393,12 +405,6 @@ func (s *Simulation) Draw() {
 		display.DrawText(clock, 8, 6)
 	}
 
-	// The underline is drawn first so it disappears under the cell, while
-	// the text stays readable on top.
-	if s.label != nil {
-		s.drawLabel(true)
-	}
-
 	if s.phase == lunge || s.phase == drag {
 		s.drawSpear()
 	}
@@ -414,7 +420,7 @@ func (s *Simulation) Draw() {
 	}
 
 	if s.label != nil {
-		s.drawLabel(false)
+		s.drawLabel()
 	}
 }
 
@@ -428,8 +434,8 @@ func (s *Simulation) drawSpear() {
 	rl.DrawLine(int32(from.X), int32(from.Y), int32(tip.X), int32(tip.Y), display.Infection)
 }
 
-// drawLabel draws either the underline or the text of the current label.
-func (s *Simulation) drawLabel(underlined bool) {
+// drawLabel draws the text and underline of the current label.
+func (s *Simulation) drawLabel() {
 	l := s.label
 	all := l.text.AllLines()
 	lh := display.LineHeight()
@@ -450,21 +456,23 @@ func (s *Simulation) drawLabel(underlined bool) {
 		x = cx - int(l.cell.Radius) - labelGap - width
 	}
 
-	if !underlined {
-		for i, line := range l.text.Lines() {
-			display.DrawText(line, x, top+i*lh)
-		}
-		return
+	for i, line := range l.text.Lines() {
+		display.DrawText(line, x, top+i*lh)
 	}
 
-	if l.text.Done() {
-		y := int32(top + (len(all)-1)*lh + underline)
-		if l.right {
-			rl.DrawLine(int32(cx), y, int32(x+width), y, display.Text)
-		} else {
-			rl.DrawLine(int32(x), y, int32(cx), y, display.Text)
-		}
+	// The underline is typed from left to right whichever side of the cell
+	// the label is on.
+	typed := len(l.line.Lines()[0])
+	if typed == 0 {
+		return
 	}
+	left, right := cx, x+width
+	if !l.right {
+		left, right = x, cx
+	}
+	end := left + (right-left)*typed/len(l.line.AllLines()[0])
+	y := int32(top + (len(all)-1)*lh + underline)
+	rl.DrawLine(int32(left), y, int32(end), y, display.Text)
 }
 
 // limit returns the vector shortened to the passed length if it is longer.
