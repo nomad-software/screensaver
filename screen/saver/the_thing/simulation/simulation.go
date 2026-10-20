@@ -23,6 +23,8 @@ const (
 	dragSpeed        = 3.0  // Speed of a cell dragged in by the spear.
 	spearTime        = 0.8  // Seconds taken for the spear to reach its target.
 	spearGap         = 5    // Gap between cells the spear can reach across.
+	spearProng       = 3.0  // Length of the prongs at the tip of the spear.
+	spearHold        = 0.5  // Seconds the spear stays in the target while dragging it.
 	assimilationTime = 10.0 // Seconds taken to assimilate a cell.
 	readTime         = 2.5  // Seconds a finished label stays on screen.
 	labelGap         = 14   // Distance between a cell and its label.
@@ -484,8 +486,9 @@ func (s *Simulation) Draw() {
 		display.DrawText(clock, 8, 6)
 	}
 
-	if s.phase == lunge || s.phase == drag {
-		s.drawSpear()
+	spearing := s.phase == lunge || s.phase == drag && s.timer < spearHold
+	if spearing {
+		s.drawSpear(false)
 	}
 
 	// The target is drawn last so its wall shows over a merging intruder.
@@ -498,19 +501,45 @@ func (s *Simulation) Draw() {
 		s.target.Draw(s.time)
 	}
 
+	// The part of the spear inside the target shows through its wall.
+	if spearing {
+		s.drawSpear(true)
+	}
+
 	if s.label != nil {
 		s.drawLabel()
 	}
 }
 
-// drawSpear draws the spear reaching from the hunter into the target.
-func (s *Simulation) drawSpear() {
+// drawSpear draws the spear reaching from the hunter into the middle of the
+// target. The part outside the target is drawn under the cells, while the part
+// inside is drawn over the target and forks into two prongs at its tip.
+func (s *Simulation) drawSpear(inside bool) {
 	dir := rl.Vector2Normalize(rl.Vector2Subtract(s.target.Pos, s.hunter.Pos))
 	from := rl.Vector2Add(s.hunter.Pos, rl.Vector2Scale(dir, float32(s.hunter.Radius)*0.8))
-	to := rl.Vector2Subtract(s.target.Pos, rl.Vector2Scale(dir, float32(s.target.Radius)*0.8))
-	tip := rl.Vector2Lerp(from, to, s.spear)
+	tip := rl.Vector2Lerp(from, s.target.Pos, s.spear)
 
-	rl.DrawLine(int32(from.X), int32(from.Y), int32(tip.X), int32(tip.Y), display.Infection)
+	if !inside {
+		rl.DrawLineV(from, tip, display.Infection)
+		return
+	}
+
+	// Only the part past the target's wall is drawn.
+	wall := rl.Vector2Subtract(s.target.Pos, rl.Vector2Scale(dir, float32(s.target.Radius)*0.9))
+	depth := rl.Vector2DotProduct(rl.Vector2Subtract(tip, wall), dir)
+	if depth <= 0 {
+		return
+	}
+
+	prong := min(depth, spearProng)
+	fork := rl.Vector2Subtract(tip, rl.Vector2Scale(dir, prong))
+	side := rl.Vector2Scale(rl.NewVector2(-dir.Y, dir.X), prong*0.5)
+
+	if depth > prong {
+		rl.DrawLineV(wall, fork, display.Spear)
+	}
+	rl.DrawLineV(fork, rl.Vector2Add(tip, side), display.Spear)
+	rl.DrawLineV(fork, rl.Vector2Subtract(tip, side), display.Spear)
 }
 
 // drawLabel draws the text and underline of the current label.

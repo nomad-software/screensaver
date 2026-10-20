@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	rate  = 10  // Characters typed per second.
+	rate  = 12  // Characters typed per second.
 	pause = 1.2 // Seconds to wait at each pause marker.
 )
 
