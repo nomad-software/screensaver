@@ -19,6 +19,7 @@ const (
 	returnSpeed      = 5.0  // Maximum speed of a cell returning to the screen.
 	huntSpeed        = 4.5  // Speed of a cell moving in on its target.
 	huntAcceleration = 0.5  // How quickly a hunter reaches its full speed.
+	mergeRate        = 0.5  // How quickly the intruder slides into its first victim.
 	dragSpeed        = 3.0  // Speed of a cell dragged in by the spear.
 	spearTime        = 0.8  // Seconds taken for the spear to reach its target.
 	spearGap         = 5    // Gap between cells the spear can reach across.
@@ -363,8 +364,11 @@ func (s *Simulation) Update(dt float32) {
 		switch s.target.Mode {
 		case cell.Hollowing:
 			// The intruder slides into its first victim and takes on its
-			// shape.
-			s.hunter.Pos = rl.Vector2Lerp(s.hunter.Pos, s.target.Pos, min(1, dt*1.2))
+			// shape. Near the end it keeps a steady pace so that it reaches the
+			// middle as it's absorbed, rather than jumping there.
+			remaining := float32((cell.HollowEnd - s.target.Infection) * assimilationTime)
+			rate := min(1, max(dt*mergeRate, dt/max(remaining, dt)))
+			s.hunter.Pos = rl.Vector2Lerp(s.hunter.Pos, s.target.Pos, rate)
 			s.hunter.Morph = min(1, s.target.Infection/cell.HollowEnd)
 			s.hunter.Absorbed = s.target.Infection >= cell.HollowEnd
 
