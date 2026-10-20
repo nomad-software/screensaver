@@ -42,12 +42,17 @@ const (
 )
 
 // label is text typed beside a cell, underlined with a line from the cell.
+// It stays still while the cell moves, so it's placed where the cell is
+// expected to be once the label has been typed.
 type label struct {
 	text  *typewriter.Typewriter
 	line  *typewriter.Typewriter // Typed after the text to draw the underline.
-	cell  *cell.Cell
-	right bool    // True if the label is drawn to the right of the cell.
-	read  float32 // Time since the label and underline finished typing.
+	x     int                    // Left edge of the text.
+	top   int                    // Top of the text.
+	left  int                    // Left end of the underline.
+	right int                    // Right end of the underline.
+	y     int                    // Height of the underline.
+	read  float32                // Time since the label and underline finished typing.
 }
 
 // Simulation is the cell assimilation scene.
@@ -65,6 +70,7 @@ type Simulation struct {
 	spear float32 // How far the spear has reached from 0 to 1.
 	time  float64 // Total time, used to animate the cells.
 	round int
+	calm  bool // True if cells don't wander, used when predicting movement.
 }
 
 // New creates a new simulation.
@@ -126,9 +132,15 @@ func (s *Simulation) setLabel(c *cell.Cell, text string) {
 		width = max(width, display.MeasureText(line))
 	}
 
+	// The underline is typed as a row of characters, so it takes as many
+	// keystrokes as characters would fit along it.
+	advance := display.MeasureText("__") - display.MeasureText("_")
 	space := int(c.Radius) + labelGap + width
-	fitsRight := int(c.Pos.X)+space < s.width-4
-	fitsLeft := int(c.Pos.X)-space > 4
+	line := typewriter.New(strings.Repeat("_", max(1, (space+advance/2)/advance)))
+
+	pos := s.predict(c, t.Duration()+line.Duration())
+	fitsRight := int(pos.X)+space < s.width-4
+	fitsLeft := int(pos.X)-space > 4
 
 	// Keep the label away from the other cell involved so it isn't covered.
 	other := s.target
@@ -137,24 +149,85 @@ func (s *Simulation) setLabel(c *cell.Cell, text string) {
 	}
 	right := fitsRight
 	if other != nil && other != c {
-		right = other.Pos.X < c.Pos.X
+		right = other.Pos.X < pos.X
 		if right && !fitsRight || !right && !fitsLeft {
 			right = !right
 		}
 	}
 
-	// The underline is typed as a row of characters, so it takes as many
-	// keystrokes as characters would fit along it.
-	advance := display.MeasureText("__") - display.MeasureText("_")
-	length := int(c.Radius) + labelGap + width
-	chars := max(1, (length+advance/2)/advance)
+	// Line the underline of the last line up with the middle of the cell.
+	lines := len(t.AllLines())
+	lh := display.LineHeight()
+	underline := 9
+	top := int(pos.Y) - underline - (lines-1)*lh
+	top = min(max(top, 8), s.height-lines*lh-8)
 
-	s.label = &label{
+	cx := int(pos.X)
+	l := &label{
 		text:  t,
-		line:  typewriter.New(strings.Repeat("_", chars)),
-		cell:  c,
-		right: right,
+		line:  line,
+		top:   top,
+		y:     top + (lines-1)*lh + underline,
+		x:     cx + int(c.Radius) + labelGap,
+		left:  cx,
+		right: cx + space,
 	}
+	if !right {
+		l.x = cx - space
+		l.left = l.x
+		l.right = cx
+	}
+	s.label = l
+}
+
+// predict returns roughly where a cell will be after the passed amount of
+// seconds.
+func (s *Simulation) predict(c *cell.Cell, seconds float32) rl.Vector2 {
+	pos := c.Pos
+
+	switch {
+	case c == s.target && s.phase == assimilate && c.Mode == cell.Disintegrating:
+		// The target eases towards its goal over the imitation.
+		away := rl.Vector2Normalize(rl.Vector2Subtract(c.Pos, s.hunter.Pos))
+		goal := rl.Vector2Add(s.hunter.Pos, rl.Vector2Scale(away, float32(s.hunter.Radius)*0.3))
+		pos = rl.Vector2Lerp(pos, goal, 1-float32(math.Exp(float64(-0.5*seconds))))
+
+	case s.phase == assimilate:
+		// Held cells barely move.
+
+	default:
+		// Move copies of the cells without their random wandering, so cells
+		// pushing apart are followed as well as cells drifting.
+		ghost := *s
+		ghost.calm = true
+		ghost.cells = make([]*cell.Cell, len(s.cells))
+		var follow *cell.Cell
+		for i, other := range s.cells {
+			copied := *other
+			ghost.cells[i] = &copied
+			if other == c {
+				follow = &copied
+			}
+			switch other {
+			case s.hunter:
+				ghost.hunter = &copied
+			case s.target:
+				ghost.target = &copied
+			}
+		}
+		if follow == nil {
+			break
+		}
+		step := float32(1.0 / 30)
+		for t := float32(0); t < seconds; t += step {
+			ghost.move(step)
+		}
+		pos = follow.Pos
+	}
+
+	pos.X = min(max(pos.X, margin), float32(s.width-margin))
+	pos.Y = min(max(pos.Y, margin), float32(s.height-margin))
+	return pos
 }
 
 // nearestHealthy returns the closest healthy cell to the hunter.
@@ -208,8 +281,8 @@ func (s *Simulation) startAssimilation() {
 		s.hunter.Mode = cell.Seeping
 		s.hunter.From = math.Atan2(float64(-dir.Y), float64(-dir.X))
 	}
-	s.setLabel(s.target, ">ASSIMILATION")
 	s.setPhase(assimilate)
+	s.setLabel(s.target, ">ASSIMILATION")
 }
 
 // setPhase moves the simulation to the next phase.
@@ -308,8 +381,8 @@ func (s *Simulation) Update(dt float32) {
 			s.target.Infection = 0
 			s.hunter.Infection = 0
 			s.target.Kind = cell.Imitation
-			s.setLabel(s.target, ">ASSIMILATION COMPLETE\n>CELL\n>"+species+"\n>IMITATION")
 			s.setPhase(complete)
+			s.setLabel(s.target, ">ASSIMILATION COMPLETE\n>CELL\n>"+species+"\n>IMITATION")
 		}
 
 	case complete:
@@ -360,8 +433,10 @@ func (s *Simulation) move(dt float32) {
 			c.Vel = limit(rl.Vector2Add(c.Vel, rl.Vector2Scale(dir, dt*4)), returnSpeed)
 
 		default:
-			wander := rl.NewVector2(rand.Float32()*2-1, rand.Float32()*2-1)
-			wander = rl.Vector2Add(wander, s.separation(c))
+			wander := s.separation(c)
+			if !s.calm {
+				wander = rl.Vector2Add(wander, rl.NewVector2(rand.Float32()*2-1, rand.Float32()*2-1))
+			}
 			c.Vel = limit(rl.Vector2Add(c.Vel, rl.Vector2Scale(wander, dt*2)), driftSpeed)
 		}
 
@@ -437,27 +512,10 @@ func (s *Simulation) drawSpear() {
 // drawLabel draws the text and underline of the current label.
 func (s *Simulation) drawLabel() {
 	l := s.label
-	all := l.text.AllLines()
 	lh := display.LineHeight()
 
-	width := 0
-	for _, line := range all {
-		width = max(width, display.MeasureText(line))
-	}
-
-	// Line the underline of the last line up with the middle of the cell.
-	underline := 9
-	top := int(l.cell.Pos.Y) - underline - (len(all)-1)*lh
-	top = min(max(top, 8), s.height-len(all)*lh-8)
-
-	cx := int(l.cell.Pos.X)
-	x := cx + int(l.cell.Radius) + labelGap
-	if !l.right {
-		x = cx - int(l.cell.Radius) - labelGap - width
-	}
-
 	for i, line := range l.text.Lines() {
-		display.DrawText(line, x, top+i*lh)
+		display.DrawText(line, l.x, l.top+i*lh)
 	}
 
 	// The underline is typed from left to right whichever side of the cell
@@ -466,13 +524,8 @@ func (s *Simulation) drawLabel() {
 	if typed == 0 {
 		return
 	}
-	left, right := cx, x+width
-	if !l.right {
-		left, right = x, cx
-	}
-	end := left + (right-left)*typed/len(l.line.AllLines()[0])
-	y := int32(top + (len(all)-1)*lh + underline)
-	rl.DrawLine(int32(left), y, int32(end), y, display.Text)
+	end := l.left + (l.right-l.left)*typed/len(l.line.AllLines()[0])
+	rl.DrawLine(int32(l.left), int32(l.y), int32(end), int32(l.y), display.Text)
 }
 
 // limit returns the vector shortened to the passed length if it is longer.

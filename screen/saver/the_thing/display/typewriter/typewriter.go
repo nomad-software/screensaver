@@ -56,6 +56,15 @@ func (t *Typewriter) Update(dt float32) {
 	}
 }
 
+// Duration returns the seconds taken to type all the text.
+func (t *Typewriter) Duration() float32 {
+	total := float32(len(t.text)) / rate
+	for _, n := range t.pauses {
+		total += float32(n) * pause
+	}
+	return total
+}
+
 // Done returns true when all the text has been typed.
 func (t *Typewriter) Done() bool {
 	return t.typed >= len(t.text)
