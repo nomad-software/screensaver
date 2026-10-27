@@ -5,9 +5,9 @@ A simple Linux screensaver framework
 ## Prerequisites
 
 * This is a Linux only screensaver framework.
-* To run the launcher you will need to use [Gnome](https://www.gnome.org/) as your desktop environment.
-    * This is because the input detection is currently handled by [Mutter](https://mutter.gnome.org/).
-    * [X11](https://www.x.org/wiki/) and [Wayland](https://wayland.freedesktop.org/) are supported.
+* The launcher detects input using the backend that suits the current desktop (via `XDG_CURRENT_DESKTOP`).
+    * On [Gnome](https://www.gnome.org/), input detection is handled by [Mutter](https://mutter.gnome.org/) and both [X11](https://www.x.org/wiki/) and [Wayland](https://wayland.freedesktop.org/) are supported.
+    * On other desktops (e.g. [KDE Plasma](https://kde.org/plasma-desktop/)), input detection is handled by the [Wayland](https://wayland.freedesktop.org/) `ext-idle-notify-v1` protocol, so a Wayland session and `libwayland-client` are required.
 * A working Go and C compiler and installed Raylib dependencies.
     * https://go.dev
     * https://github.com/gen2brain/raylib-go#requirements

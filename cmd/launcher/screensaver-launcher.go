@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/nomad-software/screensaver/cmd/launcher/cli"
-	"github.com/nomad-software/screensaver/cmd/launcher/input/mutter"
+	"github.com/nomad-software/screensaver/cmd/launcher/input"
 	"github.com/nomad-software/screensaver/cmd/launcher/server"
 	"github.com/nomad-software/screensaver/cmd/launcher/timer"
 	"github.com/nomad-software/screensaver/output"
@@ -26,7 +26,7 @@ func main() {
 
 	server.Listen()
 
-	input := mutter.GetInput()
+	input := input.GetInput()
 
 	tick := time.Tick(time.Second)
 	timer := timer.New(opt.TimerDuration)

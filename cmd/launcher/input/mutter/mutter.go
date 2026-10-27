@@ -8,7 +8,7 @@ import (
 )
 
 // signal is the signal sent on the channel when input is detected.
-type signal struct{}
+type signal = struct{}
 
 // GetInput checks for keyboard and mouse events and when detected sends a
 // signal on the returned channel.
