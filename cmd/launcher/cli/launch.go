@@ -5,6 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/nomad-software/screensaver/output"
+	"github.com/nomad-software/screensaver/process"
 )
 
 // Launch launches a screensaver by its command line name.
@@ -22,4 +23,20 @@ func Launch(saver string, args ...string) {
 	if err != nil {
 		output.LaunchErr("screensaver launch error: %s", err)
 	}
+}
+
+// Inhibited returns the first of the processes named that is running, if any
+// is, in which case the saver should not be launched.
+func Inhibited(names []string) (string, bool) {
+	running, err := process.Running(names)
+	if err != nil {
+		output.LaunchErr("cannot list processes: %s", err)
+		return "", false
+	}
+	for _, name := range names {
+		if len(running[name]) > 0 {
+			return name, true
+		}
+	}
+	return "", false
 }

@@ -3,6 +3,7 @@ package cli
 import (
 	"flag"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -12,6 +13,8 @@ type Options struct {
 	Timer         string
 	TimerDuration time.Duration
 	Saver         string
+	Inhibit       string
+	Inhibitors    []string
 	Help          bool
 }
 
@@ -22,6 +25,7 @@ func ParseOptions() (*Options, error) {
 	flag.StringVar(&opt.Port, "port", "1337", "Communication port. Other tools can interact with this launcher.")
 	flag.StringVar(&opt.Timer, "timer", "15m", "Timer duration. Screensaver will show after timer runs out.")
 	flag.StringVar(&opt.Saver, "saver", "", "The screensaver to show when the timer runs out.")
+	flag.StringVar(&opt.Inhibit, "inhibit", "", "Comma separated process names. The screensaver is not shown while any of them is running.")
 	flag.Parse()
 
 	err := opt.valid()
@@ -40,6 +44,12 @@ func (opt *Options) valid() error {
 	}
 
 	opt.TimerDuration = duration
+
+	for name := range strings.SplitSeq(opt.Inhibit, ",") {
+		if name = strings.TrimSpace(name); name != "" {
+			opt.Inhibitors = append(opt.Inhibitors, name)
+		}
+	}
 
 	return nil
 }

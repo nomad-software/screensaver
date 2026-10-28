@@ -46,7 +46,11 @@ func main() {
 
 		case <-tick:
 			if timer.Expired() {
-				cli.Launch(opt.Saver)
+				if name, ok := cli.Inhibited(opt.Inhibitors); ok {
+					output.LaunchInfo("not launching, %s is running", name)
+				} else {
+					cli.Launch(opt.Saver)
+				}
 				timer.Reset()
 			}
 		}
