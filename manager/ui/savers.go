@@ -55,7 +55,12 @@ func newSaverList(w *Window, savers []screen.Saver) *saverList {
 	// The preview is at the top, and the buttons below it at the bottom.
 	side := qt.NewQVBoxLayout2()
 	g.screen = qt.NewQLabel2()
-	g.screen.SetFixedSize2(previewWidth, previewHeight)
+	// The frame matches the list's, and is drawn around the preview rather
+	// than over it, so that none of it is hidden.
+	g.screen.SetFrameShape(qt.QFrame__StyledPanel)
+	g.screen.SetFrameShadow(qt.QFrame__Sunken)
+	frame := 2 * g.screen.FrameWidth()
+	g.screen.SetFixedSize2(previewWidth+frame, previewHeight+frame)
 	g.screen.SetAlignment(qt.AlignCenter)
 	g.screen.SetStyleSheet("background: black")
 	side.AddWidget(g.screen.QWidget)

@@ -573,10 +573,14 @@ func TestPreviewKeepsSize(t *testing.T) {
 			w.Resize(size[0], size[1])
 			qt.QCoreApplication_ProcessEvents()
 			scaled := g.movie.ScaledSize()
-			if g.screen.Width() != previewWidth || g.screen.Height() != previewHeight ||
+			inside := g.screen.ContentsRect()
+			if inside.Width() != previewWidth || inside.Height() != previewHeight ||
 				scaled.Width() != previewWidth || scaled.Height() != previewHeight {
 				t.Errorf("in a window of %v the preview is %dx%d, playing at %dx%d", size,
-					g.screen.Width(), g.screen.Height(), scaled.Width(), scaled.Height())
+					inside.Width(), inside.Height(), scaled.Width(), scaled.Height())
+			}
+			if g.screen.FrameWidth() == 0 {
+				t.Errorf("in a window of %v the preview has no frame", size)
 			}
 			if g.list.Width() < listMinWidth {
 				t.Errorf("in a window of %v the list is %d wide, want at least %d", size, g.list.Width(), listMinWidth)
