@@ -2,9 +2,10 @@ package ui
 
 import (
 	"fmt"
-	"runtime"
 
-	qt "github.com/mappu/miqt/qt6"
+	"github.com/nomad-software/qute/qtcore"
+	"github.com/nomad-software/qute/qtgui"
+	"github.com/nomad-software/qute/qtwidgets"
 )
 
 // The tabs of the window, in order.
@@ -33,47 +34,61 @@ const (
 	tabIconPen  = 1.5
 )
 
+// tabWidget is a QTabWidget subclass, only so that it can be given a tab bar
+// of its own, which is protected in Qt.
+type tabWidget struct {
+	qtwidgets.QTabWidgetBase
+}
+
+// paddedTabBar is a tab bar whose tabs have more room in them than the style
+// gives them.
+type paddedTabBar struct {
+	qtwidgets.QTabBarBase
+}
+
+// TabSizeHint is the size the style gives the tab, with the padding added.
+func (b *paddedTabBar) TabSizeHint(index int) qtcore.QSize {
+	size := b.Super().TabSizeHint(index)
+	return qtcore.QSize{Width: size.Width + tabPadX, Height: size.Height + tabPadY}
+}
+
 // makeTabs puts the panes in tabs, in the order of the tab constants, each
 // with an icon, and a shortcut to each, Ctrl+1 to Ctrl+3. The tabs are as the
 // style draws them with more room in them, and each pane has room around what
 // is in it. The icons are drawn in the colour of text, and drawn again
-// whenever the palette or style changes, as with the theme.
-func (w *Window) makeTabs(panes [tabCount]*qt.QWidget, titles [tabCount]string) {
-	w.tabs = qt.NewQTabWidget2()
-	bar := qt.NewQTabBar2()
-	// What is returned is copied once it is returned, so the size of each
-	// tab is kept here, where the collector cannot free it before then.
-	sizes := map[int]*qt.QSize{}
-	bar.OnTabSizeHint(func(super func(int) *qt.QSize, index int) *qt.QSize {
-		size := super(index)
-		if sizes[index] == nil {
-			sizes[index] = qt.NewQSize()
-		}
-		sizes[index].SetWidth(size.Width() + tabPadX)
-		sizes[index].SetHeight(size.Height() + tabPadY)
-		return sizes[index]
-	})
+// whenever the palette or style changes, as with the theme (see ChangeEvent).
+func (w *Window) makeTabs(panes [tabCount]*qtwidgets.QWidget, titles [tabCount]string) {
+	w.tabs = &tabWidget{}
+	qtwidgets.NewQTabWidgetWith(w.tabs, nil)
+	bar := &paddedTabBar{}
+	qtwidgets.NewQTabBarWith(bar, nil)
 	w.tabs.SetTabBar(bar)
 	w.tabs.SetDocumentMode(true)
 	for i, pane := range panes {
-		pane.Layout().SetContentsMargins(paneMargin, paneMargin, paneMargin, paneMargin)
+		pane.Layout().SetContentsMargins(margins(paneMargin, paneMargin, paneMargin, paneMargin))
 		w.tabs.AddTab(pane, titles[i])
 	}
 	w.drawTabIcons()
 	for i := range tabCount {
-		key := qt.NewQKeySequence2(fmt.Sprintf("Ctrl+%d", i+1))
-		shortcut := qt.NewQShortcut2(key, w.QObject)
+		key := qtgui.NewQKeySequenceWithKey(fmt.Sprintf("Ctrl+%d", i+1))
+		shortcut := qtgui.NewQShortcutWithKeySequence(key, w)
 		key.Delete()
 		shortcut.OnActivated(func() { w.tabs.SetCurrentIndex(i) })
 	}
-	w.OnChangeEvent(func(super func(*qt.QEvent), event *qt.QEvent) {
-		super(event)
-		switch event.Type() {
-		case qt.QEvent__PaletteChange, qt.QEvent__ApplicationPaletteChange, qt.QEvent__StyleChange:
-			w.drawTabIcons()
-			w.inhibitors.drawBins()
-		}
-	})
+}
+
+// ChangeEvent draws the icons again when the palette or the style changes.
+func (w *Window) ChangeEvent(event *qtcore.QEvent) {
+	w.Super().ChangeEvent(event)
+	// The window hears of changes before it has its tabs.
+	if w.tabs == nil || w.inhibitors == nil {
+		return
+	}
+	switch event.Type() {
+	case qtcore.QEventPaletteChange, qtcore.QEventApplicationPaletteChange, qtcore.QEventStyleChange:
+		w.drawTabIcons()
+		w.inhibitors.drawBins()
+	}
 }
 
 // drawTabIcons gives each tab its icon, in the colour of text: a monitor for
@@ -82,11 +97,11 @@ func (w *Window) makeTabs(panes [tabCount]*qt.QWidget, titles [tabCount]string) 
 func (w *Window) drawTabIcons() {
 	// The application's palette is the theme's at once; when the window
 	// hears of a change, the tabs can still have the palette before it.
-	palette := qt.QGuiApplication_Palette()
-	defer runtime.KeepAlive(palette)
-	text := palette.ColorWithCr(qt.QPalette__WindowText)
-	for i, draw := range [tabCount]func(*qt.QPainter){drawSaversIcon, drawServiceIcon, drawInhibitorsIcon} {
-		icon := tabIcon(text, w.DevicePixelRatioF(), draw)
+	palette := qtgui.QGuiApplicationPalette()
+	defer palette.Delete()
+	text := palette.Color(qtgui.QPaletteWindowText)
+	for i, draw := range [tabCount]func(*qtgui.QPainter){drawSaversIcon, drawServiceIcon, drawInhibitorsIcon} {
+		icon := tabIcon(text, w.AsQPaintDevice().DevicePixelRatioF(), draw)
 		w.tabs.SetTabIcon(i, icon)
 		icon.Delete()
 	}
@@ -94,77 +109,67 @@ func (w *Window) drawTabIcons() {
 
 // tabIcon returns an icon drawn by draw, on a clear square of tabIconSize, in
 // the colour, at the ratio of pixels the window has.
-func tabIcon(colour *qt.QColor, ratio float64, draw func(*qt.QPainter)) *qt.QIcon {
+func tabIcon(colour qtgui.QColor, ratio float64, draw func(*qtgui.QPainter)) *qtgui.QIcon {
 	ratio = max(ratio, 1)
 	side := int(tabIconSize * ratio)
-	pixmap := qt.NewQPixmap2(side, side)
+	pixmap := qtgui.NewQPixmapWithW(side, side)
 	defer pixmap.Delete()
 	pixmap.SetDevicePixelRatio(ratio)
-	clear := qt.NewQColor2(qt.Transparent)
-	pixmap.FillWithFillColor(clear)
-	clear.Delete()
+	// The zero colour is transparent.
+	pixmap.FillFull(qtgui.QColor{})
 
-	p := qt.NewQPainter2(pixmap.QPaintDevice)
-	p.SetRenderHint(qt.QPainter__Antialiasing)
-	pen := qt.NewQPen3(colour)
-	pen.SetWidthF(tabIconPen)
-	pen.SetCapStyle(qt.RoundCap)
-	pen.SetJoinStyle(qt.RoundJoin)
-	p.SetPenWithPen(pen)
-	pen.Delete()
-	p.SetBrushWithStyle(qt.NoBrush)
-	draw(p)
-	p.End()
-	p.Delete()
+	qtgui.PaintOn(pixmap, func(p *qtgui.QPainter) {
+		p.SetRenderHint(qtgui.QPainterAntialiasing)
+		pen := qtgui.NewQPenWithColor(colour)
+		defer pen.Delete()
+		pen.SetWidthF(tabIconPen)
+		pen.SetCapStyle(qtcore.RoundCap)
+		pen.SetJoinStyle(qtcore.RoundJoin)
+		p.SetPen(pen)
+		p.SetBrushStyle(qtcore.NoBrush)
+		draw(p)
+	})
 	// The icon keeps a copy of the picture.
-	return qt.NewQIcon2(pixmap)
+	return qtgui.NewQIconWithPixmap(pixmap)
 }
 
 // drawSaversIcon draws a monitor on a stand.
-func drawSaversIcon(p *qt.QPainter) {
-	screen := qt.NewQRectF4(1.5, 2, 13, 9)
-	p.DrawRoundedRect(screen, 1.5, 1.5)
-	screen.Delete()
+func drawSaversIcon(p *qtgui.QPainter) {
+	p.DrawRoundedRectF(qtcore.QRectF{X: 1.5, Y: 2, Width: 13, Height: 9}, 1.5, 1.5)
 	drawLine(p, 8, 11, 8, 13.5)
 	drawLine(p, 5, 13.5, 11, 13.5)
 }
 
 // drawServiceIcon draws a power symbol: a ring open at the top, with a line
 // down into the gap.
-func drawServiceIcon(p *qt.QPainter) {
-	ring := qt.NewQRectF4(2.5, 3, 11, 11)
+func drawServiceIcon(p *qtgui.QPainter) {
 	// Angles are in sixteenths of a degree, from three o'clock
 	// anticlockwise; the gap is the 70 degrees about twelve o'clock.
-	p.DrawArc(ring, 125*16, 290*16)
-	ring.Delete()
+	p.DrawArcF(qtcore.QRectF{X: 2.5, Y: 3, Width: 11, Height: 11}, 125*16, 290*16)
 	drawLine(p, 8, 1.5, 8, 7.5)
 }
 
 // drawInhibitorsIcon draws a no entry sign: a circle crossed by a line.
-func drawInhibitorsIcon(p *qt.QPainter) {
-	circle := qt.NewQRectF4(2, 2, 12, 12)
-	p.DrawEllipse(circle)
-	circle.Delete()
+func drawInhibitorsIcon(p *qtgui.QPainter) {
+	p.DrawEllipseF(qtcore.QRectF{X: 2, Y: 2, Width: 12, Height: 12})
 	drawLine(p, 3.8, 12.2, 12.2, 3.8)
 }
 
 // drawBinIcon draws a bin: a lid with a handle, and a body narrowing to its
 // foot, with two lines down it.
-func drawBinIcon(p *qt.QPainter) {
+func drawBinIcon(p *qtgui.QPainter) {
 	drawLine(p, 2.5, 4, 13.5, 4)
 	drawLine(p, 6.5, 4, 6.5, 2)
 	drawLine(p, 6.5, 2, 9.5, 2)
 	drawLine(p, 9.5, 2, 9.5, 4)
-	body := qt.NewQPainterPath()
+	body := qtgui.NewQPainterPath()
 	defer body.Delete()
-	for i, pt := range [][2]float64{{4, 4}, {5, 14}, {11, 14}, {12, 4}} {
-		point := qt.NewQPointF3(pt[0], pt[1])
+	for i, pt := range []qtcore.QPointF{{X: 4, Y: 4}, {X: 5, Y: 14}, {X: 11, Y: 14}, {X: 12, Y: 4}} {
 		if i == 0 {
-			body.MoveTo(point)
+			body.MoveTo(pt)
 		} else {
-			body.LineTo(point)
+			body.LineTo(pt)
 		}
-		point.Delete()
 	}
 	p.DrawPath(body)
 	drawLine(p, 6.8, 6.5, 7.1, 11.5)
@@ -172,9 +177,6 @@ func drawBinIcon(p *qt.QPainter) {
 }
 
 // drawLine draws a line from one point to another.
-func drawLine(p *qt.QPainter, x1, y1, x2, y2 float64) {
-	from, to := qt.NewQPointF3(x1, y1), qt.NewQPointF3(x2, y2)
-	p.DrawLine4(from, to)
-	from.Delete()
-	to.Delete()
+func drawLine(p *qtgui.QPainter, x1, y1, x2, y2 float64) {
+	p.DrawLineF(qtcore.QPointF{X: x1, Y: y1}, qtcore.QPointF{X: x2, Y: y2})
 }

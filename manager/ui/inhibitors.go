@@ -2,12 +2,12 @@ package ui
 
 import (
 	"html"
-	"runtime"
 	"slices"
 	"strings"
 
-	qt "github.com/mappu/miqt/qt6"
-	"github.com/mappu/miqt/qt6/mainthread"
+	"github.com/nomad-software/qute"
+	"github.com/nomad-software/qute/qtgui"
+	"github.com/nomad-software/qute/qtwidgets"
 )
 
 // summaryPad is the room above and below the line saying which programs are
@@ -17,20 +17,20 @@ const summaryPad = paneMargin
 // inhibitorBox lists the programs which, while any of them runs, keep the
 // launcher from showing the saver, with which of them are running now.
 type inhibitorBox struct {
-	*qt.QWidget
+	*qtwidgets.QWidget
 	w       *Window
-	summary *qt.QLabel
-	list    *qt.QListWidget
-	name    *qt.QLineEdit
-	add     *qt.QPushButton
+	summary *qtwidgets.QLabel
+	list    *qtwidgets.QListWidget
+	name    *qtwidgets.QLineEdit
+	add     *qtwidgets.QPushButton
 
 	// bins are the buttons at the right of each row which remove its
 	// program, in the order of the rows.
-	bins []*qt.QToolButton
+	bins []*qtwidgets.QToolButton
 
 	// running and stopped are the icons of programs running and not, and
 	// bin that of the buttons which remove them.
-	running, stopped, bin *qt.QIcon
+	running, stopped, bin *qtgui.QIcon
 
 	// found is what was running at the last refresh, by name.
 	found map[string][]int
@@ -38,32 +38,32 @@ type inhibitorBox struct {
 
 // newInhibitorBox lists the programs the settings name.
 func newInhibitorBox(w *Window) *inhibitorBox {
-	b := &inhibitorBox{QWidget: qt.NewQWidget2(), w: w,
+	b := &inhibitorBox{QWidget: qtwidgets.NewQWidget(nil), w: w,
 		running: dotIcon(colourOn), stopped: dotIcon(colourOff)}
-	layout := qt.NewQVBoxLayout(b.QWidget)
-	note := qt.NewQLabel3("The saver is not shown while any of these programs is running. " +
-		"Give the name of the process, as pgrep or top shows it, such as vlc, mpv or steam. Changes take effect at once.")
+	layout := qtwidgets.NewQVBoxLayout(b)
+	note := qtwidgets.NewQLabelWithText("The saver is not shown while any of these programs is running. " +
+		"Give the name of the process, as pgrep or top shows it, such as vlc, mpv or steam. Changes take effect at once.", nil)
 	note.SetWordWrap(true)
-	layout.AddWidget(note.QWidget)
-	b.summary = qt.NewQLabel2()
+	layout.AddWidget(note)
+	b.summary = qtwidgets.NewQLabel(nil)
 	b.summary.SetWordWrap(true)
 	// The summary stands apart from the note above and the list below.
-	b.summary.SetContentsMargins(0, summaryPad, 0, summaryPad)
-	layout.AddWidget(b.summary.QWidget)
+	b.summary.SetContentsMargins(margins(0, summaryPad, 0, summaryPad))
+	layout.AddWidget(b.summary)
 
-	b.list = qt.NewQListWidget2()
-	layout.AddWidget2(b.list.QWidget, 1)
+	b.list = qtwidgets.NewQListWidget(nil)
+	layout.AddWidgetFull(b.list, 1, 0)
 
-	row := qt.NewQHBoxLayout2()
-	b.name = qt.NewQLineEdit2()
+	row := qtwidgets.NewQHBoxLayout(nil)
+	b.name = qtwidgets.NewQLineEdit(nil)
 	b.name.SetPlaceholderText("Process name")
 	b.name.OnReturnPressed(b.addName)
 	b.name.OnTextChanged(func(string) { b.enable() })
-	row.AddWidget2(b.name.QWidget, 1)
-	b.add = qt.NewQPushButton3("Add")
-	b.add.OnClicked(b.addName)
-	row.AddWidget(b.add.QWidget)
-	layout.AddLayout(row.QLayout)
+	row.AddWidgetFull(b.name, 1, 0)
+	b.add = qtwidgets.NewQPushButtonWithText("Add", nil)
+	b.add.OnClicked(func(bool) { b.addName() })
+	row.AddWidget(b.add)
+	layout.AddLayout(row)
 
 	b.drawBins()
 	b.fill()
@@ -74,13 +74,13 @@ func newInhibitorBox(w *Window) *inhibitorBox {
 // of text, and gives it to those there are. It is drawn again whenever the
 // palette or style changes, as the tabs' icons are.
 func (b *inhibitorBox) drawBins() {
-	palette := qt.QGuiApplication_Palette()
-	defer runtime.KeepAlive(palette)
-	text := palette.ColorWithCr(qt.QPalette__WindowText)
+	palette := qtgui.QGuiApplicationPalette()
+	defer palette.Delete()
+	text := palette.Color(qtgui.QPaletteWindowText)
 	if b.bin != nil {
 		b.bin.Delete()
 	}
-	b.bin = tabIcon(text, b.w.DevicePixelRatioF(), drawBinIcon)
+	b.bin = tabIcon(text, b.w.AsQPaintDevice().DevicePixelRatioF(), drawBinIcon)
 	for _, bin := range b.bins {
 		bin.SetIcon(b.bin)
 	}
@@ -92,23 +92,21 @@ func (b *inhibitorBox) fill() {
 	b.list.Clear()
 	b.bins = nil
 	for _, name := range b.w.settings.Inhibitors {
-		item := qt.NewQListWidgetItem7("", b.list)
-		bin := qt.NewQToolButton2()
+		item := qtwidgets.NewQListWidgetItemWithText("", b.list)
+		bin := qtwidgets.NewQToolButton(nil)
 		bin.SetAutoRaise(true)
 		bin.SetIcon(b.bin)
 		bin.SetToolTip("Remove " + name)
-		bin.OnClicked(func() { b.removeName(name) })
+		bin.OnClicked(func(bool) { b.removeName(name) })
 		b.bins = append(b.bins, bin)
 		// The button is on a clear widget over the row, at its right, so
 		// that the row's own dot and text show beside it.
-		cell := qt.NewQWidget2()
-		cellLayout := qt.NewQHBoxLayout(cell)
-		cellLayout.SetContentsMargins(0, 0, 4, 0)
+		cell := qtwidgets.NewQWidget(nil)
+		cellLayout := qtwidgets.NewQHBoxLayout(cell)
+		cellLayout.SetContentsMargins(margins(0, 0, 4, 0))
 		cellLayout.AddStretch()
-		cellLayout.AddWidget(bin.QWidget)
-		hint := cell.SizeHint()
-		item.SetSizeHint(hint)
-		runtime.KeepAlive(hint)
+		cellLayout.AddWidget(bin)
+		item.SetSizeHint(cell.SizeHint())
 		b.list.SetItemWidget(item, cell)
 	}
 	b.show(b.found)
@@ -186,5 +184,5 @@ func (b *inhibitorBox) removeName(name string) {
 	b.w.reconfigure()
 	// The list is made again once the click is done with, as making it
 	// again deletes the button that was clicked.
-	mainthread.Start(b.fill)
+	qute.Post(b.fill)
 }

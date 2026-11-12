@@ -7,7 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	qt "github.com/mappu/miqt/qt6"
+	"github.com/nomad-software/qute/qtcore"
+	"github.com/nomad-software/qute/qtwidgets"
 
 	"github.com/nomad-software/screensaver/manager/service"
 )
@@ -27,85 +28,85 @@ const timerSettle = 800 * time.Millisecond
 // serviceBox shows the launcher's service, with the buttons that install and
 // control it, and the timer it waits for.
 type serviceBox struct {
-	*qt.QWidget
+	*qtwidgets.QWidget
 	w         *Window
-	state     *qt.QLabel
-	login     *qt.QLabel
-	stray     *qt.QLabel
-	timer     *qt.QSpinBox
-	install   *qt.QPushButton
-	start     *qt.QPushButton
-	stop      *qt.QPushButton
-	uninstall *qt.QPushButton
+	state     *qtwidgets.QLabel
+	login     *qtwidgets.QLabel
+	stray     *qtwidgets.QLabel
+	timer     *qtwidgets.QSpinBox
+	install   *qtwidgets.QPushButton
+	start     *qtwidgets.QPushButton
+	stop      *qtwidgets.QPushButton
+	uninstall *qtwidgets.QPushButton
 }
 
 // newServiceBox shows the service, as found at the first refresh.
 func newServiceBox(w *Window) *serviceBox {
-	b := &serviceBox{QWidget: qt.NewQWidget2(), w: w}
-	layout := qt.NewQVBoxLayout(b.QWidget)
-	note := qt.NewQLabel3("The launcher runs as a systemd user service, " + service.Name +
-		", which starts when you log in. It shows the saver once there has been no input for the time below.")
+	b := &serviceBox{QWidget: qtwidgets.NewQWidget(nil), w: w}
+	layout := qtwidgets.NewQVBoxLayout(b)
+	note := qtwidgets.NewQLabelWithText("The launcher runs as a systemd user service, " + service.Name +
+		", which starts when you log in. It shows the saver once there has been no input for the time below.", nil)
 	note.SetWordWrap(true)
-	layout.AddWidget(note.QWidget)
+	layout.AddWidget(note)
 
 	// The state and the timer are a form below the note, its labels lined
 	// up on the right and its fields at their own widths.
 	layout.AddSpacing(paneMargin)
-	form := qt.NewQFormLayout2()
-	form.SetFieldGrowthPolicy(qt.QFormLayout__FieldsStayAtSizeHint)
-	form.SetLabelAlignment(qt.AlignRight | qt.AlignVCenter)
+	form := qtwidgets.NewQFormLayout(nil)
+	form.SetFieldGrowthPolicy(qtwidgets.QFormLayoutFieldsStayAtSizeHint)
+	form.SetLabelAlignment(qtcore.AlignRight | qtcore.AlignVCenter)
 	form.SetHorizontalSpacing(formSpacing)
 	form.SetVerticalSpacing(formSpacing)
-	b.state = qt.NewQLabel2()
-	b.state.SetTextInteractionFlags(qt.TextSelectableByMouse)
-	form.AddRow3("Status:", b.state.QWidget)
-	b.login = qt.NewQLabel2()
-	form.AddRow3("Starts at login:", b.login.QWidget)
-	b.timer = qt.NewQSpinBox2()
+	b.state = qtwidgets.NewQLabel(nil)
+	b.state.SetTextInteractionFlags(qtcore.TextSelectableByMouse)
+	form.AddRowText("Status:", b.state)
+	b.login = qtwidgets.NewQLabel(nil)
+	form.AddRowText("Starts at login:", b.login)
+	b.timer = qtwidgets.NewQSpinBox(nil)
 	b.timer.SetRange(1, 24*60)
 	b.timer.SetSuffix(" minutes")
 	b.timer.SetValue(minutes(w.settings.Timer))
 	b.timer.SetMinimumWidth(timerWidth)
-	form.AddRow3("Show after:", b.timer.QWidget)
-	layout.AddLayout(form.QLayout)
+	form.AddRowText("Show after:", b.timer)
+	layout.AddLayout(form)
 
-	settle := qt.NewQTimer2(b.QObject)
+	settle := qtcore.NewQTimer(b)
 	settle.SetSingleShot(true)
 	settle.OnTimeout(func() {
 		w.settings.Timer = strconv.Itoa(b.timer.Value()) + "m"
 		w.saveAndReconfigure()
 	})
-	b.timer.OnValueChanged(func(int) { settle.Start(int(timerSettle / time.Millisecond)) })
+	b.timer.OnValueChanged(func(int) { settle.StartWithDuration(timerSettle) })
 
 	// A warning stands out in a box of its own below the form.
 	layout.AddSpacing(paneMargin)
-	b.stray = qt.NewQLabel2()
+	b.stray = qtwidgets.NewQLabel(nil)
 	b.stray.SetWordWrap(true)
 	b.stray.SetStyleSheet("QLabel { color: " + colourFailed + "; border: 1px solid " + colourFailed +
 		"; border-radius: 4px; padding: 10px; }")
 	b.stray.Hide()
-	layout.AddWidget(b.stray.QWidget)
+	layout.AddWidget(b.stray)
 	layout.AddStretch()
 
 	// The buttons are at their own sizes at the bottom right, as on the
 	// Screensavers tab.
-	buttons := qt.NewQHBoxLayout2()
+	buttons := qtwidgets.NewQHBoxLayout(nil)
 	buttons.AddStretch()
-	b.install = qt.NewQPushButton3("Install")
+	b.install = qtwidgets.NewQPushButtonWithText("Install", nil)
 	b.install.SetToolTip("Writes the service, with the launcher found now, and starts it with every login and now.")
-	b.install.OnClicked(b.installService)
-	b.start = qt.NewQPushButton3("Start")
-	b.start.OnClicked(func() { w.inBackground(w.manager.Start) })
-	b.stop = qt.NewQPushButton3("Stop")
+	b.install.OnClicked(func(bool) { b.installService() })
+	b.start = qtwidgets.NewQPushButtonWithText("Start", nil)
+	b.start.OnClicked(func(bool) { w.inBackground(w.manager.Start) })
+	b.stop = qtwidgets.NewQPushButtonWithText("Stop", nil)
 	b.stop.SetToolTip("Stops the launcher until it is started again, or the next login.")
-	b.stop.OnClicked(func() { w.inBackground(w.manager.Stop) })
-	b.uninstall = qt.NewQPushButton3("Uninstall")
+	b.stop.OnClicked(func(bool) { w.inBackground(w.manager.Stop) })
+	b.uninstall = qtwidgets.NewQPushButtonWithText("Uninstall", nil)
 	b.uninstall.SetToolTip("Stops the launcher and removes the service, so that it no longer starts at login.")
-	b.uninstall.OnClicked(b.uninstallService)
-	for _, button := range []*qt.QPushButton{b.install, b.start, b.stop, b.uninstall} {
-		buttons.AddWidget(button.QWidget)
+	b.uninstall.OnClicked(func(bool) { b.uninstallService() })
+	for _, button := range []*qtwidgets.QPushButton{b.install, b.start, b.stop, b.uninstall} {
+		buttons.AddWidget(button)
 	}
-	layout.AddLayout(buttons.QLayout)
+	layout.AddLayout(buttons)
 	b.show(state{})
 	return b
 }
@@ -129,7 +130,7 @@ func minutes(timer string) int {
 func (b *serviceBox) installService() {
 	// The launcher will not start without a saver to show.
 	if b.w.settings.Saver == "" {
-		warning(b.w.QWidget, "Start Up", "Choose a saver first, with Use This Saver on the Screensavers tab.")
+		warning(&b.w.QWidget, "Start Up", "Choose a saver first, with Use This Saver on the Screensavers tab.")
 		return
 	}
 	path, ok := b.w.launcherPath()
@@ -142,7 +143,7 @@ func (b *serviceBox) installService() {
 
 // uninstallService stops and removes the service, once the user agrees.
 func (b *serviceBox) uninstallService() {
-	if !confirm(b.w.QWidget, "Start Up", "Stop the launcher and remove the service? No saver will be shown until it is installed again.") {
+	if !confirm(&b.w.QWidget, "Start Up", "Stop the launcher and remove the service? No saver will be shown until it is installed again.") {
 		return
 	}
 	b.w.inBackground(b.w.manager.Uninstall)

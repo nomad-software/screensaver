@@ -1,7 +1,9 @@
 package ui
 
 import (
-	qt "github.com/mappu/miqt/qt6"
+	"github.com/nomad-software/qute/qtcore"
+	"github.com/nomad-software/qute/qtgui"
+	"github.com/nomad-software/qute/qtwidgets"
 
 	"github.com/nomad-software/screensaver/screen"
 )
@@ -21,62 +23,62 @@ const listMinWidth = 240
 // The one selected plays its preview, with buttons to run the saver itself and
 // to use it.
 type saverList struct {
-	*qt.QWidget
+	*qtwidgets.QWidget
 	w      *Window
 	savers []screen.Saver
-	list   *qt.QListWidget
+	list   *qtwidgets.QListWidget
 
 	// selected is the index of the saver selected, -1 for none.
 	selected int
 
 	// movie plays the preview of the saver selected, nil while none is.
-	movie *qt.QMovie
+	movie *qtgui.QMovie
 
-	screen  *qt.QLabel
-	preview *qt.QPushButton
-	use     *qt.QPushButton
+	screen  *qtwidgets.QLabel
+	preview *qtwidgets.QPushButton
+	use     *qtwidgets.QPushButton
 }
 
 // newSaverList lists the savers, with the one chosen marked and selected, so
 // that its preview plays.
 func newSaverList(w *Window, savers []screen.Saver) *saverList {
-	g := &saverList{QWidget: qt.NewQWidget2(), w: w, savers: savers, selected: -1}
-	layout := qt.NewQHBoxLayout(g.QWidget)
+	g := &saverList{QWidget: qtwidgets.NewQWidget(nil), w: w, savers: savers, selected: -1}
+	layout := qtwidgets.NewQHBoxLayout(g)
 
-	g.list = qt.NewQListWidget2()
+	g.list = qtwidgets.NewQListWidget(nil)
 	for _, s := range savers {
-		g.list.AddItem(s.Title)
+		g.list.AddItemText(s.Title)
 	}
 	g.list.SetCurrentRow(-1)
 	g.list.OnCurrentRowChanged(g.choose)
 	g.list.SetMinimumWidth(listMinWidth)
-	layout.AddWidget2(g.list.QWidget, 1)
+	layout.AddWidgetFull(g.list, 1, 0)
 
 	// The preview is at the top, and the buttons below it at the bottom.
-	side := qt.NewQVBoxLayout2()
-	g.screen = qt.NewQLabel2()
+	side := qtwidgets.NewQVBoxLayout(nil)
+	g.screen = qtwidgets.NewQLabel(nil)
 	// The frame matches the list's, and is drawn around the preview rather
 	// than over it, so that none of it is hidden.
-	g.screen.SetFrameShape(qt.QFrame__StyledPanel)
-	g.screen.SetFrameShadow(qt.QFrame__Sunken)
+	g.screen.SetFrameShape(qtwidgets.QFrameStyledPanel)
+	g.screen.SetFrameShadow(qtwidgets.QFrameSunken)
 	frame := 2 * g.screen.FrameWidth()
-	g.screen.SetFixedSize2(previewWidth+frame, previewHeight+frame)
-	g.screen.SetAlignment(qt.AlignCenter)
+	g.screen.SetFixedSize(previewWidth+frame, previewHeight+frame)
+	g.screen.SetAlignment(qtcore.AlignCenter)
 	g.screen.SetStyleSheet("background: black")
-	side.AddWidget(g.screen.QWidget)
+	side.AddWidget(g.screen)
 	side.AddStretch()
-	buttons := qt.NewQHBoxLayout2()
+	buttons := qtwidgets.NewQHBoxLayout(nil)
 	buttons.AddStretch()
-	g.preview = qt.NewQPushButton3("Preview")
+	g.preview = qtwidgets.NewQPushButtonWithText("Preview", nil)
 	g.preview.SetToolTip("Runs the saver now, full screen. Move the mouse or press a key to end it.")
-	g.preview.OnClicked(g.previewSelected)
-	buttons.AddWidget(g.preview.QWidget)
-	g.use = qt.NewQPushButton3("Use This Saver")
+	g.preview.OnClicked(func(bool) { g.previewSelected() })
+	buttons.AddWidget(g.preview)
+	g.use = qtwidgets.NewQPushButtonWithText("Use This Saver", nil)
 	g.use.SetToolTip("Makes it the saver the launcher shows, restarting the launcher if it is running.")
-	g.use.OnClicked(g.useSelected)
-	buttons.AddWidget(g.use.QWidget)
-	side.AddLayout(buttons.QLayout)
-	layout.AddLayout(side.QLayout)
+	g.use.OnClicked(func(bool) { g.useSelected() })
+	buttons.AddWidget(g.use)
+	side.AddLayout(buttons)
+	layout.AddLayout(side)
 
 	g.markCurrent()
 	g.choose(-1)
@@ -116,15 +118,13 @@ func (g *saverList) play(i int) {
 	if i < 0 {
 		return
 	}
-	movie := qt.NewQMovie4(g.screen.QObject)
-	buffer := qt.NewQBuffer2(movie.QObject)
+	movie := qtgui.NewQMovie(g.screen)
+	buffer := qtcore.NewQBuffer(movie)
 	buffer.SetData(g.savers[i].Preview)
-	buffer.Open(qt.QIODeviceBase__ReadOnly)
-	movie.SetDevice(buffer.QIODevice)
+	buffer.Open(qtcore.QIODeviceBaseReadOnly)
+	movie.SetDevice(buffer)
 	movie.SetFormat([]byte("gif"))
-	size := qt.NewQSize2(previewWidth, previewHeight)
-	movie.SetScaledSize(size)
-	size.Delete()
+	movie.SetScaledSize(qtcore.QSize{Width: previewWidth, Height: previewHeight})
 	g.movie = movie
 	g.screen.SetMovie(movie)
 	movie.Start()
@@ -148,7 +148,7 @@ func (g *saverList) previewSelected() {
 	}
 	s := g.savers[g.selected]
 	if err := startSaver(s.Name); err != nil {
-		warning(g.w.QWidget, "Preview", s.Title+" could not be started: "+err.Error())
+		warning(&g.w.QWidget, "Preview", s.Title+" could not be started: "+err.Error())
 	}
 }
 

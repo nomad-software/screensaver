@@ -6,8 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mappu/miqt/qt6/mainthread"
-
 	"github.com/nomad-software/screensaver/manager/settings"
 )
 
@@ -26,7 +24,7 @@ func TestScreenshot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { onMain(func() { applyTheme("") }) })
+	t.Cleanup(func() { onMain(t, func() { applyTheme("") }) })
 	var c settings.Settings
 	c.Theme = settings.ThemeDark
 	c.Saver = "screensaver-digital-rain"
@@ -38,11 +36,15 @@ func TestScreenshot(t *testing.T) {
 	if err := os.WriteFile(w.manager.Path(), nil, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	onMain(func() { w.Show() })
+	onMain(t, func() { w.Show() })
 	wait(t, "the service to be shown running", func() bool { return strings.Contains(w.service.state.Text(), "Running") })
 	// The previews are a second in, rather than at their first frames.
 	time.Sleep(time.Second)
-	if !mainthread.Wait2(func() bool { return w.Grab().Save(path) }) {
-		t.Fatal("the screenshot could not be saved")
-	}
+	onMain(t, func() {
+		pixmap := w.Grab()
+		defer pixmap.Delete()
+		if err := pixmap.Save(path); err != nil {
+			t.Fatal("the screenshot could not be saved:", err)
+		}
+	})
 }

@@ -1,7 +1,8 @@
 package ui
 
 import (
-	qt "github.com/mappu/miqt/qt6"
+	"github.com/nomad-software/qute/qtcore"
+	"github.com/nomad-software/qute/qtgui"
 )
 
 // The colours of the dots which show whether something is running. They are
@@ -19,23 +20,18 @@ func dot(colour string) string {
 }
 
 // dotIcon returns a dot of the colour as an icon, for a list.
-func dotIcon(colour string) *qt.QIcon {
+func dotIcon(colour string) *qtgui.QIcon {
 	const size = 12
-	pixmap := qt.NewQPixmap2(size, size)
+	pixmap := qtgui.NewQPixmapWithW(size, size)
 	defer pixmap.Delete()
-	transparent := qt.NewQColor2(qt.Transparent)
-	defer transparent.Delete()
-	pixmap.FillWithFillColor(transparent)
-	painter := qt.NewQPainter2(pixmap.QPaintDevice)
-	painter.SetRenderHint(qt.QPainter__Antialiasing)
-	painter.SetPenWithStyle(qt.NoPen)
-	c := qt.NewQColor6(colour)
-	defer c.Delete()
-	brush := qt.NewQBrush3(c)
-	defer brush.Delete()
-	painter.SetBrush(brush)
-	painter.DrawEllipse2(1, 1, size-2, size-2)
-	painter.End()
-	painter.Delete()
-	return qt.NewQIcon2(pixmap)
+	// The zero colour is transparent.
+	pixmap.FillFull(qtgui.QColor{})
+	qtgui.PaintOn(pixmap, func(painter *qtgui.QPainter) {
+		painter.SetRenderHint(qtgui.QPainterAntialiasing)
+		painter.SetPenStyle(qtcore.NoPen)
+		painter.SetBrushColor(mustColour(colour))
+		painter.DrawEllipse(qtcore.QRect{X: 1, Y: 1, Width: size - 2, Height: size - 2})
+	})
+	// The icon keeps a copy of the picture.
+	return qtgui.NewQIconWithPixmap(pixmap)
 }

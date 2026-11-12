@@ -5,15 +5,16 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
-	qt "github.com/mappu/miqt/qt6"
-	"github.com/mappu/miqt/qt6/mainthread"
+	"github.com/nomad-software/qute/qtcore"
+	"github.com/nomad-software/qute/qtgui"
+	"github.com/nomad-software/qute/qtwidgets"
+	"github.com/nomad-software/qute/qutetest"
 
 	"github.com/nomad-software/screensaver/manager/service"
 	"github.com/nomad-software/screensaver/manager/settings"
@@ -26,27 +27,21 @@ var warned struct {
 }
 
 func TestMain(m *testing.M) {
-	os.Setenv("QT_QPA_PLATFORM", "offscreen")
-	qt.NewQApplication(os.Args[:1])
-	qt.QGuiApplication_SetQuitOnLastWindowClosed(false)
-	warning = func(_ *qt.QWidget, title, text string) {
+	warning = func(_ *qtwidgets.QWidget, title, text string) {
 		warned.Lock()
 		defer warned.Unlock()
 		warned.list = append(warned.list, title+": "+text)
 	}
-
-	code := 0
-	go func() {
-		code = m.Run()
-		mainthread.Start(qt.QCoreApplication_Quit)
-	}()
-	qt.QApplication_Exec()
-	os.Exit(code)
+	// The tests run offscreen, with an application which goes on when its
+	// last window is closed.
+	qutetest.TestMain(m)
 }
 
-// onMain runs f on the UI's thread and waits for it.
-func onMain(f func()) {
-	mainthread.Wait(f)
+// onMain runs f on the UI's thread and waits for it. A panic in f, or in
+// what it sets off, fails the test, as t.Fatal in f does.
+func onMain(t testing.TB, f func()) {
+	t.Helper()
+	qutetest.Run(t, f)
 }
 
 // wait waits, with a deadline, until cond, run on the UI's thread, is true.
@@ -55,7 +50,7 @@ func wait(t *testing.T, what string, cond func() bool) {
 	deadline := time.Now().Add(10 * time.Second)
 	for time.Now().Before(deadline) {
 		var ok bool
-		onMain(func() { ok = cond() })
+		onMain(t, func() { ok = cond() })
 		if ok {
 			return
 		}
@@ -118,8 +113,8 @@ func newTestWindow(t *testing.T, s *settings.Settings, sd *fakeSystemd) (*Window
 	warned.list = nil
 	warned.Unlock()
 	var w *Window
-	onMain(func() { w = NewWindow(path, m) })
-	t.Cleanup(func() { onMain(func() { w.DeleteLater() }) })
+	onMain(t, func() { w = NewWindow(path, m) })
+	t.Cleanup(func() { onMain(t, func() { w.DeleteLater() }) })
 	return w, path
 }
 
@@ -170,7 +165,7 @@ func TestSaversShown(t *testing.T) {
 	var c settings.Settings
 	c.Saver = "screensaver-the-thing"
 	w, _ := newTestWindow(t, &c, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		g := w.savers
 		if g.list.Count() == 0 {
 			t.Fatal("no savers")
@@ -204,7 +199,7 @@ func TestNoSaverConfigured(t *testing.T) {
 	var c settings.Settings
 	c.Saver = "screensaver-not-in-the-list"
 	w, _ := newTestWindow(t, &c, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		g := w.savers
 		if g.selected >= 0 || g.movie != nil || g.preview.IsEnabled() || g.use.IsEnabled() {
 			t.Fatalf("selected %d with nothing configured in the list", g.selected)
@@ -219,7 +214,7 @@ func TestUseSaverRestartsLauncher(t *testing.T) {
 	installed(t, w)
 	wait(t, "the service to be seen installed and running", func() bool { return w.status.Installed && w.status.Running() })
 	var name string
-	onMain(func() {
+	onMain(t, func() {
 		g := w.savers
 		for i, s := range g.savers {
 			if s.Name != w.settings.Saver {
@@ -247,7 +242,7 @@ func TestUseSaverNotRunning(t *testing.T) {
 	sd := &fakeSystemd{}
 	w, path := newTestWindow(t, nil, sd)
 	wait(t, "a refresh", func() bool { return !w.refreshing })
-	onMain(func() {
+	onMain(t, func() {
 		w.savers.list.SetCurrentRow(0)
 		w.savers.useSelected()
 	})
@@ -267,7 +262,7 @@ func TestPreview(t *testing.T) {
 		return nil
 	}
 	w, _ := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		w.savers.list.SetCurrentRow(1)
 		w.savers.preview.Click()
 	})
@@ -277,7 +272,7 @@ func TestPreview(t *testing.T) {
 	}
 
 	startSaver = func(string) error { return errors.New("no display") }
-	onMain(func() { w.savers.preview.Click() })
+	onMain(t, func() { w.savers.preview.Click() })
 	warned.Lock()
 	defer warned.Unlock()
 	if len(warned.list) != 1 || !strings.Contains(warned.list[0], "no display") {
@@ -295,7 +290,7 @@ func TestInhibitors(t *testing.T) {
 	c.Inhibitors = []string{"no-such-program"}
 	w, path := newTestWindow(t, &c, &fakeSystemd{})
 	b := w.inhibitors
-	onMain(func() {
+	onMain(t, func() {
 		if b.add.IsEnabled() {
 			t.Error("Add is enabled with no name")
 		}
@@ -312,7 +307,7 @@ func TestInhibitors(t *testing.T) {
 			strings.Contains(b.summary.Text(), "will not be shown")
 	})
 
-	onMain(func() {
+	onMain(t, func() {
 		// A name listed already is not added again.
 		b.name.SetText(me)
 		if b.add.IsEnabled() {
@@ -339,7 +334,7 @@ func TestInstall(t *testing.T) {
 	s.Timer = "5m"
 	s.Inhibitors = []string{"vlc", "mpv"}
 	w, _ := newTestWindow(t, s, sd)
-	onMain(func() {
+	onMain(t, func() {
 		if w.service.uninstall.IsEnabled() || w.service.stop.IsEnabled() {
 			t.Error("Uninstall or Stop is enabled with no service")
 		}
@@ -356,7 +351,7 @@ func TestInstall(t *testing.T) {
 func TestInstallNoSaver(t *testing.T) {
 	withLauncher(t)
 	w, path := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() { w.service.install.Click() })
+	onMain(t, func() { w.service.install.Click() })
 	if _, err := os.Stat(w.manager.Path()); !errors.Is(err, os.ErrNotExist) {
 		t.Fatalf("a service was written with no saver chosen: %v", err)
 	}
@@ -373,7 +368,7 @@ func TestInstallNoSaver(t *testing.T) {
 
 func TestNoDefaultSaver(t *testing.T) {
 	w, _ := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		g := w.savers
 		if w.settings.Saver != "" || g.selected >= 0 || g.movie != nil {
 			t.Fatalf("saver %q selected %d with none chosen", w.settings.Saver, g.selected)
@@ -389,7 +384,7 @@ func TestNoDefaultSaver(t *testing.T) {
 func TestInstallNoLauncher(t *testing.T) {
 	t.Setenv("PATH", t.TempDir())
 	w, _ := newTestWindow(t, withSaver(), &fakeSystemd{})
-	onMain(func() { w.service.install.Click() })
+	onMain(t, func() { w.service.install.Click() })
 	if _, err := os.Stat(w.manager.Path()); !errors.Is(err, os.ErrNotExist) {
 		t.Fatalf("a service was written with no launcher: %v", err)
 	}
@@ -408,17 +403,17 @@ func TestUninstallDeclined(t *testing.T) {
 	t.Setenv("PATH", bin)
 	sd := &fakeSystemd{}
 	w, _ := newTestWindow(t, withSaver(), sd)
-	onMain(func() { w.service.install.Click() })
+	onMain(t, func() { w.service.install.Click() })
 	wait(t, "the service to be installed", func() bool { return w.service.uninstall.IsEnabled() })
 	asked := false
-	confirm = func(*qt.QWidget, string, string) bool { asked = true; return false }
-	onMain(func() { w.service.uninstall.Click() })
+	confirm = func(*qtwidgets.QWidget, string, string) bool { asked = true; return false }
+	onMain(t, func() { w.service.uninstall.Click() })
 	time.Sleep(100 * time.Millisecond)
 	if _, err := os.Stat(w.manager.Path()); !asked || err != nil {
 		t.Fatalf("asked %v; unit file: %v", asked, err)
 	}
-	confirm = func(*qt.QWidget, string, string) bool { return true }
-	onMain(func() { w.service.uninstall.Click() })
+	confirm = func(*qtwidgets.QWidget, string, string) bool { return true }
+	onMain(t, func() { w.service.uninstall.Click() })
 	wait(t, "the service to be removed", func() bool {
 		_, err := os.Stat(w.manager.Path())
 		return errors.Is(err, os.ErrNotExist) && strings.Contains(w.service.state.Text(), "Not installed")
@@ -427,7 +422,7 @@ func TestUninstallDeclined(t *testing.T) {
 
 func TestStrayLauncher(t *testing.T) {
 	w, _ := newTestWindow(t, nil, &fakeSystemd{running: true, pid: 5})
-	onMain(func() {
+	onMain(t, func() {
 		w.service.show(state{
 			status:  service.Status{Installed: true, State: "active", PID: 5},
 			running: map[string][]int{launcher: {9, 5}},
@@ -447,7 +442,7 @@ func TestStrayLauncher(t *testing.T) {
 
 func TestTimer(t *testing.T) {
 	w, path := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		if w.service.timer.Value() != 15 {
 			t.Fatalf("timer shows %d", w.service.timer.Value())
 		}
@@ -473,12 +468,12 @@ func TestMinutes(t *testing.T) {
 
 func TestTabsPadded(t *testing.T) {
 	w, _ := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		tabs := w.tabs
-		plain := qt.NewQTabWidget2()
+		plain := qtwidgets.NewQTabWidget(nil)
 		defer plain.Delete()
 		for _, title := range []string{"Screensavers", "Start Up", "Inhibit"} {
-			plain.AddTab(qt.NewQWidget2(), title)
+			plain.AddTab(qtwidgets.NewQWidget(nil), title)
 		}
 		plain.SetDocumentMode(true)
 		// The tabs are laid out once shown.
@@ -488,12 +483,12 @@ func TestTabsPadded(t *testing.T) {
 		bar := tabs.TabBar()
 		for i := range tabs.Count() {
 			got, natural := bar.TabRect(i), plain.TabBar().TabRect(i)
-			if got.Width() < natural.Width()+tabPadX || got.Height() < natural.Height()+tabPadY {
-				t.Errorf("tab %d is %dx%d, want at least %dx%d", i, got.Width(), got.Height(), natural.Width()+tabPadX, natural.Height()+tabPadY)
+			if got.Width < natural.Width+tabPadX || got.Height < natural.Height+tabPadY {
+				t.Errorf("tab %d is %dx%d, want at least %dx%d", i, got.Width, got.Height, natural.Width+tabPadX, natural.Height+tabPadY)
 			}
-			margins := tabs.Widget(i).Layout().ContentsMargins()
-			if margins.Left() != paneMargin || margins.Top() != paneMargin || margins.Right() != paneMargin || margins.Bottom() != paneMargin {
-				t.Errorf("pane %d has margins %d, %d, %d, %d, want %d all round", i, margins.Left(), margins.Top(), margins.Right(), margins.Bottom(), paneMargin)
+			m := tabs.Widget(i).Layout().ContentsMargins()
+			if m != margins(paneMargin, paneMargin, paneMargin, paneMargin) {
+				t.Errorf("pane %d has margins %d, %d, %d, %d, want %d all round", i, m.Left, m.Top, m.Right, m.Bottom, paneMargin)
 			}
 		}
 	})
@@ -501,7 +496,7 @@ func TestTabsPadded(t *testing.T) {
 
 func TestMenus(t *testing.T) {
 	w, _ := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		var titles []string
 		for _, menu := range w.MenuBar().Actions() {
 			titles = append(titles, menu.Text())
@@ -509,13 +504,15 @@ func TestMenus(t *testing.T) {
 		if !reflect.DeepEqual(titles, []string{"&File", "&Help"}) {
 			t.Errorf("the menus are %q", titles)
 		}
-		for action, want := range map[*qt.QAction]string{w.quit: "Ctrl+Q", w.about: "Ctrl+I"} {
+		for action, want := range map[*qtgui.QAction]string{w.quit: "Ctrl+Q", w.about: "Ctrl+I"} {
 			key := action.Shortcut()
+			defer key.Delete()
 			if got := key.ToString(); got != want {
 				t.Errorf("%s has shortcut %q, want %q", action.Text(), got, want)
 			}
 		}
 		icon := w.WindowIcon()
+		defer icon.Delete()
 		if icon.IsNull() {
 			t.Error("the window has no icon")
 		}
@@ -524,8 +521,8 @@ func TestMenus(t *testing.T) {
 
 func TestAbout(t *testing.T) {
 	w, _ := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() {
-		d := showAbout(w.QWidget)
+	onMain(t, func() {
+		d := showAbout(&w.QWidget)
 		if !d.IsVisible() || d.WindowTitle() != "About Screensaver Manager" {
 			t.Errorf("the about box is not shown: %q", d.WindowTitle())
 		}
@@ -538,9 +535,10 @@ func TestAbout(t *testing.T) {
 
 func TestTabIcons(t *testing.T) {
 	w, _ := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		for i := range tabCount {
 			icon := w.tabs.TabIcon(i)
+			defer icon.Delete()
 			if icon.IsNull() {
 				t.Errorf("tab %d has no icon", i)
 			}
@@ -556,7 +554,7 @@ func TestTabIcons(t *testing.T) {
 
 func TestStatusBar(t *testing.T) {
 	w, _ := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		if !w.StatusBar().IsSizeGripEnabled() {
 			t.Error("the status bar has no handle to drag")
 		}
@@ -565,19 +563,19 @@ func TestStatusBar(t *testing.T) {
 
 func TestPreviewKeepsSize(t *testing.T) {
 	w, _ := newTestWindow(t, withSaver(), &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		g := w.savers
 		w.Show()
 		// The smallest is smaller than the window can be made.
 		for _, size := range [][2]int{{1400, 900}, {1000, 640}, {200, 200}} {
 			w.Resize(size[0], size[1])
-			qt.QCoreApplication_ProcessEvents()
+			qtcore.QCoreApplicationProcessEvents()
 			scaled := g.movie.ScaledSize()
 			inside := g.screen.ContentsRect()
-			if inside.Width() != previewWidth || inside.Height() != previewHeight ||
-				scaled.Width() != previewWidth || scaled.Height() != previewHeight {
+			if inside.Width != previewWidth || inside.Height != previewHeight ||
+				scaled.Width != previewWidth || scaled.Height != previewHeight {
 				t.Errorf("in a window of %v the preview is %dx%d, playing at %dx%d", size,
-					inside.Width(), inside.Height(), scaled.Width(), scaled.Height())
+					inside.Width, inside.Height, scaled.Width, scaled.Height)
 			}
 			if g.screen.FrameWidth() == 0 {
 				t.Errorf("in a window of %v the preview has no frame", size)
@@ -595,20 +593,20 @@ func TestPreviewKeepsSize(t *testing.T) {
 }
 
 func TestApplyTheme(t *testing.T) {
-	t.Cleanup(func() { onMain(func() { applyTheme("") }) })
-	onMain(func() {
+	t.Cleanup(func() { onMain(t, func() { applyTheme("") }) })
+	onMain(t, func() {
 		window := func() string {
-			// The palette is a copy, which its finalizer frees.
-			p := qt.QGuiApplication_Palette()
-			defer runtime.KeepAlive(p)
-			return p.ColorWithCr(qt.QPalette__Window).NameWithFormat(qt.QColor__HexRgb)
+			// The palette is a copy.
+			p := qtgui.QGuiApplicationPalette()
+			defer p.Delete()
+			return p.Color(qtgui.QPaletteWindow).Name()
 		}
 		rememberSystemStyle()
 		applyTheme(settings.ThemeLight)
 		if c := window(); c != "#efefef" {
 			t.Errorf("light window = %s", c)
 		}
-		if s := qt.QApplication_Style().Name(); s != "fusion" {
+		if s := qtwidgets.QApplicationStyle().Name(); s != "fusion" {
 			t.Errorf("light style = %s", s)
 		}
 		applyTheme(settings.ThemeDark)
@@ -616,34 +614,36 @@ func TestApplyTheme(t *testing.T) {
 			t.Errorf("dark window = %s", c)
 		}
 		applyTheme("")
-		if s := qt.QApplication_Style().Name(); s != systemStyle {
+		if s := qtwidgets.QApplicationStyle().Name(); s != systemStyle {
 			t.Errorf("system style = %s, want %s", s, systemStyle)
 		}
 	})
 }
 
 func TestSettingsTheme(t *testing.T) {
-	t.Cleanup(func() { onMain(func() { applyTheme("") }) })
+	t.Cleanup(func() { onMain(t, func() { applyTheme("") }) })
 	w, _ := newTestWindow(t, nil, &fakeSystemd{})
-	onMain(func() {
+	onMain(t, func() {
 		key := w.settingsAction.Shortcut()
+		defer key.Delete()
 		if got := key.ToString(); got != "Ctrl+," {
 			t.Errorf("Settings has shortcut %q", got)
 		}
 		lightness := func() int {
 			icon := w.tabs.TabIcon(tabSavers)
-			image := icon.Pixmap2(tabIconSize, tabIconSize)
-			defer runtime.KeepAlive(image)
-			img := image.ToImage()
-			defer runtime.KeepAlive(img)
+			defer icon.Delete()
+			pixmap := icon.Pixmap(qtcore.QSize{Width: tabIconSize, Height: tabIconSize})
+			defer pixmap.Delete()
+			img := pixmap.ToImage()
+			defer img.Delete()
 			most := 0
 			for y := range img.Height() {
 				for x := range img.Width() {
-					c := img.PixelColor(x, y)
-					if c.Alpha() == 0xff {
-						most = max(most, c.Lightness())
+					if c := img.PixelColor(x, y); c.A == 0xff {
+						// The lightness of HSL, as QColor gives it.
+						l := (int(max(c.R, c.G, c.B)) + int(min(c.R, c.G, c.B))) / 2
+						most = max(most, l)
 					}
-					runtime.KeepAlive(c)
 				}
 			}
 			return most
@@ -659,8 +659,8 @@ func TestSettingsTheme(t *testing.T) {
 			t.Errorf("the settings have tabs %d, the first %q", d.tabs.Count(), d.tabs.TabText(0))
 		}
 		selectData(d.theme, settings.ThemeDark)
-		d.box.Button(qt.QDialogButtonBox__Ok).Click()
-		if s := qt.QApplication_Style().Name(); s != "fusion" {
+		d.box.Button(qtwidgets.QDialogButtonBoxOk).Click()
+		if s := qtwidgets.QApplicationStyle().Name(); s != "fusion" {
 			t.Errorf("the style is %s after choosing the dark theme", s)
 		}
 		if l := lightness(); l < 128 {
@@ -676,14 +676,14 @@ func TestSettingsTheme(t *testing.T) {
 			t.Error("the dialog does not show the theme chosen")
 		}
 		selectData(d.theme, settings.ThemeLight)
-		d.box.Button(qt.QDialogButtonBox__Cancel).Click()
+		d.box.Button(qtwidgets.QDialogButtonBoxCancel).Click()
 		if w.settings.Theme != settings.ThemeDark {
 			t.Error("cancelling changed the theme")
 		}
 
 		d = w.editSettings()
 		selectData(d.theme, settings.ThemeLight)
-		d.box.Button(qt.QDialogButtonBox__Ok).Click()
+		d.box.Button(qtwidgets.QDialogButtonBoxOk).Click()
 		if l := lightness(); l > 128 {
 			t.Errorf("the tab icons are %d light in the light theme", l)
 		}
@@ -691,7 +691,7 @@ func TestSettingsTheme(t *testing.T) {
 }
 
 func TestStartThemed(t *testing.T) {
-	t.Cleanup(func() { onMain(func() { applyTheme("") }) })
+	t.Cleanup(func() { onMain(t, func() { applyTheme("") }) })
 	dir := t.TempDir()
 	path := filepath.Join(dir, "settings.json")
 	if err := settings.Save(path, settings.Settings{Theme: settings.ThemeDark}); err != nil {
@@ -699,10 +699,10 @@ func TestStartThemed(t *testing.T) {
 	}
 	m := &service.Manager{Dir: dir, Systemctl: (&fakeSystemd{}).systemctl}
 	var w *Window
-	onMain(func() { w = NewWindow(path, m) })
-	t.Cleanup(func() { onMain(func() { w.DeleteLater() }) })
-	onMain(func() {
-		if s := qt.QApplication_Style().Name(); s != "fusion" {
+	onMain(t, func() { w = NewWindow(path, m) })
+	t.Cleanup(func() { onMain(t, func() { w.DeleteLater() }) })
+	onMain(t, func() {
+		if s := qtwidgets.QApplicationStyle().Name(); s != "fusion" {
 			t.Errorf("the style is %s, want the dark theme's", s)
 		}
 	})
@@ -714,7 +714,7 @@ func TestInhibitorsReconfigure(t *testing.T) {
 	w, _ := newTestWindow(t, withSaver(), sd)
 	installed(t, w)
 	wait(t, "the service to be seen installed", func() bool { return w.status.Installed })
-	onMain(func() {
+	onMain(t, func() {
 		// A name with a comma or space cannot be given to the launcher.
 		for _, name := range []string{"a,b", "a b"} {
 			w.inhibitors.name.SetText(name)
@@ -726,6 +726,6 @@ func TestInhibitorsReconfigure(t *testing.T) {
 		w.inhibitors.add.Click()
 	})
 	unitExec(t, w, exe+" -saver screensaver-digital-rain -inhibit kodi")
-	onMain(func() { w.inhibitors.bins[0].Click() })
+	onMain(t, func() { w.inhibitors.bins[0].Click() })
 	unitExec(t, w, exe+" -saver screensaver-digital-rain")
 }

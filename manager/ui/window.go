@@ -7,8 +7,10 @@ import (
 	"slices"
 	"time"
 
-	qt "github.com/mappu/miqt/qt6"
-	"github.com/mappu/miqt/qt6/mainthread"
+	"github.com/nomad-software/qute"
+	"github.com/nomad-software/qute/qtcore"
+	"github.com/nomad-software/qute/qtgui"
+	"github.com/nomad-software/qute/qtwidgets"
 
 	"github.com/nomad-software/screensaver/manager/appicon"
 	"github.com/nomad-software/screensaver/manager/service"
@@ -24,9 +26,10 @@ const launcher = "screensaver-launcher"
 // looked at again, so that what is shown follows them.
 const refreshInterval = 2 * time.Second
 
-// Window is the main window.
+// Window is the main window. It is a Go subclass of QMainWindow, so that it
+// hears of changes to the palette and the style (see ChangeEvent).
 type Window struct {
-	*qt.QMainWindow
+	qtwidgets.QMainWindowBase
 
 	// settingsPath is where the manager's settings are kept, and settings
 	// what they are: the theme, and what the launcher is run with.
@@ -36,10 +39,10 @@ type Window struct {
 	manager *service.Manager
 	status  service.Status
 
-	tabs           *qt.QTabWidget
-	settingsAction *qt.QAction
-	quit           *qt.QAction
-	about          *qt.QAction
+	tabs           *tabWidget
+	settingsAction *qtgui.QAction
+	quit           *qtgui.QAction
+	about          *qtgui.QAction
 	savers         *saverList
 	service        *serviceBox
 	inhibitors     *inhibitorBox
@@ -47,10 +50,6 @@ type Window struct {
 	// refreshing is whether the state is being looked at, so that a slow
 	// systemctl does not have the looks pile up.
 	refreshing bool
-
-	// gone is whether the window has been destroyed, with its widgets, which
-	// what finishes in the background must then leave alone.
-	gone bool
 }
 
 // state is what is looked at away from the UI's thread at each refresh.
@@ -63,37 +62,36 @@ type state struct {
 // NewWindow makes the main window, for the manager's settings at
 // settingsPath and the service the manager controls.
 func NewWindow(settingsPath string, manager *service.Manager) *Window {
-	w := &Window{QMainWindow: qt.NewQMainWindow2(), manager: manager,
-		settingsPath: settingsPath, settings: settings.Load(settingsPath)}
+	w := &Window{manager: manager, settingsPath: settingsPath, settings: settings.Load(settingsPath)}
+	qtwidgets.NewQMainWindowWith(w, nil)
 	rememberSystemStyle()
 	if w.settings.Theme != "" {
 		applyTheme(w.settings.Theme)
 	}
 	w.SetWindowTitle("Screensaver Manager")
-	w.OnDestroyed(func() { w.gone = true })
 	icon := appIcon()
 	defer icon.Delete()
 	w.SetWindowIcon(icon)
 	// Dialogs take their icon from the application.
-	qt.QGuiApplication_SetWindowIcon(icon)
+	qtgui.QGuiApplicationSetWindowIcon(icon)
 	w.makeMenus()
 
 	w.savers = newSaverList(w, screen.Savers())
 	w.service = newServiceBox(w)
 	w.inhibitors = newInhibitorBox(w)
 	w.makeTabs(
-		[tabCount]*qt.QWidget{w.savers.QWidget, w.service.QWidget, w.inhibitors.QWidget},
+		[tabCount]*qtwidgets.QWidget{w.savers.QWidget, w.service.QWidget, w.inhibitors.QWidget},
 		[tabCount]string{"Screensavers", "Start Up", "Inhibit"},
 	)
-	w.SetCentralWidget(w.tabs.QWidget)
+	w.SetCentralWidget(w.tabs)
 	// A status bar along the bottom, with a handle in its corner to drag
 	// the window bigger or smaller by.
 	w.StatusBar().SetSizeGripEnabled(true)
 	w.Resize(1000, 640)
 
-	timer := qt.NewQTimer2(w.QObject)
+	timer := qtcore.NewQTimer(w)
 	timer.OnTimeout(w.refresh)
-	timer.Start(int(refreshInterval / time.Millisecond))
+	timer.StartWithDuration(refreshInterval)
 	w.refresh()
 	return w
 }
@@ -101,34 +99,36 @@ func NewWindow(settingsPath string, manager *service.Manager) *Window {
 // makeMenus makes the menu bar: File, with the settings and Quit, and Help,
 // with the about box.
 func (w *Window) makeMenus() {
-	file := w.MenuBar().AddMenuWithTitle("&File")
-	w.settingsAction = file.AddActionWithText("&Settings…")
-	w.settingsAction.SetMenuRole(qt.QAction__PreferencesRole)
-	shortcut := qt.NewQKeySequence2("Ctrl+,")
-	w.settingsAction.SetShortcut(shortcut)
-	shortcut.Delete()
-	w.settingsAction.OnTriggered(func() { w.editSettings() })
+	file := w.MenuBar().AddMenuTitle("&File")
+	w.settingsAction = file.AddActionText("&Settings…")
+	w.settingsAction.SetMenuRole(qtgui.QActionPreferencesRole)
+	setShortcut(w.settingsAction, "Ctrl+,")
+	w.settingsAction.OnTriggered(func(bool) { w.editSettings() })
 	file.AddSeparator()
-	w.quit = file.AddActionWithText("&Quit")
-	shortcut = qt.NewQKeySequence2("Ctrl+Q")
-	w.quit.SetShortcut(shortcut)
-	shortcut.Delete()
-	w.quit.SetMenuRole(qt.QAction__QuitRole)
-	w.quit.OnTriggered(func() { w.Close() })
+	w.quit = file.AddActionText("&Quit")
+	setShortcut(w.quit, "Ctrl+Q")
+	w.quit.SetMenuRole(qtgui.QActionQuitRole)
+	w.quit.OnTriggered(func(bool) { w.Close() })
 
-	help := w.MenuBar().AddMenuWithTitle("&Help")
-	w.about = help.AddActionWithText("&About")
-	w.about.SetMenuRole(qt.QAction__AboutRole)
-	shortcut = qt.NewQKeySequence2("Ctrl+I")
-	w.about.SetShortcut(shortcut)
-	shortcut.Delete()
-	w.about.OnTriggered(func() { showAbout(w.QWidget) })
+	help := w.MenuBar().AddMenuTitle("&Help")
+	w.about = help.AddActionText("&About")
+	w.about.SetMenuRole(qtgui.QActionAboutRole)
+	setShortcut(w.about, "Ctrl+I")
+	w.about.OnTriggered(func(bool) { showAbout(&w.QWidget) })
+}
+
+// setShortcut gives the action the shortcut of the keys, such as "Ctrl+Q".
+func setShortcut(action *qtgui.QAction, keys string) {
+	shortcut := qtgui.NewQKeySequenceWithKey(keys)
+	// The action keeps a copy of the shortcut.
+	defer shortcut.Delete()
+	action.SetShortcut(shortcut)
 }
 
 // editSettings shows the settings, which are put into effect and saved if
 // they are accepted.
 func (w *Window) editSettings() *settingsDialog {
-	return newSettingsDialog(w.QWidget, w.settings, w.applySettings)
+	return newSettingsDialog(&w.QWidget, w.settings, w.applySettings)
 }
 
 // applySettings puts the settings into effect, and saves them.
@@ -145,18 +145,18 @@ func (w *Window) applySettings(s settings.Settings) {
 }
 
 // appIcon returns the program's icon.
-func appIcon() *qt.QIcon {
-	pixmap := qt.NewQPixmap()
+func appIcon() *qtgui.QIcon {
+	pixmap := qtgui.NewQPixmap()
 	// The icon keeps a copy of the picture.
 	defer pixmap.Delete()
-	pixmap.LoadFromDataWithData(appicon.PNG)
-	return qt.NewQIcon2(pixmap)
+	pixmap.LoadFromData(appicon.PNG)
+	return qtgui.NewQIconWithPixmap(pixmap)
 }
 
 // save writes the settings file, and says so if it cannot.
 func (w *Window) save() bool {
 	if err := settings.Save(w.settingsPath, w.settings); err != nil {
-		warning(w.QWidget, "Settings", "The settings file "+w.settingsPath+" could not be written: "+err.Error())
+		warning(&w.QWidget, "Settings", "The settings file "+w.settingsPath+" could not be written: "+err.Error())
 		return false
 	}
 	return true
@@ -190,7 +190,7 @@ func (w *Window) reconfigure() {
 func (w *Window) launcherPath() (string, bool) {
 	path, err := exec.LookPath(launcher)
 	if err != nil {
-		warning(w.QWidget, "Start Up", "The launcher, "+launcher+", is not installed: run make install.")
+		warning(&w.QWidget, "Start Up", "The launcher, "+launcher+", is not installed: run make install.")
 		return "", false
 	}
 	return path, true
@@ -201,12 +201,14 @@ func (w *Window) launcherPath() (string, bool) {
 func (w *Window) inBackground(work func() error) {
 	go func() {
 		err := work()
-		mainthread.Start(func() {
-			if w.gone {
+		qute.Post(func() {
+			// The window may have been destroyed, with its widgets, while
+			// the work was done.
+			if !w.Alive() {
 				return
 			}
 			if err != nil {
-				warning(w.QWidget, "Start Up", err.Error())
+				warning(&w.QWidget, "Start Up", err.Error())
 			}
 			w.refresh()
 		})
@@ -225,8 +227,8 @@ func (w *Window) refresh() {
 		var s state
 		s.status, s.statusErr = w.manager.Status()
 		s.running, _ = process.Running(names)
-		mainthread.Start(func() {
-			if w.gone {
+		qute.Post(func() {
+			if !w.Alive() {
 				return
 			}
 			w.refreshing = false
@@ -250,12 +252,13 @@ var startSaver = func(name string) error {
 }
 
 // warning shows a warning. Tests replace it rather than let the dialog open.
-var warning = func(parent *qt.QWidget, title, text string) {
-	qt.QMessageBox_Warning(parent, title, text)
+var warning = func(parent *qtwidgets.QWidget, title, text string) {
+	qtwidgets.QMessageBoxWarning(parent, title, text)
 }
 
 // confirm asks the user a question, and reports if they said yes. Tests
 // replace it rather than let the dialog open.
-var confirm = func(parent *qt.QWidget, title, text string) bool {
-	return qt.QMessageBox_Question5(parent, title, text, qt.QMessageBox__Yes|qt.QMessageBox__No) == qt.QMessageBox__Yes
+var confirm = func(parent *qtwidgets.QWidget, title, text string) bool {
+	return qtwidgets.QMessageBoxQuestionFull(parent, title, text,
+		qtwidgets.QMessageBoxYes|qtwidgets.QMessageBoxNo, qtwidgets.QMessageBoxNoButton) == qtwidgets.QMessageBoxYes
 }

@@ -4,8 +4,11 @@ github.com/gen2brain/raylib-go/raylib
 # github.com/godbus/dbus/v5 v5.1.0
 ## explicit; go 1.12
 github.com/godbus/dbus/v5
-# github.com/mappu/miqt v0.15.0
-## explicit; go 1.19
-github.com/mappu/miqt/libmiqt
-github.com/mappu/miqt/qt6
-github.com/mappu/miqt/qt6/mainthread
+# github.com/nomad-software/qute v1.0.15
+## explicit; go 1.26.0
+github.com/nomad-software/qute
+github.com/nomad-software/qute/internal/rt
+github.com/nomad-software/qute/qtcore
+github.com/nomad-software/qute/qtgui
+github.com/nomad-software/qute/qtwidgets
+github.com/nomad-software/qute/qutetest

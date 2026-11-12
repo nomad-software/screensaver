@@ -71,8 +71,9 @@ screensaver-launcher -saver screensaver-game-of-life > /dev/null 2>&1
 
 ## Screensaver Manager
 
-A Qt 6 app, built with [miqt](https://github.com/mappu/miqt), to manage the
-launcher. Building it needs Qt 6 and its development files.
+A Qt 6 app, built with [qute](https://github.com/nomad-software/qute), to
+manage the launcher. Building it needs Qt 6.12 or newer and its development
+files. The first build compiles qute's C++ shims, which takes a few minutes.
 
 * *Screensavers* lists every saver by name, with the one in use marked and
   selected. The selected one's preview plays beside the list. *Preview* runs

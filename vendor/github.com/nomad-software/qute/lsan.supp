@@ -1,0 +1,27 @@
+# LeakSanitizer suppressions for go test -asan: allocations GL and video
+# drivers, and the media libraries Qt Multimedia's backend loads, keep until
+# process exit. Only third-party libraries are listed, so qute's and Qt's own
+# memory is still checked. Use with LSAN_OPTIONS=suppressions=$PWD/lsan.supp.
+# On a machine with CUDA, FFmpeg's hardware-device probing also leaks from a
+# library it unloads before the check (an unnamed module, which no pattern
+# matches): set QT_FFMPEG_DECODING_HW_DEVICE_TYPES=, and
+# QT_FFMPEG_ENCODING_HW_DEVICE_TYPES=, for go test -asan.
+leak:libnvidia-glcore.so
+leak:libnvidia-glsi.so
+leak:libnvidia-eglcore.so
+leak:libGLX_nvidia.so
+leak:libEGL_nvidia.so
+leak:libgallium
+leak:libEGL_mesa.so
+leak:libGLX_mesa.so
+leak:libglapi.so
+leak:libdrm.so
+leak:libcuda.so
+leak:nvidia_drv_video.so
+leak:libavutil.so
+leak:libdbus-1.so
+# Chromium (Qt WebEngine) leaves internal allocations of its own threads at
+# exit; its stacks have no symbols, so only the library can be named. This
+# also hides leaks of web-engine internals, but ASan's use-after-free and
+# overflow checks still cover them.
+leak:libQt6WebEngineCore.so
