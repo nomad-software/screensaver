@@ -132,6 +132,9 @@ again, as it builds the previews into itself.
 ### `screensaver-game-of-life`
 ![](screen/saver/game_of_life/assets/images/preview.gif)
 
+### `screensaver-hex-cascade`
+![](screen/saver/hex_cascade/assets/images/preview.gif)
+
 ### `screensaver-shader-fire`
 ![](screen/saver/shader_fire/assets/images/preview.gif)
 
