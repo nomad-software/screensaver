@@ -1,0 +1,143 @@
+# Classes bound in package qtcore. Options:
+#   kind: value        copyable Qt value class held in an owned handle
+#   kind: event        an event class (arguments are scoped to their handler)
+#   subclass: false    do not let Go subclass it. Every class with virtuals is
+#                      subclassable unless Qt prevents it (COVERAGE.md lists why);
+#                      subclass: true insists, so the generator warns if it cannot be
+#   notify-dtor: true  shim destructor tells Go when a non-QObject dies; only
+#                      needed with subclass: false (a subclass shim does it)
+#   no-construct: true hide constructors
+#   skip-virtuals: [x] virtuals Go may not override
+#   raw-pointers: true pass pointer-to-number arguments as unsafe.Pointer (GL)
+#   inline: true       a trivially copyable value kept in Go memory, not a C++ heap copy
+#   enums-only: true   emit the enums but no wrapper (QChar is a rune in Go)
+#   depends-on: x      the object(s) a value is only valid with: a getter name,
+#                      or {cpp: <expr over $self>, class: <class>}; a list for several
+#   reviewed: true     every default rule on the class was checked; avoid it,
+#                      it hides methods nobody looked at (review per method)
+module: QtCore
+package: qtcore
+classes:
+  QObject: {}
+  QTimer: {}
+  QCoreApplication: { no-construct: true }
+  QAbstractItemModel: {}
+  QAbstractListModel: {}
+  QAbstractTableModel: {}
+  QStringListModel: {}
+  QItemSelectionModel: {}
+  QAbstractProxyModel: {}
+  QSortFilterProxyModel: {}
+  QIODeviceBase: { no-construct: true }
+  QIODevice: {}
+  QFileDevice: {}
+  QFile: {}
+  QBuffer: {}
+  QMimeData: {}
+  QSettings: {}
+  QEvent: { kind: event }
+  QTimerEvent: { kind: event, no-construct: true }
+  QChildEvent: { kind: event, no-construct: true }
+  QVariant: { kind: value }
+  QModelIndex: { kind: value, inline: true, depends-on: model }
+  QPersistentModelIndex: { kind: value }
+  QUrl: { kind: value }
+  QDate: { kind: value }
+  QTime: { kind: value }
+  QDateTime: { kind: value }
+  QCalendar: { kind: value }
+  QTimeZone: { kind: value }
+  QLocale: { kind: value }
+  QRegularExpression: { kind: value }
+  QRegularExpressionMatch: { kind: value }
+  QItemSelection: { kind: value }
+  QItemSelectionRange: { kind: value }
+  QDataStream: {}
+  QLine: { kind: value }
+  QLineF: { kind: value }
+  QMetaType: { kind: value }
+  QBitArray: { kind: value }
+  QDir: { kind: value }
+  QEasingCurve: { kind: value }
+  QEventLoop: {}
+  QJsonArray: { kind: value }
+  QJsonDocument: { kind: value }
+  QJsonObject: { kind: value }
+  QJsonValue: { kind: value }
+  QTranslator: {}
+  QUuid: { kind: value }
+  QBasicTimer: {}
+  QUrlQuery: { kind: value }
+  QPartialOrdering: { kind: value }
+  QKeyCombination: { kind: value }
+  QDeadlineTimer: { kind: value }
+  QFileInfo: { kind: value }
+  QRegularExpressionMatchIterator: { kind: value }
+  "QCalendar::YearMonthDay": { kind: value }
+  "QCalendar::SystemId": { kind: value }
+  "QTimeZone::OffsetData": { kind: value }
+  QSysInfo: { no-construct: true }
+  QChar: { enums-only: true }
+  QAbstractAnimation: {}
+  QAnimationGroup: {}
+  QParallelAnimationGroup: {}
+  QSequentialAnimationGroup: {}
+  QPauseAnimation: {}
+  QVariantAnimation: {}
+  QPropertyAnimation: {}
+  QTimeLine: {}
+  QChronoTimer: {}
+  QCommandLineOption: { kind: value }
+  QCommandLineParser: {}
+  QIdentityProxyModel: {}
+  QTransposeProxyModel: {}
+  QConcatenateTablesProxyModel: {}
+  QDirIterator: {}
+  QFileSelector: {}
+  QFileSystemWatcher: {}
+  QLibraryInfo: { no-construct: true }
+  QVersionNumber: { kind: value }
+  QLockFile: {}
+  QLoggingCategory: {}
+  QMimeDatabase: {}
+  QMimeType: { kind: value }
+  QOperatingSystemVersionBase: { kind: value }
+  QOperatingSystemVersionUnexported: { kind: value }
+  QOperatingSystemVersion: { kind: value }
+  QProcess: {}
+  QProcessEnvironment: { kind: value }
+  "QProcess::UnixProcessParameters": { kind: value }
+  QResource: {}
+  QSaveFile: {}
+  QSignalMapper: {}
+  QStandardPaths: { no-construct: true }
+  QStorageInfo: { kind: value }
+  QTemporaryDir: {}
+  QTemporaryFile: {}
+  QXmlStreamReader: {}
+  QXmlStreamWriter: {}
+  QXmlStreamAttribute: { kind: value }
+  QXmlStreamAttributes: { kind: value }
+  QXmlStreamEntityDeclaration: { kind: value }
+  QXmlStreamNamespaceDeclaration: { kind: value }
+  QXmlStreamNotationDeclaration: { kind: value }
+  QXmlStreamEntityResolver: {}
+  QCborValue: { kind: value }
+  QCborMap: { kind: value }
+  QCborArray: { kind: value }
+  QCborStreamReader: {}
+  QCborStreamWriter: {}
+  QCborParserError: { kind: value }
+  QCborError: { kind: value }
+  QJsonParseError: { kind: value }
+  QMetaObject: { no-construct: true }
+  QMetaMethod: { kind: value }
+  QMetaProperty: { kind: value }
+  QMetaEnum: { kind: value }
+  QMetaClassInfo: { kind: value }
+  QSocketDescriptor: { kind: value }
+  QSocketNotifier: {}
+  QEventLoopLocker: {}
+  QObjectCleanupHandler: {}
+  QDynamicPropertyChangeEvent: { kind: event }
+  QTypeRevision: { kind: value }

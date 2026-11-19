@@ -1,0 +1,171 @@
+# Ownership overlays for qtopengl. See spec/overlays/qtwidgets.yaml for the rules.
+
+QOpenGLTexture:
+  setData: { no-full: "the pixel transfer options (QOpenGLPixelTransferOptions) are not bound; Qt's defaults apply" }
+  setCompressedData: { no-full: "the pixel transfer options (QOpenGLPixelTransferOptions) are not bound; Qt's defaults apply" }
+  setData(PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetDataRaw }
+  setData(int, PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetMipLevelData }
+  setData(int, int, PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetLayerData }
+  setData(int, int, CubeMapFace, PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetCubeFaceData }
+  setData(int, int, int, CubeMapFace, PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetCubeFaceLayersData }
+  setData(int, int, int, int, int, int, PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetRegionData }
+  setData(int, int, int, int, int, int, int, PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetRegionMipData }
+  setData(int, int, int, int, int, int, int, int, PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetRegionLayerData }
+  setData(int, int, int, int, int, int, int, int, CubeMapFace, PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetRegionCubeFaceData }
+  setData(int, int, int, int, int, int, int, int, CubeMapFace, int, PixelFormat, PixelType, const void *, const QOpenGLPixelTransferOptions *const): { name: SetRegionCubeFaceLayersData }
+  setCompressedData(int, const void *, const QOpenGLPixelTransferOptions *const): { name: SetCompressedData }
+  setCompressedData(int, int, const void *, const QOpenGLPixelTransferOptions *const): { name: SetCompressedMipData }
+  setCompressedData(int, int, int, const void *, const QOpenGLPixelTransferOptions *const): { name: SetCompressedLayerData }
+  setCompressedData(int, int, CubeMapFace, int, const void *, const QOpenGLPixelTransferOptions *const): { name: SetCompressedCubeFaceData }
+  setCompressedData(int, int, int, CubeMapFace, int, const void *, const QOpenGLPixelTransferOptions *const): { name: SetCompressedCubeFaceLayersData }
+  borderColor(float *): { name: BorderColorFloat }
+  borderColor(int *): { name: BorderColorInt }
+  borderColor(unsigned int *): { name: BorderColorUint }
+  setSize: { keep-defaults: true, doc: "Pass 1 for unused dimensions." }
+  createTextureView:
+    return: transfer-to-go
+    doc: "The caller owns the new texture view. Needs OpenGL 4.3 or texture-view support."
+    test: |
+      fmt := qtgui.NewQSurfaceFormat()
+      fmt.SetVersion(4, 3)
+      fmt.SetProfile(qtgui.QSurfaceFormatCoreProfile)
+      ctx := qtgui.NewQOpenGLContext(nil)
+      defer ctx.Delete()
+      ctx.SetFormat(fmt)
+      surf := qtgui.NewQOffscreenSurfaceWithScreen(nil, nil)
+      defer surf.Delete()
+      surf.SetFormat(fmt)
+      surf.Create()
+      if !ctx.Create() || !ctx.MakeCurrent(surf) {
+      	t.Skip("no OpenGL 4.3 context available")
+      }
+      defer ctx.DoneCurrent()
+      tex := qtopengl.NewQOpenGLTextureWithTarget(qtopengl.QOpenGLTextureTarget2D)
+      defer tex.Delete()
+      tex.SetFormat(qtopengl.QOpenGLTextureRGBA8_UNorm)
+      tex.SetSize(4, 4, 1)
+      tex.AllocateStorage()
+      view := tex.CreateTextureView(qtopengl.QOpenGLTextureTarget2D, qtopengl.QOpenGLTextureRGBA8_UNorm, 0, 0, 0, 0)
+      if view == nil {
+      	t.Skip("this driver does not support texture views")
+      }
+      if got := view.Ownership(); got != qtcore.Owned {
+      	t.Errorf("view: %v, want Owned", got)
+      }
+      view.Delete()
+
+QOpenGLShaderProgram:
+  hasOpenGLShaderPrograms: { reviewed: true }
+  setAttributeValue(int, GLfloat): { name: SetAttributeFloat }
+  setAttributeValue(int, GLfloat, GLfloat): { name: SetAttributeFloat2 }
+  setAttributeValue(int, GLfloat, GLfloat, GLfloat): { name: SetAttributeFloat3 }
+  setAttributeValue(int, GLfloat, GLfloat, GLfloat, GLfloat): { name: SetAttributeFloat4 }
+  setAttributeValue(int, const QVector2D &): { name: SetAttributeVector2D }
+  setAttributeValue(int, const QVector3D &): { name: SetAttributeVector3D }
+  setAttributeValue(int, const QVector4D &): { name: SetAttributeVector4D }
+  setAttributeValue(int, const QColor &): { name: SetAttributeColor }
+  setAttributeValue(int, const GLfloat *, int, int): { name: SetAttributeValues }
+  setAttributeValue(const char *, GLfloat): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeValue(const char *, GLfloat, GLfloat): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeValue(const char *, GLfloat, GLfloat, GLfloat): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeValue(const char *, GLfloat, GLfloat, GLfloat, GLfloat): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeValue(const char *, const QVector2D &): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeValue(const char *, const QVector3D &): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeValue(const char *, const QVector4D &): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeValue(const char *, const QColor &): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeValue(const char *, const GLfloat *, int, int): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeArray(int, const GLfloat *, int, int): { name: SetAttributeArray, doc: "Qt reads the array at draw time: keep the memory alive and pinned until then, or use SetAttributeBuffer." }
+  setAttributeArray(int, const QVector2D *, int): { skip: "a client-side array Qt reads later; use SetAttributeBuffer with a QOpenGLBuffer" }
+  setAttributeArray(int, const QVector3D *, int): { skip: "a client-side array Qt reads later; use SetAttributeBuffer with a QOpenGLBuffer" }
+  setAttributeArray(int, const QVector4D *, int): { skip: "a client-side array Qt reads later; use SetAttributeBuffer with a QOpenGLBuffer" }
+  setAttributeArray(int, GLenum, const void *, int, int): { name: SetAttributeArrayType, doc: "Qt reads the array at draw time: keep the memory alive and pinned until then, or use SetAttributeBuffer." }
+  setAttributeArray(const char *, const GLfloat *, int, int): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeArray(const char *, const QVector2D *, int): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeArray(const char *, const QVector3D *, int): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeArray(const char *, const QVector4D *, int): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeArray(const char *, GLenum, const void *, int, int): { skip: "use AttributeLocation(name) with the location overload" }
+  setAttributeBuffer(const char *, GLenum, int, int, int): { skip: "use AttributeLocation(name) with the location overload" }
+  enableAttributeArray(const char *): { skip: "use AttributeLocation(name) with the location overload" }
+  disableAttributeArray(const char *): { skip: "use AttributeLocation(name) with the location overload" }
+  setUniformValue(int, GLfloat): { name: SetUniformFloat }
+  setUniformValue(int, GLint): { name: SetUniformInt }
+  setUniformValue(int, GLuint): { name: SetUniformUint }
+  setUniformValue(int, GLfloat, GLfloat): { name: SetUniformFloat2 }
+  setUniformValue(int, GLfloat, GLfloat, GLfloat): { name: SetUniformFloat3 }
+  setUniformValue(int, GLfloat, GLfloat, GLfloat, GLfloat): { name: SetUniformFloat4 }
+  setUniformValue(int, const QVector2D &): { name: SetUniformVector2D }
+  setUniformValue(int, const QVector3D &): { name: SetUniformVector3D }
+  setUniformValue(int, const QVector4D &): { name: SetUniformVector4D }
+  setUniformValue(int, const QColor &): { name: SetUniformColor }
+  setUniformValue(int, const QPoint &): { name: SetUniformPoint }
+  setUniformValue(int, const QPointF &): { name: SetUniformPointF }
+  setUniformValue(int, const QSize &): { name: SetUniformSize }
+  setUniformValue(int, const QSizeF &): { name: SetUniformSizeF }
+  setUniformValue(int, const QMatrix4x4 &): { name: SetUniformMatrix4x4 }
+  setUniformValue(int, const QTransform &): { name: SetUniformTransform }
+  setUniformValue(const char *, GLfloat): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, GLint): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, GLuint): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, GLfloat, GLfloat): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, GLfloat, GLfloat, GLfloat): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, GLfloat, GLfloat, GLfloat, GLfloat): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QVector2D &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QVector3D &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QVector4D &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QColor &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QPoint &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QPointF &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QSize &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QSizeF &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QMatrix2x2 &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QMatrix2x3 &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QMatrix2x4 &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QMatrix3x2 &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QMatrix3x3 &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QMatrix3x4 &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QMatrix4x2 &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QMatrix4x3 &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QMatrix4x4 &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const GLfloat[2][2]): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const GLfloat[3][3]): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const GLfloat[4][4]): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValue(const char *, const QTransform &): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(int, const GLfloat *, int, int): { name: SetUniformFloatArray }
+  setUniformValueArray(int, const GLint *, int): { name: SetUniformIntArray }
+  setUniformValueArray(int, const GLuint *, int): { name: SetUniformUintArray }
+  setUniformValueArray(int, const QVector2D *, int): { name: SetUniformVector2DArray }
+  setUniformValueArray(int, const QVector3D *, int): { name: SetUniformVector3DArray }
+  setUniformValueArray(int, const QVector4D *, int): { name: SetUniformVector4DArray }
+  setUniformValueArray(int, const QMatrix4x4 *, int): { name: SetUniformMatrix4x4Array }
+  setUniformValueArray(const char *, const GLfloat *, int, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const GLint *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const GLuint *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QVector2D *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QVector3D *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QVector4D *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QMatrix2x2 *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QMatrix2x3 *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QMatrix2x4 *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QMatrix3x2 *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QMatrix3x3 *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QMatrix3x4 *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QMatrix4x2 *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QMatrix4x3 *, int): { skip: "use UniformLocation(name) with the location overload" }
+  setUniformValueArray(const char *, const QMatrix4x4 *, int): { skip: "use UniformLocation(name) with the location overload" }
+  addShader: { reviewed: true, doc: "The caller keeps ownership of the shader (Qt docs)." }
+  removeShader: { reviewed: true }
+  shaders: { return: borrowed }
+
+QOpenGLFramebufferObject:
+  blitFramebuffer: { reviewed: true }
+
+QOpenGLPaintDevice:
+  context: { return: borrowed }
+
+QOpenGLWindow:
+  QOpenGLWindow(QOpenGLContext*, QOpenGLWindow::UpdateBehavior, QWindow*): { name: NewQOpenGLWindowShared, args: { shareContext: keep } }
+  context: { return: borrowed }
+  shareContext: { return: borrowed }
+
+QOpenGLShader:
+  hasOpenGLShaders: { reviewed: true }

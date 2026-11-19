@@ -1,0 +1,17 @@
+# Classes bound in package qtopengl (Qt OpenGL helpers). See qtcore.yaml for options.
+module: QtOpenGL
+package: qtopengl
+classes:
+  QOpenGLShaderProgram: {}
+  QOpenGLShader: {}
+  QOpenGLBuffer: { kind: value }
+  QOpenGLVertexArrayObject: {}
+  QOpenGLTexture: { raw-pointers: true }
+  QOpenGLFramebufferObject: {}
+  QOpenGLFramebufferObjectFormat: { kind: value }
+  QOpenGLPaintDevice: {}
+  QOpenGLDebugLogger: {}
+  QOpenGLDebugMessage: { kind: value }
+  QOpenGLTextureBlitter: {}
+  QOpenGLPixelTransferOptions: { kind: value }
+  QOpenGLWindow: {}

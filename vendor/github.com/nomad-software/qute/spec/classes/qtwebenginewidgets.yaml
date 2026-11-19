@@ -1,0 +1,5 @@
+# Classes bound in package qtwebenginewidgets. See qtcore.yaml for options.
+module: QtWebEngineWidgets
+package: qtwebenginewidgets
+classes:
+  QWebEngineView: {}

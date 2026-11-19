@@ -1,0 +1,6 @@
+# Classes bound in package qtmultimediawidgets. See qtcore.yaml for options.
+module: QtMultimediaWidgets
+package: qtmultimediawidgets
+classes:
+  QVideoWidget: {}
+  QGraphicsVideoItem: {}

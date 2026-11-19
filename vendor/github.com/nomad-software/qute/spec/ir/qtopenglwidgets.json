@@ -1,0 +1,702 @@
+{
+ "classes": [
+  {
+   "abstract": false,
+   "bases": [
+    "QWidget"
+   ],
+   "dropped": [],
+   "dtor": {
+    "access": "public",
+    "virtual": true
+   },
+   "enums": [
+    {
+     "name": "UpdateBehavior",
+     "scope": "QOpenGLWidget",
+     "scoped": false,
+     "underlying": "unsigned int",
+     "values": [
+      {
+       "name": "NoPartialUpdate",
+       "value": 0
+      },
+      {
+       "name": "PartialUpdate",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "name": "TargetBuffer",
+     "scope": "QOpenGLWidget",
+     "scoped": false,
+     "underlying": "unsigned char",
+     "values": [
+      {
+       "name": "LeftBuffer",
+       "value": 0
+      },
+      {
+       "name": "RightBuffer",
+       "value": 1
+      }
+     ]
+    }
+   ],
+   "fields": [],
+   "flags": [],
+   "gadget": false,
+   "header": "qopenglwidget.h",
+   "kind": "class",
+   "methods": [
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "metaObject",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "const QMetaObject *",
+      "spelling": "const QMetaObject *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "tr",
+     "params": [
+      {
+       "default": false,
+       "name": "s",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "c",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "n",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": true,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QOpenGLWidget",
+     "params": [
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QWidget *",
+        "spelling": "QWidget *"
+       }
+      },
+      {
+       "default": true,
+       "name": "f",
+       "type": {
+        "canonical": "QFlags<Qt::WindowType>",
+        "spelling": "Qt::WindowFlags"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setUpdateBehavior",
+     "params": [
+      {
+       "default": false,
+       "name": "updateBehavior",
+       "type": {
+        "canonical": "QOpenGLWidget::UpdateBehavior",
+        "spelling": "UpdateBehavior"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "updateBehavior",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QOpenGLWidget::UpdateBehavior",
+      "spelling": "UpdateBehavior"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setFormat",
+     "params": [
+      {
+       "default": false,
+       "name": "format",
+       "type": {
+        "canonical": "const QSurfaceFormat &",
+        "spelling": "const QSurfaceFormat &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "format",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QSurfaceFormat",
+      "spelling": "QSurfaceFormat"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "textureFormat",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "unsigned int",
+      "spelling": "GLenum"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setTextureFormat",
+     "params": [
+      {
+       "default": false,
+       "name": "texFormat",
+       "type": {
+        "canonical": "unsigned int",
+        "spelling": "GLenum"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "isValid",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "makeCurrent",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "makeCurrent",
+     "params": [
+      {
+       "default": false,
+       "name": "targetBuffer",
+       "type": {
+        "canonical": "QOpenGLWidget::TargetBuffer",
+        "spelling": "TargetBuffer"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "doneCurrent",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "context",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QOpenGLContext *",
+      "spelling": "QOpenGLContext *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "defaultFramebufferObject",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "unsigned int",
+      "spelling": "GLuint"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "defaultFramebufferObject",
+     "params": [
+      {
+       "default": false,
+       "name": "targetBuffer",
+       "type": {
+        "canonical": "QOpenGLWidget::TargetBuffer",
+        "spelling": "TargetBuffer"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "unsigned int",
+      "spelling": "GLuint"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "grabFramebuffer",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QImage",
+      "spelling": "QImage"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "grabFramebuffer",
+     "params": [
+      {
+       "default": false,
+       "name": "targetBuffer",
+       "type": {
+        "canonical": "QOpenGLWidget::TargetBuffer",
+        "spelling": "TargetBuffer"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QImage",
+      "spelling": "QImage"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "currentTargetBuffer",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QOpenGLWidget::TargetBuffer",
+      "spelling": "TargetBuffer"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "aboutToCompose",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "frameSwapped",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "aboutToResize",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "resized",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "initializeGL",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "resizeGL",
+     "params": [
+      {
+       "default": false,
+       "name": "w",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      },
+      {
+       "default": false,
+       "name": "h",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "paintGL",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "paintEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "e",
+       "type": {
+        "canonical": "QPaintEvent *",
+        "spelling": "QPaintEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "resizeEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "e",
+       "type": {
+        "canonical": "QResizeEvent *",
+        "spelling": "QResizeEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "event",
+     "params": [
+      {
+       "default": false,
+       "name": "e",
+       "type": {
+        "canonical": "QEvent *",
+        "spelling": "QEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": true,
+     "kind": "method",
+     "name": "metric",
+     "params": [
+      {
+       "default": false,
+       "name": "metric",
+       "type": {
+        "canonical": "QPaintDevice::PaintDeviceMetric",
+        "spelling": "QPaintDevice::PaintDeviceMetric"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "int",
+      "spelling": "int"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": true,
+     "kind": "method",
+     "name": "redirected",
+     "params": [
+      {
+       "default": false,
+       "name": "p",
+       "type": {
+        "canonical": "QPoint *",
+        "spelling": "QPoint *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QPaintDevice *",
+      "spelling": "QPaintDevice *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": true,
+     "kind": "method",
+     "name": "paintEngine",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QPaintEngine *",
+      "spelling": "QPaintEngine *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "private",
+     "copy": true,
+     "kind": "ctor",
+     "name": "QOpenGLWidget",
+     "params": []
+    }
+   ],
+   "module": "QtOpenGLWidgets",
+   "name": "QOpenGLWidget",
+   "qobject": true
+  }
+ ],
+ "enums": [],
+ "flags": [],
+ "module": "QtOpenGLWidgets",
+ "qt_version": "6.12.0"
+}

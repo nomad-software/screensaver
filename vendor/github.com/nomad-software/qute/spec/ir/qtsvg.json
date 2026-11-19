@@ -1,0 +1,1287 @@
+{
+ "classes": [
+  {
+   "abstract": false,
+   "bases": [
+    "QPaintDevice"
+   ],
+   "dropped": [],
+   "dtor": {
+    "access": "public",
+    "virtual": true
+   },
+   "enums": [
+    {
+     "name": "SvgVersion",
+     "scope": "QSvgGenerator",
+     "scoped": true,
+     "underlying": "int",
+     "values": [
+      {
+       "name": "SvgTiny12",
+       "value": 0
+      },
+      {
+       "name": "Svg11",
+       "value": 1
+      }
+     ]
+    }
+   ],
+   "fields": [],
+   "flags": [],
+   "gadget": false,
+   "header": "qsvggenerator.h",
+   "kind": "class",
+   "methods": [
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QSvgGenerator",
+     "params": [],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QSvgGenerator",
+     "params": [
+      {
+       "default": false,
+       "name": "version",
+       "type": {
+        "canonical": "QSvgGenerator::SvgVersion",
+        "spelling": "SvgVersion"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "title",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setTitle",
+     "params": [
+      {
+       "default": false,
+       "name": "title",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "description",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setDescription",
+     "params": [
+      {
+       "default": false,
+       "name": "description",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "size",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QSize",
+      "spelling": "QSize"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setSize",
+     "params": [
+      {
+       "default": false,
+       "name": "size",
+       "type": {
+        "canonical": "const QSize &",
+        "spelling": "const QSize &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "viewBox",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QRect",
+      "spelling": "QRect"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "viewBoxF",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QRectF",
+      "spelling": "QRectF"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setViewBox",
+     "params": [
+      {
+       "default": false,
+       "name": "viewBox",
+       "type": {
+        "canonical": "const QRect &",
+        "spelling": "const QRect &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setViewBox",
+     "params": [
+      {
+       "default": false,
+       "name": "viewBox",
+       "type": {
+        "canonical": "const QRectF &",
+        "spelling": "const QRectF &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "fileName",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setFileName",
+     "params": [
+      {
+       "default": false,
+       "name": "fileName",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "outputDevice",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QIODevice *",
+      "spelling": "QIODevice *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setOutputDevice",
+     "params": [
+      {
+       "default": false,
+       "name": "outputDevice",
+       "type": {
+        "canonical": "QIODevice *",
+        "spelling": "QIODevice *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setResolution",
+     "params": [
+      {
+       "default": false,
+       "name": "dpi",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "resolution",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "int",
+      "spelling": "int"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "svgVersion",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QSvgGenerator::SvgVersion",
+      "spelling": "SvgVersion"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "protected",
+     "const": true,
+     "kind": "method",
+     "name": "paintEngine",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QPaintEngine *",
+      "spelling": "QPaintEngine *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": true,
+     "kind": "method",
+     "name": "metric",
+     "params": [
+      {
+       "default": false,
+       "name": "metric",
+       "type": {
+        "canonical": "QPaintDevice::PaintDeviceMetric",
+        "spelling": "QPaintDevice::PaintDeviceMetric"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "int",
+      "spelling": "int"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": true,
+     "kind": "method",
+     "name": "initPainter",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "QPainter *",
+        "spelling": "QPainter *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    }
+   ],
+   "module": "QtSvg",
+   "name": "QSvgGenerator",
+   "qobject": false
+  },
+  {
+   "abstract": false,
+   "bases": [
+    "QObject"
+   ],
+   "dropped": [],
+   "dtor": {
+    "access": "public",
+    "virtual": true
+   },
+   "enums": [],
+   "fields": [],
+   "flags": [],
+   "gadget": false,
+   "header": "qsvgrenderer.h",
+   "kind": "class",
+   "methods": [
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "metaObject",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "const QMetaObject *",
+      "spelling": "const QMetaObject *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "tr",
+     "params": [
+      {
+       "default": false,
+       "name": "s",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "c",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "n",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": true,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QSvgRenderer",
+     "params": [
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QObject *",
+        "spelling": "QObject *"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QSvgRenderer",
+     "params": [
+      {
+       "default": false,
+       "name": "filename",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      },
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QObject *",
+        "spelling": "QObject *"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QSvgRenderer",
+     "params": [
+      {
+       "default": false,
+       "name": "contents",
+       "type": {
+        "canonical": "const QByteArray &",
+        "spelling": "const QByteArray &"
+       }
+      },
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QObject *",
+        "spelling": "QObject *"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QSvgRenderer",
+     "params": [
+      {
+       "default": false,
+       "name": "contents",
+       "type": {
+        "canonical": "QXmlStreamReader *",
+        "spelling": "QXmlStreamReader *"
+       }
+      },
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QObject *",
+        "spelling": "QObject *"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "isValid",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "defaultSize",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QSize",
+      "spelling": "QSize"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "viewBox",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QRect",
+      "spelling": "QRect"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "viewBoxF",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QRectF",
+      "spelling": "QRectF"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setViewBox",
+     "params": [
+      {
+       "default": false,
+       "name": "viewbox",
+       "type": {
+        "canonical": "const QRect &",
+        "spelling": "const QRect &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setViewBox",
+     "params": [
+      {
+       "default": false,
+       "name": "viewbox",
+       "type": {
+        "canonical": "const QRectF &",
+        "spelling": "const QRectF &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "aspectRatioMode",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "Qt::AspectRatioMode",
+      "spelling": "Qt::AspectRatioMode"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setAspectRatioMode",
+     "params": [
+      {
+       "default": false,
+       "name": "mode",
+       "type": {
+        "canonical": "Qt::AspectRatioMode",
+        "spelling": "Qt::AspectRatioMode"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "options",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QFlags<QtSvg::Option>",
+      "spelling": "QtSvg::Options"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setOptions",
+     "params": [
+      {
+       "default": false,
+       "name": "flags",
+       "type": {
+        "canonical": "QFlags<QtSvg::Option>",
+        "spelling": "QtSvg::Options"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "animated",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "framesPerSecond",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "int",
+      "spelling": "int"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setFramesPerSecond",
+     "params": [
+      {
+       "default": false,
+       "name": "num",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "currentFrame",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "int",
+      "spelling": "int"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setCurrentFrame",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "animationDuration",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "int",
+      "spelling": "int"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "isAnimationEnabled",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setAnimationEnabled",
+     "params": [
+      {
+       "default": false,
+       "name": "enable",
+       "type": {
+        "canonical": "bool",
+        "spelling": "bool"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "boundsOnElement",
+     "params": [
+      {
+       "default": false,
+       "name": "id",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QRectF",
+      "spelling": "QRectF"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "elementExists",
+     "params": [
+      {
+       "default": false,
+       "name": "id",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "transformForElement",
+     "params": [
+      {
+       "default": false,
+       "name": "id",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QTransform",
+      "spelling": "QTransform"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setDefaultOptions",
+     "params": [
+      {
+       "default": false,
+       "name": "flags",
+       "type": {
+        "canonical": "QFlags<QtSvg::Option>",
+        "spelling": "QtSvg::Options"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": true,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "load",
+     "params": [
+      {
+       "default": false,
+       "name": "filename",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "load",
+     "params": [
+      {
+       "default": false,
+       "name": "contents",
+       "type": {
+        "canonical": "const QByteArray &",
+        "spelling": "const QByteArray &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "load",
+     "params": [
+      {
+       "default": false,
+       "name": "contents",
+       "type": {
+        "canonical": "QXmlStreamReader *",
+        "spelling": "QXmlStreamReader *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "render",
+     "params": [
+      {
+       "default": false,
+       "name": "p",
+       "type": {
+        "canonical": "QPainter *",
+        "spelling": "QPainter *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "render",
+     "params": [
+      {
+       "default": false,
+       "name": "p",
+       "type": {
+        "canonical": "QPainter *",
+        "spelling": "QPainter *"
+       }
+      },
+      {
+       "default": false,
+       "name": "bounds",
+       "type": {
+        "canonical": "const QRectF &",
+        "spelling": "const QRectF &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "render",
+     "params": [
+      {
+       "default": false,
+       "name": "p",
+       "type": {
+        "canonical": "QPainter *",
+        "spelling": "QPainter *"
+       }
+      },
+      {
+       "default": false,
+       "name": "elementId",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      },
+      {
+       "default": true,
+       "name": "bounds",
+       "type": {
+        "canonical": "const QRectF &",
+        "spelling": "const QRectF &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "repaintNeeded",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    }
+   ],
+   "module": "QtSvg",
+   "name": "QSvgRenderer",
+   "qobject": true
+  }
+ ],
+ "enums": [
+  {
+   "name": "Option",
+   "scope": "QtSvg",
+   "scoped": false,
+   "underlying": "unsigned int",
+   "values": [
+    {
+     "name": "NoOption",
+     "value": 0
+    },
+    {
+     "name": "Tiny12FeaturesOnly",
+     "value": 1
+    },
+    {
+     "name": "AssumeTrustedSource",
+     "value": 2
+    },
+    {
+     "name": "DisableSMILAnimations",
+     "value": 16
+    },
+    {
+     "name": "DisableCSSAnimations",
+     "value": 32
+    },
+    {
+     "name": "DisableAnimations",
+     "value": 240
+    }
+   ]
+  }
+ ],
+ "flags": [
+  {
+   "enum": "QtSvg::Option",
+   "name": "Options"
+  }
+ ],
+ "module": "QtSvg",
+ "qt_version": "6.12.0"
+}

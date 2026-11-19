@@ -1,0 +1,1374 @@
+{
+ "classes": [
+  {
+   "abstract": false,
+   "bases": [
+    "QWidget"
+   ],
+   "dropped": [],
+   "dtor": {
+    "access": "public",
+    "virtual": true
+   },
+   "enums": [],
+   "fields": [],
+   "flags": [],
+   "gadget": false,
+   "header": "qwebengineview.h",
+   "kind": "class",
+   "methods": [
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "metaObject",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "const QMetaObject *",
+      "spelling": "const QMetaObject *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "tr",
+     "params": [
+      {
+       "default": false,
+       "name": "s",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "c",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "n",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": true,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QWebEngineView",
+     "params": [
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QWidget *",
+        "spelling": "QWidget *"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QWebEngineView",
+     "params": [
+      {
+       "default": false,
+       "name": "profile",
+       "type": {
+        "canonical": "QWebEngineProfile *",
+        "spelling": "QWebEngineProfile *"
+       }
+      },
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QWidget *",
+        "spelling": "QWidget *"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QWebEngineView",
+     "params": [
+      {
+       "default": false,
+       "name": "page",
+       "type": {
+        "canonical": "QWebEnginePage *",
+        "spelling": "QWebEnginePage *"
+       }
+      },
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QWidget *",
+        "spelling": "QWidget *"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "forPage",
+     "params": [
+      {
+       "default": false,
+       "name": "page",
+       "type": {
+        "canonical": "const QWebEnginePage *",
+        "spelling": "const QWebEnginePage *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QWebEngineView *",
+      "spelling": "QWebEngineView *"
+     },
+     "static": true,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "page",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QWebEnginePage *",
+      "spelling": "QWebEnginePage *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setPage",
+     "params": [
+      {
+       "default": false,
+       "name": "page",
+       "type": {
+        "canonical": "QWebEnginePage *",
+        "spelling": "QWebEnginePage *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "load",
+     "params": [
+      {
+       "default": false,
+       "name": "url",
+       "type": {
+        "canonical": "const QUrl &",
+        "spelling": "const QUrl &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "load",
+     "params": [
+      {
+       "default": false,
+       "name": "request",
+       "type": {
+        "canonical": "const QWebEngineHttpRequest &",
+        "spelling": "const QWebEngineHttpRequest &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setHtml",
+     "params": [
+      {
+       "default": false,
+       "name": "html",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      },
+      {
+       "default": true,
+       "name": "baseUrl",
+       "type": {
+        "canonical": "const QUrl &",
+        "spelling": "const QUrl &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setContent",
+     "params": [
+      {
+       "default": false,
+       "name": "data",
+       "type": {
+        "canonical": "const QByteArray &",
+        "spelling": "const QByteArray &"
+       }
+      },
+      {
+       "default": true,
+       "name": "mimeType",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      },
+      {
+       "default": true,
+       "name": "baseUrl",
+       "type": {
+        "canonical": "const QUrl &",
+        "spelling": "const QUrl &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "history",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QWebEngineHistory *",
+      "spelling": "QWebEngineHistory *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "title",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setUrl",
+     "params": [
+      {
+       "default": false,
+       "name": "url",
+       "type": {
+        "canonical": "const QUrl &",
+        "spelling": "const QUrl &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "url",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QUrl",
+      "spelling": "QUrl"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "iconUrl",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QUrl",
+      "spelling": "QUrl"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "icon",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QIcon",
+      "spelling": "QIcon"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "hasSelection",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "selectedText",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "pageAction",
+     "params": [
+      {
+       "default": false,
+       "name": "action",
+       "type": {
+        "canonical": "QWebEnginePage::WebAction",
+        "spelling": "QWebEnginePage::WebAction"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QAction *",
+      "spelling": "QAction *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "triggerPageAction",
+     "params": [
+      {
+       "default": false,
+       "name": "action",
+       "type": {
+        "canonical": "QWebEnginePage::WebAction",
+        "spelling": "QWebEnginePage::WebAction"
+       }
+      },
+      {
+       "default": true,
+       "name": "checked",
+       "type": {
+        "canonical": "bool",
+        "spelling": "bool"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "zoomFactor",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "double",
+      "spelling": "qreal"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setZoomFactor",
+     "params": [
+      {
+       "default": false,
+       "name": "factor",
+       "type": {
+        "canonical": "double",
+        "spelling": "qreal"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "findText",
+     "params": [
+      {
+       "default": false,
+       "name": "subString",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      },
+      {
+       "default": true,
+       "name": "options",
+       "type": {
+        "canonical": "QFlags<QWebEnginePage::FindFlag>",
+        "spelling": "QWebEnginePage::FindFlags"
+       }
+      },
+      {
+       "default": true,
+       "name": "resultCallback",
+       "type": {
+        "canonical": "const std::function<void (const QWebEngineFindTextResult &)> &",
+        "spelling": "const std::function<void (const QWebEngineFindTextResult &)> &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "sizeHint",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QSize",
+      "spelling": "QSize"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "settings",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QWebEngineSettings *",
+      "spelling": "QWebEngineSettings *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "createStandardContextMenu",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QMenu *",
+      "spelling": "QMenu *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "lastContextMenuRequest",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QWebEngineContextMenuRequest *",
+      "spelling": "QWebEngineContextMenuRequest *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "printToPdf",
+     "params": [
+      {
+       "default": false,
+       "name": "filePath",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      },
+      {
+       "default": true,
+       "name": "layout",
+       "type": {
+        "canonical": "const QPageLayout &",
+        "spelling": "const QPageLayout &"
+       }
+      },
+      {
+       "default": true,
+       "name": "ranges",
+       "type": {
+        "canonical": "const QPageRanges &",
+        "spelling": "const QPageRanges &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "printToPdf",
+     "params": [
+      {
+       "default": false,
+       "name": "resultCallback",
+       "type": {
+        "canonical": "const std::function<void (const QByteArray &)> &",
+        "spelling": "const std::function<void (const QByteArray &)> &"
+       }
+      },
+      {
+       "default": true,
+       "name": "layout",
+       "type": {
+        "canonical": "const QPageLayout &",
+        "spelling": "const QPageLayout &"
+       }
+      },
+      {
+       "default": true,
+       "name": "ranges",
+       "type": {
+        "canonical": "const QPageRanges &",
+        "spelling": "const QPageRanges &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "print",
+     "params": [
+      {
+       "default": false,
+       "name": "printer",
+       "type": {
+        "canonical": "QPrinter *",
+        "spelling": "QPrinter *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "stop",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "back",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "forward",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "reload",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "loadStarted",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "loadProgress",
+     "params": [
+      {
+       "default": false,
+       "name": "progress",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "loadFinished",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "bool",
+        "spelling": "bool"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "titleChanged",
+     "params": [
+      {
+       "default": false,
+       "name": "title",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "selectionChanged",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "urlChanged",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "const QUrl &",
+        "spelling": "const QUrl &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "iconUrlChanged",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "const QUrl &",
+        "spelling": "const QUrl &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "iconChanged",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "const QIcon &",
+        "spelling": "const QIcon &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "renderProcessTerminated",
+     "params": [
+      {
+       "default": false,
+       "name": "terminationStatus",
+       "type": {
+        "canonical": "QWebEnginePage::RenderProcessTerminationStatus",
+        "spelling": "QWebEnginePage::RenderProcessTerminationStatus"
+       }
+      },
+      {
+       "default": false,
+       "name": "exitCode",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "pdfPrintingFinished",
+     "params": [
+      {
+       "default": false,
+       "name": "filePath",
+       "type": {
+        "canonical": "const QString &",
+        "spelling": "const QString &"
+       }
+      },
+      {
+       "default": false,
+       "name": "success",
+       "type": {
+        "canonical": "bool",
+        "spelling": "bool"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "printRequested",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "printRequestedByFrame",
+     "params": [
+      {
+       "default": false,
+       "name": "frame",
+       "type": {
+        "canonical": "QWebEngineFrame",
+        "spelling": "QWebEngineFrame"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "printFinished",
+     "params": [
+      {
+       "default": false,
+       "name": "success",
+       "type": {
+        "canonical": "bool",
+        "spelling": "bool"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "createWindow",
+     "params": [
+      {
+       "default": false,
+       "name": "type",
+       "type": {
+        "canonical": "QWebEnginePage::WebWindowType",
+        "spelling": "QWebEnginePage::WebWindowType"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QWebEngineView *",
+      "spelling": "QWebEngineView *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "contextMenuEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "QContextMenuEvent *",
+        "spelling": "QContextMenuEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "event",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "QEvent *",
+        "spelling": "QEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "showEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "QShowEvent *",
+        "spelling": "QShowEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "hideEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "QHideEvent *",
+        "spelling": "QHideEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "closeEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "",
+       "type": {
+        "canonical": "QCloseEvent *",
+        "spelling": "QCloseEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "dragEnterEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "e",
+       "type": {
+        "canonical": "QDragEnterEvent *",
+        "spelling": "QDragEnterEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "dragLeaveEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "e",
+       "type": {
+        "canonical": "QDragLeaveEvent *",
+        "spelling": "QDragLeaveEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "dragMoveEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "e",
+       "type": {
+        "canonical": "QDragMoveEvent *",
+        "spelling": "QDragMoveEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "dropEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "e",
+       "type": {
+        "canonical": "QDropEvent *",
+        "spelling": "QDropEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "private",
+     "copy": true,
+     "kind": "ctor",
+     "name": "QWebEngineView",
+     "params": []
+    }
+   ],
+   "module": "QtWebEngineWidgets",
+   "name": "QWebEngineView",
+   "qobject": true
+  }
+ ],
+ "enums": [],
+ "flags": [],
+ "module": "QtWebEngineWidgets",
+ "qt_version": "6.12.0"
+}

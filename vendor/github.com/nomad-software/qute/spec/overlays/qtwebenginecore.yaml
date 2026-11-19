@@ -1,0 +1,133 @@
+# Ownership overlays for qtwebenginecore. See spec/overlays/qtwidgets.yaml for the rules.
+#
+# A page must not outlive its profile (Qt docs: "the profile must outlive the
+# page"), so a page keeps its profile; the cleanup queue frees kept objects
+# after their keepers when both are collected together.
+
+QWebEnginePage:
+  javaScriptPrompt: { args: { result: out } } # the answer the prompt returns
+  createWindow: { return: borrowed } # Qt does not take ownership; keep the new page (or its view) alive yourself
+  QWebEnginePage(QWebEngineProfile*, QObject*): { name: NewQWebEnginePageWithProfile, args: { profile: keep:profile }, kept-delete: guard, reviewed: true, doc: "The page keeps the profile alive: Qt requires the profile to outlive the page, so deleting the profile while the page lives panics." }
+  profile: { return: borrowed }
+  history: { return: borrowed, doc: "The history belongs to the page." }
+  settings: { return: borrowed, doc: "The settings belong to the page." }
+  scripts: { return: borrowed, doc: "The script collection belongs to the page." }
+  action: { return: borrowed, doc: "The action belongs to the page." }
+  setInspectedPage: { args: { page: keep:inspected }, reviewed: true, doc: "The page does not take ownership of the inspected page." }
+  inspectedPage: { return: borrowed }
+  setDevToolsPage: { args: { page: keep:devTools }, reviewed: true, doc: "The page does not take ownership of the developer-tools page." }
+  devToolsPage: { return: borrowed }
+  setUrlRequestInterceptor:
+    args: { interceptor: keep:interceptor }
+    reviewed: true
+    doc: "The page does not take ownership of the interceptor."
+    test: |
+      ic := qtwebenginecore.NewQWebEngineUrlRequestInterceptorWith(&struct {
+      	qtwebenginecore.QWebEngineUrlRequestInterceptorBase
+      }{})
+      page := qtwebenginecore.NewQWebEnginePage(nil)
+      page.SetUrlRequestInterceptor(ic)
+      if !rt.KeepsArg(unsafe.Pointer(page), unsafe.Pointer(ic)) {
+      	t.Error("interceptor: not kept by the page")
+      }
+      page.Delete()
+      ic.Delete()
+  acceptAsNewWindow: { reviewed: true }
+  setWebChannel: { skip: "on purpose: QtWebChannel is not bound" }
+
+QWebEngineProfile:
+  defaultProfile: { return: borrowed, doc: "The default profile belongs to the application." }
+  cookieStore: { return: borrowed, doc: "The cookie store belongs to the profile." }
+  settings: { return: borrowed, doc: "The settings belong to the profile." }
+  scripts: { return: borrowed, doc: "The script collection belongs to the profile." }
+  clientHints: { return: borrowed, doc: "The client hints belong to the profile." }
+  clientCertificateStore: { return: borrowed, doc: "The store belongs to the profile." }
+  extensionManager: { return: borrowed, doc: "The extension manager belongs to the profile." }
+  setUrlRequestInterceptor:
+    args: { interceptor: keep:interceptor }
+    reviewed: true
+    doc: "The profile does not take ownership of the interceptor."
+    test: |
+      ic := qtwebenginecore.NewQWebEngineUrlRequestInterceptorWith(&struct {
+      	qtwebenginecore.QWebEngineUrlRequestInterceptorBase
+      }{})
+      prof := qtwebenginecore.NewQWebEngineProfile(nil)
+      prof.SetUrlRequestInterceptor(ic)
+      if !rt.KeepsArg(unsafe.Pointer(prof), unsafe.Pointer(ic)) {
+      	t.Error("interceptor: not kept by the profile")
+      }
+      prof.Delete()
+      ic.Delete()
+  urlSchemeHandler: { return: borrowed }
+  installUrlSchemeHandler:
+    args: { 1: keep-each }
+    reviewed: true
+    doc: "The profile does not take ownership of the handler; it keeps the handler from being garbage collected until RemoveUrlSchemeHandler."
+    test: |
+      sh := qtwebenginecore.NewQWebEngineUrlSchemeHandlerWith(&struct {
+      	qtwebenginecore.QWebEngineUrlSchemeHandlerBase
+      }{}, nil)
+      prof := qtwebenginecore.NewQWebEngineProfile(nil)
+      prof.InstallUrlSchemeHandler([]byte("qute-test"), sh)
+      if !rt.KeepsArg(unsafe.Pointer(prof), unsafe.Pointer(sh)) {
+      	t.Error("handler: not kept by the profile")
+      }
+      prof.Delete()
+      sh.Delete()
+  removeUrlSchemeHandler:
+    args: { 0: release }
+    reviewed: true
+    test: |
+      sh := qtwebenginecore.NewQWebEngineUrlSchemeHandlerWith(&struct {
+      	qtwebenginecore.QWebEngineUrlSchemeHandlerBase
+      }{}, nil)
+      prof := qtwebenginecore.NewQWebEngineProfile(nil)
+      prof.InstallUrlSchemeHandler([]byte("qute-test"), sh)
+      prof.RemoveUrlSchemeHandler(sh)
+      if rt.KeepsArg(unsafe.Pointer(prof), unsafe.Pointer(sh)) {
+      	t.Error("handler: still kept after RemoveUrlSchemeHandler")
+      }
+      prof.Delete()
+      sh.Delete()
+  setNotificationPresenter: { skip: "on purpose: Qt hands the notification over as a std::unique_ptr" }
+
+QWebEngineProfileBuilder:
+  createProfile: { return: transfer-to-go, reviewed: true, doc: "The new profile is Owned when parent is nil; with a parent it is Parented and its parent frees it." }
+  createOffTheRecordProfile: { return: transfer-to-go, reviewed: true, doc: "The new profile is Owned when parent is nil; with a parent it is Parented and its parent frees it." }
+
+QWebEngineHistory:
+  itemsModel: { return: borrowed, doc: "The model belongs to the history." }
+  backItemsModel: { return: borrowed, doc: "The model belongs to the history." }
+  forwardItemsModel: { return: borrowed, doc: "The model belongs to the history." }
+
+QWebEngineDownloadRequest:
+  page: { return: borrowed }
+
+QWebEngineDesktopMediaRequest:
+  screensModel: { return: borrowed, doc: "The model belongs to the request." }
+  windowsModel: { return: borrowed, doc: "The model belongs to the request." }
+
+QWebEngineNewWindowRequest:
+  openIn: { reviewed: true, doc: "The request does not take ownership of the page." }
+
+QWebEngineLoadingInfo:
+  responseHeaders: { skip: "on purpose: multi-maps keyed by byte arrays are not supported yet" }
+
+QWebEngineCookieStore:
+  setCookieFilter: { skip: "on purpose: hand-written in cookiefilter_manual.go, because Qt calls the filter on a network thread" }
+
+QWebEngineUrlRequestInfo:
+  requestBody: { return: borrowed, doc: "The body is valid only inside InterceptRequest." }
+  httpHeaders: { skip: "on purpose: maps keyed by byte arrays are not supported yet" }
+
+QWebEngineUrlRequestInterceptor:
+  interceptRequest: { reviewed: true }
+
+QWebEngineUrlRequestJob:
+  requestBody: { return: borrowed, doc: "The body belongs to the job." }
+  reply: { args: { device: keep:device }, reviewed: true, test: "skip: a job exists only while Qt loads a URL of a scheme registered before the application starts; covered by qtwebenginewidgets/lifetime_test.go", doc: "Qt reads the device for as long as the job lives and does not take ownership; the job keeps it from being garbage collected." }
+  requestHeaders: { skip: "on purpose: maps keyed by byte arrays are not supported yet" }
+  setAdditionalResponseHeaders: { skip: "on purpose: multi-maps keyed by byte arrays are not supported yet" }
+
+QWebEngineUrlSchemeHandler:
+  requestStarted: { reviewed: true, doc: "The job lives until it is answered or destroyed; it is not the handler's to free." }

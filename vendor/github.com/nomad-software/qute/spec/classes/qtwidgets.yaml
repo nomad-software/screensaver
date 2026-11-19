@@ -1,0 +1,195 @@
+module: QtWidgets
+package: qtwidgets
+classes:
+  QApplication: { no-construct: true }
+  QWidget: {}
+  QFrame: {}
+  QLabel: {}
+  QAbstractButton: {}
+  QPushButton: {}
+  QCheckBox: {}
+  QRadioButton: {}
+  QToolButton: {}
+  QCommandLinkButton: {}
+  QButtonGroup: {}
+  QLineEdit: {}
+  QTextEdit: {}
+  QPlainTextEdit: {}
+  QTextBrowser: {}
+  QAbstractScrollArea: {}
+  QScrollArea: {}
+  QAbstractSlider: {}
+  QSlider: {}
+  QScrollBar: {}
+  QDial: {}
+  QAbstractSpinBox: {}
+  QSpinBox: {}
+  QDoubleSpinBox: {}
+  QDateTimeEdit: {}
+  QDateEdit: {}
+  QTimeEdit: {}
+  QComboBox: {}
+  QFontComboBox: {}
+  QProgressBar: {}
+  QGroupBox: {}
+  QTabWidget: {}
+  QTabBar: {}
+  QStackedWidget: {}
+  QSplitter: {}
+  QToolBox: {}
+  QMainWindow: {}
+  QMenuBar: {}
+  QMenu: {}
+  QToolBar: {}
+  QStatusBar: {}
+  QDockWidget: {}
+  QDialog: {}
+  QMessageBox: {}
+  QFileDialog: {}
+  QInputDialog: {}
+  QColorDialog: {}
+  QFontDialog: {}
+  QProgressDialog: {}
+  QDialogButtonBox: {}
+  # Qt makes most layout items itself and frees them with their layout, which
+  # qute cannot watch: an item handed out by a layout depends on it (see
+  # WrapClassFrom), and on its widget, whose deletion also frees the item.
+  # Items built in Go report their death themselves (the subclass shim).
+  QLayoutItem: { depends-on: widget, parented-delete: "take it out of its layout with the layout's TakeAt or RemoveItem first, which makes it Owned" }
+  QSpacerItem: {}
+  QWidgetItem: { depends-on: widget }
+  QLayout: {}
+  QBoxLayout: {}
+  QHBoxLayout: {}
+  QVBoxLayout: {}
+  QGridLayout: {}
+  QFormLayout: {}
+  QStackedLayout: {}
+  QSizePolicy: { kind: value }
+  QAbstractItemView: {}
+  QListView: {}
+  QTreeView: {}
+  QTableView: {}
+  QHeaderView: {}
+  QListWidget: {}
+  QListWidgetItem: {}
+  QTreeWidget: {}
+  QTreeWidgetItem: {}
+  QTableWidget: {}
+  QTableWidgetItem: {}
+  QAbstractItemDelegate: {}
+  QStyledItemDelegate: {}
+  QCompleter: {}
+  QCalendarWidget: {}
+  QLCDNumber: {}
+  QKeySequenceEdit: {}
+  QStyle: {}
+  QCommonStyle: {}
+  QProxyStyle: {}
+  QStyleHintReturn: { kind: value, cast: qstyleoption_cast }
+  QStyleHintReturnMask: { kind: value }
+  QStyleHintReturnVariant: { kind: value }
+  QStyleFactory: { no-construct: true }
+  QSystemTrayIcon: {}
+  QWidgetAction: {}
+  QRubberBand: {}
+  QSizeGrip: {}
+  QMdiArea: {}
+  QMdiSubWindow: {}
+  QGraphicsScene: {}
+  QGraphicsView: {}
+  QGraphicsItem: {}
+  QAbstractGraphicsShapeItem: {}
+  QGraphicsRectItem: {}
+  QGraphicsEllipseItem: {}
+  QGraphicsSimpleTextItem: {}
+  QGraphicsPixmapItem: {}
+  QGraphicsObject: {}
+  QGraphicsTextItem: {}
+  QToolTip: { no-construct: true }
+  "QTextEdit::ExtraSelection": { kind: value }
+  "QFormLayout::TakeRowResult": { kind: value }
+  QGraphicsLayoutItem: {}
+  QGraphicsWidget: {}
+  QGraphicsProxyWidget: {}
+  QGraphicsEffect: {}
+  QGraphicsBlurEffect: {}
+  QGraphicsColorizeEffect: {}
+  QGraphicsDropShadowEffect: {}
+  QGraphicsOpacityEffect: {}
+  QGraphicsTransform: {}
+  QGraphicsRotation: {}
+  QGraphicsScale: {}
+  QGraphicsItemGroup: {}
+  QGraphicsLineItem: {}
+  QGraphicsPathItem: {}
+  QGraphicsPolygonItem: {}
+  QStyleOption: { kind: value, cast: qstyleoption_cast }
+  QStyleOptionViewItem: { kind: value }
+  QStyleOptionComplex: { kind: value }
+  QStyleOptionButton: { kind: value }
+  QStyleOptionGraphicsItem: { kind: value }
+  QStyleOptionFrame: { kind: value }
+  QStyleOptionTabWidgetFrame: { kind: value }
+  QStyleOptionTab: { kind: value }
+  QStyleOptionToolBar: { kind: value }
+  QStyleOptionProgressBar: { kind: value }
+  QStyleOptionMenuItem: { kind: value }
+  QStyleOptionDockWidget: { kind: value }
+  QStyleOptionRubberBand: { kind: value }
+  QStyleOptionHeader: { kind: value }
+  QStyleOptionSlider: { kind: value }
+  QStyleOptionSpinBox: { kind: value }
+  QStyleOptionToolButton: { kind: value }
+  QStyleOptionComboBox: { kind: value }
+  QStyleOptionGroupBox: { kind: value }
+  # graphics-scene events: what a QGraphicsItem or QGraphicsScene subclass handles
+  QGraphicsSceneEvent: { kind: event }
+  QGraphicsSceneMouseEvent: { kind: event }
+  QGraphicsSceneWheelEvent: { kind: event }
+  QGraphicsSceneContextMenuEvent: { kind: event }
+  QGraphicsSceneHoverEvent: { kind: event }
+  QGraphicsSceneHelpEvent: { kind: event }
+  QGraphicsSceneDragDropEvent: { kind: event }
+  QGraphicsSceneResizeEvent: { kind: event }
+  QGraphicsSceneMoveEvent: { kind: event }
+  QSplitterHandle: {}
+  QItemEditorFactory: {}
+  QTableWidgetSelectionRange: { kind: value }
+  QFileIconProvider: {}
+  QGraphicsLayout: {}
+  QGraphicsLinearLayout: {}
+  QGraphicsGridLayout: {}
+  QColumnView: {}
+  QDataWidgetMapper: {}
+  QErrorMessage: {}
+  QFocusFrame: {}
+  QGesture: {}
+  QGestureEvent: { kind: event }
+  QGestureRecognizer: {}
+  QPanGesture: {}
+  QPinchGesture: {}
+  QSwipeGesture: {}
+  QTapAndHoldGesture: {}
+  QTapGesture: {}
+  QGraphicsAnchor: { no-construct: true }
+  QGraphicsAnchorLayout: {}
+  QGraphicsItemAnimation: {}
+  QItemDelegate: {}
+  QScroller: { no-construct: true }
+  QScrollerProperties: { kind: value }
+  QSplashScreen: {}
+  QStyleOptionFocusRect: { kind: value }
+  QStyleOptionHeaderV2: { kind: value }
+  QStyleOptionSizeGrip: { kind: value }
+  QStyleOptionTabBarBase: { kind: value }
+  QStyleOptionTitleBar: { kind: value }
+  QStyleOptionToolBox: { kind: value }
+  QStyleOptionMenuItemV2: { kind: value }
+  QStylePainter: {}
+  QTileRules: { kind: value }
+  QUndoView: {}
+  QWhatsThis: { no-construct: true }
+  QWidgetItemV2: { depends-on: widget }
+  QWizard: {}
+  QWizardPage: {}

@@ -1,0 +1,95 @@
+# Ownership overlays for qtmultimedia. See spec/overlays/qtwidgets.yaml for the rules.
+#
+# Qt Multimedia never takes ownership of the objects plugged into a player or
+# capture session (outputs, inputs, sinks, devices, cameras, recorders); it
+# drops them when they are destroyed. So every setter keeps its argument from
+# being garbage collected while the receiver uses it.
+
+QMediaPlayer:
+  setAudioOutput: { args: { output: keep:audioOutput }, reviewed: true, doc: "The player does not take ownership of the output." }
+  audioOutput: { return: borrowed }
+  setAudioBufferOutput: { args: { output: keep:audioBufferOutput }, reviewed: true, doc: "The player does not take ownership of the output." }
+  audioBufferOutput: { return: borrowed }
+  setVideoOutput: { args: { 0: keep:video }, reviewed: true, doc: "The player does not take ownership of the output (a QVideoWidget, QGraphicsVideoItem or QVideoSink). It replaces the sink SetVideoSink set." }
+  videoOutput: { return: borrowed }
+  setVideoSink: { args: { sink: keep:video }, reviewed: true, doc: "The player does not take ownership of the sink. It replaces the output SetVideoOutput set." }
+  videoSink: { return: borrowed }
+  setSourceDevice: { args: { device: keep:device }, reviewed: true, doc: "The player does not take ownership of the device; it must stay open while it plays." }
+  sourceDevice: { return: borrowed }
+
+QAudioDecoder:
+  setSourceDevice: { args: { device: keep:device }, reviewed: true, doc: "The decoder does not take ownership of the device." }
+  sourceDevice: { return: borrowed }
+
+QAudioSink:
+  start(QIODevice*): { name: StartWithDevice, args: { device: keep:device }, reviewed: true, doc: "The sink reads from the device until stopped; it does not take ownership." }
+  start(): { return: borrowed, doc: "The returned device belongs to the sink; write audio data to it." }
+
+QAudioSource:
+  start(QIODevice*): { name: StartWithDevice, args: { device: keep:device }, reviewed: true, doc: "The source writes to the device until stopped; it does not take ownership." }
+  start(): { return: borrowed, doc: "The returned device belongs to the source; read audio data from it." }
+
+QMediaCaptureSession:
+  setAudioInput: { args: { input: keep:audioInput }, reviewed: true, doc: "The session does not take ownership of the input." }
+  audioInput: { return: borrowed }
+  setAudioBufferInput: { args: { input: keep:audioBufferInput }, reviewed: true, doc: "The session does not take ownership of the input." }
+  audioBufferInput: { return: borrowed }
+  setCamera: { args: { camera: keep:camera }, reviewed: true, doc: "The session does not take ownership of the camera." }
+  camera: { return: borrowed }
+  setNativeVideoSource: { args: { videoSource: keep:nativeVideoSource }, reviewed: true, doc: "The session does not take ownership of the source." }
+  nativeVideoSource: { return: borrowed }
+  setImageCapture: { args: { imageCapture: keep:imageCapture }, reviewed: true, doc: "The session does not take ownership of the image capture." }
+  imageCapture: { return: borrowed }
+  setScreenCapture: { args: { screenCapture: keep:screenCapture }, reviewed: true, doc: "The session does not take ownership of the screen capture." }
+  screenCapture: { return: borrowed }
+  setWindowCapture: { args: { windowCapture: keep:windowCapture }, reviewed: true, doc: "The session does not take ownership of the window capture." }
+  windowCapture: { return: borrowed }
+  setVideoFrameInput: { args: { input: keep:videoFrameInput }, reviewed: true, doc: "The session does not take ownership of the input." }
+  videoFrameInput: { return: borrowed }
+  setRecorder: { args: { recorder: keep:recorder }, reviewed: true, doc: "The session does not take ownership of the recorder." }
+  recorder: { return: borrowed }
+  setVideoOutput: { args: { output: keep:video }, reviewed: true, doc: "The session does not take ownership of the output. It replaces the sink SetVideoSink set." }
+  videoOutput: { return: borrowed }
+  setVideoSink: { args: { sink: keep:video }, reviewed: true, doc: "The session does not take ownership of the sink. It replaces the output SetVideoOutput set." }
+  videoSink: { return: borrowed }
+  setAudioOutput: { args: { output: keep:audioOutput }, reviewed: true, doc: "The session does not take ownership of the output." }
+  audioOutput: { return: borrowed }
+
+QMediaRecorder:
+  setOutputDevice: { args: { device: keep:device }, reviewed: true, doc: "The recorder does not take ownership of the device." }
+  outputDevice: { return: borrowed }
+  captureSession: { return: borrowed }
+
+QCamera:
+  captureSession: { return: borrowed }
+
+QImageCapture:
+  captureSession: { return: borrowed }
+
+QAudioBufferInput:
+  captureSession: { return: borrowed }
+
+QVideoFrameInput:
+  captureSession: { return: borrowed }
+
+QScreenCapture:
+  captureSession: { return: borrowed }
+  setScreen: { reviewed: true, doc: "Screens belong to the application." }
+  screen: { return: borrowed }
+  setMaximumFrameRate: { skip: "on purpose: std::optional<qreal> is not supported yet" }
+  maximumFrameRate: { skip: "on purpose: std::optional<qreal> is not supported yet" }
+
+QWindowCapture:
+  captureSession: { return: borrowed }
+  setMaximumFrameRate: { skip: "on purpose: std::optional<qreal> is not supported yet" }
+  maximumFrameRate: { skip: "on purpose: std::optional<qreal> is not supported yet" }
+
+QCapturableWindow:
+  QCapturableWindow(QWindow*): { reviewed: true, doc: "The value refers to the window without owning it; it becomes invalid when the window is destroyed." }
+
+QVideoFrame:
+  QVideoFrame(std::unique_ptr<QAbstractVideoBuffer>): { skip: "on purpose: custom video buffers need C++ subclassing" }
+  paint: { reviewed: true, doc: "The frame paints through the painter during the call only." }
+
+QVideoFrameFormat:
+  updateUniformData: { args: { dst: out } }

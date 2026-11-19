@@ -1,0 +1,8 @@
+# Ownership overlays for qtmultimediawidgets. See spec/overlays/qtwidgets.yaml for the rules.
+
+QVideoWidget:
+  videoSink: { return: borrowed, doc: "The sink belongs to the widget." }
+
+QGraphicsVideoItem:
+  videoSink: { return: borrowed, doc: "The sink belongs to the item." }
+  paint: { reviewed: true }

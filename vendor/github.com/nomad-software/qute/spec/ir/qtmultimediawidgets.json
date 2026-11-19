@@ -1,0 +1,771 @@
+{
+ "classes": [
+  {
+   "abstract": false,
+   "bases": [
+    "QGraphicsObject"
+   ],
+   "dropped": [],
+   "dtor": {
+    "access": "public",
+    "virtual": true
+   },
+   "enums": [
+    {
+     "name": "(unnamed enum at /usr/include/qt6/QtMultimediaWidgets/qgraphicsvideoitem.h:45:5)",
+     "scope": "QGraphicsVideoItem",
+     "scoped": false,
+     "underlying": "unsigned int",
+     "values": [
+      {
+       "name": "Type",
+       "value": 14
+      }
+     ]
+    }
+   ],
+   "fields": [],
+   "flags": [],
+   "gadget": false,
+   "header": "qgraphicsvideoitem.h",
+   "kind": "class",
+   "methods": [
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "metaObject",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "const QMetaObject *",
+      "spelling": "const QMetaObject *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "tr",
+     "params": [
+      {
+       "default": false,
+       "name": "s",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "c",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "n",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": true,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QGraphicsVideoItem",
+     "params": [
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QGraphicsItem *",
+        "spelling": "QGraphicsItem *"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "invokable": true,
+     "kind": "method",
+     "name": "videoSink",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QVideoSink *",
+      "spelling": "QVideoSink *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "aspectRatioMode",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "Qt::AspectRatioMode",
+      "spelling": "Qt::AspectRatioMode"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setAspectRatioMode",
+     "params": [
+      {
+       "default": false,
+       "name": "mode",
+       "type": {
+        "canonical": "Qt::AspectRatioMode",
+        "spelling": "Qt::AspectRatioMode"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "offset",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QPointF",
+      "spelling": "QPointF"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setOffset",
+     "params": [
+      {
+       "default": false,
+       "name": "offset",
+       "type": {
+        "canonical": "const QPointF &",
+        "spelling": "const QPointF &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "size",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QSizeF",
+      "spelling": "QSizeF"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "setSize",
+     "params": [
+      {
+       "default": false,
+       "name": "size",
+       "type": {
+        "canonical": "const QSizeF &",
+        "spelling": "const QSizeF &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "nativeSize",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QSizeF",
+      "spelling": "QSizeF"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "boundingRect",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QRectF",
+      "spelling": "QRectF"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "paint",
+     "params": [
+      {
+       "default": false,
+       "name": "painter",
+       "type": {
+        "canonical": "QPainter *",
+        "spelling": "QPainter *"
+       }
+      },
+      {
+       "default": false,
+       "name": "option",
+       "type": {
+        "canonical": "const QStyleOptionGraphicsItem *",
+        "spelling": "const QStyleOptionGraphicsItem *"
+       }
+      },
+      {
+       "default": true,
+       "name": "widget",
+       "type": {
+        "canonical": "QWidget *",
+        "spelling": "QWidget *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "type",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "int",
+      "spelling": "int"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "nativeSizeChanged",
+     "params": [
+      {
+       "default": false,
+       "name": "size",
+       "type": {
+        "canonical": "const QSizeF &",
+        "spelling": "const QSizeF &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "timerEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "event",
+       "type": {
+        "canonical": "QTimerEvent *",
+        "spelling": "QTimerEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "itemChange",
+     "params": [
+      {
+       "default": false,
+       "name": "change",
+       "type": {
+        "canonical": "QGraphicsItem::GraphicsItemChange",
+        "spelling": "GraphicsItemChange"
+       }
+      },
+      {
+       "default": false,
+       "name": "value",
+       "type": {
+        "canonical": "const QVariant &",
+        "spelling": "const QVariant &"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QVariant",
+      "spelling": "QVariant"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    }
+   ],
+   "module": "QtMultimediaWidgets",
+   "name": "QGraphicsVideoItem",
+   "qobject": true
+  },
+  {
+   "abstract": false,
+   "bases": [
+    "QWidget"
+   ],
+   "dropped": [],
+   "dtor": {
+    "access": "public",
+    "virtual": true
+   },
+   "enums": [],
+   "fields": [],
+   "flags": [],
+   "gadget": false,
+   "header": "qvideowidget.h",
+   "kind": "class",
+   "methods": [
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "metaObject",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "const QMetaObject *",
+      "spelling": "const QMetaObject *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "method",
+     "name": "tr",
+     "params": [
+      {
+       "default": false,
+       "name": "s",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "c",
+       "type": {
+        "canonical": "const char *",
+        "spelling": "const char *"
+       }
+      },
+      {
+       "default": false,
+       "name": "n",
+       "type": {
+        "canonical": "int",
+        "spelling": "int"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "QString",
+      "spelling": "QString"
+     },
+     "static": true,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "copy": false,
+     "kind": "ctor",
+     "move": false,
+     "name": "QVideoWidget",
+     "params": [
+      {
+       "default": true,
+       "name": "parent",
+       "type": {
+        "canonical": "QWidget *",
+        "spelling": "QWidget *"
+       }
+      }
+     ],
+     "variadic": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "invokable": true,
+     "kind": "method",
+     "name": "videoSink",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QVideoSink *",
+      "spelling": "QVideoSink *"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "aspectRatioMode",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "Qt::AspectRatioMode",
+      "spelling": "Qt::AspectRatioMode"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": true,
+     "kind": "method",
+     "name": "sizeHint",
+     "params": [],
+     "pure": false,
+     "return": {
+      "canonical": "QSize",
+      "spelling": "QSize"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "setFullScreen",
+     "params": [
+      {
+       "default": false,
+       "name": "fullScreen",
+       "type": {
+        "canonical": "bool",
+        "spelling": "bool"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "slot",
+     "name": "setAspectRatioMode",
+     "params": [
+      {
+       "default": false,
+       "name": "mode",
+       "type": {
+        "canonical": "Qt::AspectRatioMode",
+        "spelling": "Qt::AspectRatioMode"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "fullScreenChanged",
+     "params": [
+      {
+       "default": false,
+       "name": "fullScreen",
+       "type": {
+        "canonical": "bool",
+        "spelling": "bool"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "public",
+     "const": false,
+     "kind": "signal",
+     "name": "aspectRatioModeChanged",
+     "params": [
+      {
+       "default": false,
+       "name": "mode",
+       "type": {
+        "canonical": "Qt::AspectRatioMode",
+        "spelling": "Qt::AspectRatioMode"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": false
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "event",
+     "params": [
+      {
+       "default": false,
+       "name": "event",
+       "type": {
+        "canonical": "QEvent *",
+        "spelling": "QEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "bool",
+      "spelling": "bool"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "showEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "event",
+       "type": {
+        "canonical": "QShowEvent *",
+        "spelling": "QShowEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "hideEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "event",
+       "type": {
+        "canonical": "QHideEvent *",
+        "spelling": "QHideEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "resizeEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "event",
+       "type": {
+        "canonical": "QResizeEvent *",
+        "spelling": "QResizeEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    },
+    {
+     "access": "protected",
+     "const": false,
+     "kind": "method",
+     "name": "moveEvent",
+     "params": [
+      {
+       "default": false,
+       "name": "event",
+       "type": {
+        "canonical": "QMoveEvent *",
+        "spelling": "QMoveEvent *"
+       }
+      }
+     ],
+     "pure": false,
+     "return": {
+      "canonical": "void",
+      "spelling": "void"
+     },
+     "static": false,
+     "variadic": false,
+     "virtual": true
+    }
+   ],
+   "module": "QtMultimediaWidgets",
+   "name": "QVideoWidget",
+   "qobject": true
+  }
+ ],
+ "enums": [],
+ "flags": [],
+ "module": "QtMultimediaWidgets",
+ "qt_version": "6.12.0"
+}

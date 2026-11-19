@@ -1,0 +1,180 @@
+module: QtGui
+package: qtgui
+classes:
+  QGuiApplication: { no-construct: true }
+  QPaintDevice: {}
+  QImage:
+    kind: value
+    memory: { size: "$self->sizeInBytes()", changed-by: [load, loadFromData, convertTo] }
+  QPixmap:
+    kind: value
+    memory: { size: "qint64($self->width()) * $self->height() * (($self->depth() + 7) / 8)", changed-by: [load, loadFromData, convertFromImage] }
+  QIcon: { kind: value }
+  QFont: { kind: value }
+  QFontMetrics: { kind: value }
+  QPalette: { kind: value }
+  QKeySequence: { kind: value }
+  QBrush: { kind: value }
+  QPen: { kind: value }
+  QCursor: { kind: value }
+  QPainterPath: { kind: value }
+  QTransform: { kind: value }
+  QRegion: { kind: value }
+  QEventPoint: { kind: value }
+  QPainter: {}
+  QAction: {}
+  QActionGroup: {}
+  QShortcut: {}
+  QClipboard: { no-construct: true }
+  QScreen: { no-construct: true }
+  QStandardItemModel: {}
+  QStandardItem: {}
+  QValidator: {}
+  QIntValidator: {}
+  QDoubleValidator: {}
+  QTextDocument: {}
+  QInputEvent: { kind: event }
+  QPointerEvent: { kind: event }
+  QSinglePointEvent: { kind: event }
+  QMouseEvent: { kind: event }
+  QWheelEvent: { kind: event }
+  QHoverEvent: { kind: event }
+  QKeyEvent: { kind: event }
+  QPaintEvent: { kind: event }
+  QResizeEvent: { kind: event }
+  QMoveEvent: { kind: event }
+  QCloseEvent: { kind: event }
+  QShowEvent: { kind: event }
+  QHideEvent: { kind: event }
+  QFocusEvent: { kind: event }
+  QEnterEvent: { kind: event }
+  QContextMenuEvent: { kind: event }
+  QDropEvent: { kind: event }
+  QDragMoveEvent: { kind: event }
+  QDragEnterEvent: { kind: event }
+  QDragLeaveEvent: { kind: event }
+  QTextCursor: { kind: value }
+  QTextFormat: { kind: value }
+  QTextCharFormat: { kind: value }
+  QTextBlockFormat: { kind: value }
+  QTextFrameFormat: { kind: value }
+  QTextBlock: { kind: value, depends-on: document }
+  QTextOption: { kind: value }
+  QTextObject: {}
+  QTextFrame: {}
+  QTextDocumentFragment: { kind: value }
+  QBitmap:
+    kind: value
+    # QPixmap's methods measure a QBitmap again too
+    memory: { size: "qint64($self->width()) * $self->height() * (($self->depth() + 7) / 8)" }
+  QColorSpace: { kind: value }
+  QColorTransform: { kind: value }
+  QPicture:
+    kind: value
+    memory: { size: "$self->size()", changed-by: [load, setData] }
+  "QFont::Tag": { kind: value }
+  QSurface: {}
+  QWindow: {}
+  QSessionManager: { no-construct: true }
+  QPixelFormat: { kind: value }
+  QStaticText: { kind: value }
+  QTextItem: { no-construct: true }
+  QGradient: { kind: value }
+  QLinearGradient: { kind: value }
+  QRadialGradient: { kind: value }
+  QConicalGradient: { kind: value }
+  QFontInfo: { kind: value }
+  QFontDatabase: { no-construct: true }
+  QMovie: {}
+  QInputDevice: {}
+  QPointingDevice: {}
+  QPointingDeviceUniqueId: { kind: value }
+  QStyleHints: { no-construct: true }
+  QInputMethod: { no-construct: true }
+  QVector2D: { kind: value }
+  QImageReader: {}
+  QGlyphRun: { kind: value }
+  "QPainter::PixmapFragment": { kind: value }
+  "QPainterPath::Element": { kind: value }
+  QAbstractFileIconProvider: {}
+  QHelpEvent: { kind: event }
+  QInputMethodEvent: { kind: event }
+  "QInputMethodEvent::Attribute": { kind: value }
+  QActionEvent: { kind: event }
+  QTabletEvent: { kind: event }
+  QTouchEvent: { kind: event }
+  QExposeEvent: { kind: event }
+  QPagedPaintDevice: {}
+  QPdfWriter: {}
+  QVector3D: { kind: value }
+  QVector4D: { kind: value }
+  QMatrix4x4: { kind: value }
+  QQuaternion: { kind: value }
+  QSurfaceFormat: { kind: value }
+  QTextLength: { kind: value }
+  QTextListFormat: { kind: value }
+  QTextTableFormat: { kind: value }
+  QTextTableCellFormat: { kind: value }
+  QTextImageFormat: { kind: value }
+  QTextBlockGroup: {}
+  QSyntaxHighlighter: {}
+  QTextBlockUserData: {}
+  QTextList: { no-construct: true }
+  QTextTable: { no-construct: true }
+  QTextTableCell:
+    kind: value
+    # A cell holds a raw QTextTable pointer and has no getter for it: find the
+    # innermost table whose cell at our first position is this cell.
+    depends-on:
+      - class: QTextTable
+        cpp: |-
+          [](const QTextTableCell *c) -> QTextTable * {
+          		if (!c->isValid()) return nullptr;
+          		for (QTextFrame *f = c->firstCursorPosition().currentFrame(); f; f = f->parentFrame())
+          			if (auto *t = qobject_cast<QTextTable *>(f); t && t->cellAt(c->firstPosition()) == *c) return t;
+          		return nullptr;
+          	}($self)
+      - class: QTextDocument
+        cpp: $self->firstCursorPosition().document()
+  "QTextOption::Tab": { kind: value }
+  "QColorSpace::PrimaryPoints": { kind: value }
+  QRgba64: { kind: value }
+  QImageIOHandler: { enums-only: true }
+  QOpenGLContext: {}
+  QOpenGLContextGroup: { no-construct: true }
+  QOpenGLFunctions: { raw-pointers: true }
+  QOpenGLExtraFunctions: { raw-pointers: true }
+  QOffscreenSurface: {}
+  QPaintDeviceWindow: {}
+  QDesktopServices: { no-construct: true }
+  QDrag: {}
+  QFileSystemModel: {}
+  QFontMetricsF: { kind: value }
+  QIconEngine: {}
+  "QIconEngine::ScaledPixmapArgument": { kind: value }
+  QImageWriter: {}
+  QPainterPathStroker: { kind: value }
+  QPainterStateGuard: {}
+  QPixmapCache: { no-construct: true }
+  "QPixmapCache::Key": { kind: value }
+  QRasterWindow: {}
+  QRegularExpressionValidator: {}
+  QTextDocumentWriter: {}
+  QUndoCommand: {}
+  QUndoGroup: {}
+  QUndoStack: {}
+  QApplicationStateChangeEvent: { kind: event }
+  QChildWindowEvent: { kind: event }
+  QFileOpenEvent: { kind: event }
+  QIconDragEvent: { kind: event }
+  QInputMethodQueryEvent: { kind: event }
+  QNativeGestureEvent: { kind: event }
+  QPlatformSurfaceEvent: { kind: event }
+  QScreenOrientationChangeEvent: { kind: event }
+  QScrollEvent: { kind: event }
+  QScrollPrepareEvent: { kind: event }
+  QShortcutEvent: { kind: event }
+  QStatusTipEvent: { kind: event }
+  QToolBarChangeEvent: { kind: event }
+  QWhatsThisClickedEvent: { kind: event }
+  QWindowStateChangeEvent: { kind: event }

@@ -1,0 +1,41 @@
+# Classes bound in package qtmultimedia. See qtcore.yaml for options.
+# QAbstractVideoBuffer is left out: it is an interface for C++ subclasses.
+module: QtMultimedia
+package: qtmultimedia
+classes:
+  QMediaPlayer: {}
+  QAudioOutput: {}
+  QAudioInput: {}
+  QAudioDevice: { kind: value }
+  QAudioFormat: { kind: value }
+  QAudioBuffer:
+    kind: value
+    memory: { size: "$self->byteCount()" }
+  QAudioDecoder: {}
+  QAudioSink: {}
+  QAudioSource: {}
+  QAudioBufferInput: {}
+  QAudioBufferOutput: {}
+  QSoundEffect: {}
+  QMediaDevices: {}
+  QMediaFormat: { kind: value }
+  QMediaMetaData: { kind: value }
+  QMediaTimeRange: { kind: value }
+  "QMediaTimeRange::Interval": { kind: value }
+  QPlaybackOptions: { kind: value }
+  QMediaCaptureSession: {}
+  QMediaRecorder: {}
+  QImageCapture: {}
+  QCamera: {}
+  QCameraDevice: { kind: value }
+  QCameraFormat: { kind: value }
+  QScreenCapture: {}
+  QWindowCapture: {}
+  QCapturableWindow: { kind: value }
+  QVideoSink: {}
+  QVideoFrame:
+    kind: value
+    memory: { size: "qint64($self->width()) * $self->height() * 4" }
+  "QVideoFrame::PaintOptions": { kind: value }
+  QVideoFrameFormat: { kind: value }
+  QVideoFrameInput: {}

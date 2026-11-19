@@ -1,0 +1,41 @@
+# Classes bound in package qtwebenginecore. See qtcore.yaml for options.
+# QWebEngineNotification is left out: Qt hands it over as a std::unique_ptr.
+module: QtWebEngineCore
+package: qtwebenginecore
+classes:
+  QWebEnginePage: {}
+  QWebEngineProfile: {}
+  QWebEngineProfileBuilder: {}
+  QWebEngineSettings: { no-construct: true }
+  QWebEngineHistory: { no-construct: true }
+  QWebEngineHistoryItem: { kind: value }
+  QWebEngineHistoryModel: { no-construct: true }
+  QWebEngineHttpRequest: { kind: value }
+  QWebEngineScript: { kind: value }
+  QWebEngineScriptCollection: { no-construct: true }
+  QWebEngineCookieStore: { no-construct: true }
+  QWebEngineDownloadRequest: { no-construct: true }
+  QWebEngineContextMenuRequest: { no-construct: true }
+  QWebEngineNavigationRequest: { no-construct: true }
+  QWebEngineNewWindowRequest: { no-construct: true }
+  QWebEngineLoadingInfo: { kind: value }
+  QWebEngineCertificateError: { kind: value }
+  QWebEngineClientCertificateSelection: { kind: value }
+  QWebEngineClientCertificateStore: { no-construct: true }
+  QWebEngineClientHints: { no-construct: true }
+  QWebEngineFindTextResult: { kind: value }
+  QWebEngineFullScreenRequest: { kind: value }
+  QWebEngineFileSystemAccessRequest: { kind: value }
+  QWebEngineRegisterProtocolHandlerRequest: { kind: value }
+  QWebEngineDesktopMediaRequest: { kind: value }
+  QWebEnginePermission: { kind: value }
+  QWebEngineFrame: { kind: value }
+  QWebEngineUrlScheme: { kind: value }
+  QWebEngineUrlSchemeHandler: {}
+  QWebEngineUrlRequestJob: { no-construct: true }
+  QWebEngineUrlRequestInterceptor: {}
+  QWebEngineUrlRequestInfo: { no-construct: true }
+  QWebEngineWebAuthUxRequest: { no-construct: true }
+  QWebEngineWebAuthPinRequest: { kind: value }
+  QWebEngineExtensionManager: { no-construct: true }
+  QWebEngineExtensionInfo: { kind: value }

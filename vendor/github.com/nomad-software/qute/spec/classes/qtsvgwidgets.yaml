@@ -1,0 +1,6 @@
+# Classes bound in package qtsvgwidgets. See qtcore.yaml for options.
+module: QtSvgWidgets
+package: qtsvgwidgets
+classes:
+  QSvgWidget: {}
+  QGraphicsSvgItem: {}

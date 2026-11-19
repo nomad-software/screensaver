@@ -1,0 +1,6 @@
+# Classes bound in package qtsvg. See qtcore.yaml for options.
+module: QtSvg
+package: qtsvg
+classes:
+  QSvgRenderer: {}
+  QSvgGenerator: {}

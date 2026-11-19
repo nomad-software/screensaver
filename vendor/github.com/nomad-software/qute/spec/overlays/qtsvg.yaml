@@ -1,0 +1,24 @@
+# Ownership overlays for qtsvg. See spec/overlays/qtwidgets.yaml for the rules.
+
+QSvgRenderer:
+  render: { reviewed: true, doc: "The renderer paints through the painter during the call only." }
+  QSvgRenderer(QXmlStreamReader*, QObject*):
+    reviewed: true # the reader is read during the call only
+    test: |
+      p := qtcore.NewQObject(nil)
+      r := qtsvg.NewQSvgRendererWithXmlStreamReader(qtcore.NewQXmlStreamReaderWithData(`<svg xmlns="http://www.w3.org/2000/svg" width="4" height="3"/>`), p)
+      if got := r.Ownership(); got != qtcore.Parented {
+      	t.Errorf("with a parent: %v, want Parented", got)
+      }
+      if !r.IsValid() || r.DefaultSize() != (qtcore.QSize{Width: 4, Height: 3}) {
+      	t.Errorf("valid %v, size %v; want a 4x3 document", r.IsValid(), r.DefaultSize())
+      }
+      p.Delete()
+      if r.Alive() {
+      	t.Error("renderer alive after its parent was deleted")
+      }
+  load(QXmlStreamReader*): { reviewed: true }
+
+QSvgGenerator:
+  setOutputDevice: { args: { outputDevice: keep:device }, reviewed: true, doc: "The generator does not take ownership of the device; it keeps the device from being garbage collected." }
+  outputDevice: { return: borrowed }

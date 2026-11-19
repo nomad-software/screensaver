@@ -1,0 +1,1796 @@
+# Ownership overlays for qtwidgets.
+#
+# Rules for args: transfer-to-cpp (Qt frees it from now on), transfer-to-go
+# (Go frees it), transfer-this (the receiver is parented to the arg, or Owned
+# when nil), borrowed (no change), scoped (valid only during a callback).
+# Rules for return: transfer-to-go, parented, borrowed.
+#
+# Keys are method names (all overloads) or signatures, e.g. "resize(const QSize&)".
+# Every transfer rule gets a generated test in qtwidgets/ownership_gen_test.go.
+
+QApplication:
+  setStyle: { args: { 0: transfer-to-cpp } }
+  setStyle(const QString&): { name: QApplicationSetStyleName, return: borrowed }
+  palette(const QWidget*): { name: QApplicationPaletteFor, reviewed: true }
+  font(const QWidget*): { name: QApplicationFontFor, reviewed: true }
+  font(const char*): { name: QApplicationFontForClass }
+  widgetAt(int, int): { skip: "use the QPoint overload" }
+  topLevelAt(int, int): { skip: "use the QPoint overload" }
+  focusWidget: { return: borrowed }
+  activeWindow: { return: borrowed }
+  activePopupWidget: { return: borrowed }
+  activeModalWidget: { return: borrowed }
+  widgetAt: { return: borrowed }
+  topLevelAt: { return: borrowed }
+  allWidgets: { return: borrowed }
+  topLevelWidgets: { return: borrowed }
+  style: { return: borrowed }
+  alert: { reviewed: true }
+
+QWidget:
+  setGraphicsEffect: { args: { effect: transfer-to-cpp }, doc: "The widget takes ownership of the effect." }
+  graphicsEffect: { return: borrowed }
+  graphicsProxyWidget: { return: borrowed }
+  windowHandle: { return: borrowed }
+  setLayout: { args: { layout: transfer-to-cpp } }
+  setParent(QWidget*): { args: { parent: transfer-this } }
+  topLevelWidget: { return: borrowed }
+  stackUnder: { reviewed: true }
+  actions: { return: borrowed }
+  screen: { return: borrowed }
+  setScreen: { reviewed: true }
+  mouseGrabber: { return: borrowed }
+  keyboardGrabber: { return: borrowed }
+  setParent(QWidget*, Qt::WindowFlags): { name: SetParentWithFlags, args: { parent: transfer-this } }
+  layout: { return: borrowed }
+  parentWidget: { return: borrowed }
+  window: { return: borrowed }
+  nativeParentWidget: { return: borrowed }
+  focusWidget: { return: borrowed }
+  focusProxy: { return: borrowed }
+  nextInFocusChain: { return: borrowed }
+  previousInFocusChain: { return: borrowed }
+  childAt: { return: borrowed }
+  childAt(const QPoint&): { name: ChildAt }
+  childAt(int, int): { skip: "use the QPoint overload" }
+  childAt(const QPointF&): { name: ChildAtF }
+  setFocusProxy: { reviewed: true }
+  setStyle:
+    args: { 0: keep }
+    reviewed: true
+    doc: "Qt does not take ownership of the style; the widget keeps it from being garbage collected."
+    test: |
+      recv := qtwidgets.NewQWidget(nil)
+      s := qtwidgets.QStyleFactoryCreate("Fusion")
+      recv.SetStyle(s)
+      if !rt.KeepsArg(unsafe.Pointer(recv), unsafe.Pointer(s)) {
+        t.Error("style not kept")
+      }
+      recv.SetStyle(nil)
+      if rt.KeepsArg(unsafe.Pointer(recv), unsafe.Pointer(s)) {
+        t.Error("style still kept after SetStyle(nil)")
+      }
+      s.Delete()
+      recv.Delete()
+  style: { return: borrowed }
+  addAction(QAction*): { args: { action: keep-each } }
+  addAction(const QString&): { name: AddActionText, return: parented }
+  addAction(const QIcon&, const QString&): { name: AddActionIcon, return: parented }
+  addAction(const QString&, const QKeySequence&): { name: AddActionShortcut, return: parented }
+  addAction(const QIcon&, const QString&, const QKeySequence&): { name: AddActionIconShortcut, return: parented }
+  addActions: { reviewed: true }
+  insertAction: { args: { action: keep-each }, reviewed: true }
+  insertActions: { reviewed: true }
+  removeAction: { args: { action: release }, reviewed: true }
+  setTabOrder: { reviewed: true }
+  isAncestorOf: { reviewed: true }
+  isEnabledTo: { reviewed: true }
+  isVisibleTo: { reviewed: true }
+  mapTo: { reviewed: true }
+  mapFrom: { reviewed: true }
+  mapTo(const QWidget*, const QPoint&): { name: MapTo }
+  mapTo(const QWidget*, const QPointF&): { name: MapToF }
+  mapFrom(const QWidget*, const QPoint&): { name: MapFrom }
+  mapFrom(const QWidget*, const QPointF&): { name: MapFromF }
+  mapToGlobal(const QPoint&): { name: MapToGlobal }
+  mapToGlobal(const QPointF&): { name: MapToGlobalF }
+  mapFromGlobal(const QPoint&): { name: MapFromGlobal }
+  mapFromGlobal(const QPointF&): { name: MapFromGlobalF }
+  mapToParent(const QPoint&): { name: MapToParent }
+  mapToParent(const QPointF&): { name: MapToParentF }
+  mapFromParent(const QPoint&): { name: MapFromParent }
+  mapFromParent(const QPointF&): { name: MapFromParentF }
+  render: { reviewed: true }
+  render(QPaintDevice*, const QPoint&, const QRegion&, RenderFlags): { name: Render }
+  render(QPainter*, const QPoint&, const QRegion&, RenderFlags): { name: RenderWithPainter }
+  resize(const QSize&): { skip: "use Resize(w, h)" }
+  move(const QPoint&): { skip: "use Move(x, y)" }
+  setGeometry(const QRect&): { name: SetGeometryRect }
+  setMinimumSize(const QSize&): { skip: "use SetMinimumSize(w, h)" }
+  setMaximumSize(const QSize&): { skip: "use SetMaximumSize(w, h)" }
+  setFixedSize(const QSize&): { skip: "use SetFixedSize(w, h)" }
+  setSizeIncrement(const QSize&): { skip: "use SetSizeIncrement(w, h)" }
+  setBaseSize(const QSize&): { skip: "use SetBaseSize(w, h)" }
+  setContentsMargins(const QMargins&): { name: SetContentsMargins }
+  setSizePolicy(QSizePolicy::Policy, QSizePolicy::Policy): { name: SetSizePolicies }
+  setFocus(Qt::FocusReason): { name: SetFocusReason }
+  grabMouse(const QCursor&): { name: GrabMouseCursor }
+  update(int, int, int, int): { skip: "use UpdateRect" }
+  update(const QRect&): { name: UpdateRect }
+  update(const QRegion&): { name: UpdateRegion }
+  repaint(int, int, int, int): { skip: "use RepaintRect" }
+  repaint(const QRect&): { name: RepaintRect }
+  repaint(const QRegion&): { name: RepaintRegion }
+  scroll(int, int, const QRect&): { name: ScrollRect }
+  find: { return: borrowed }
+  setWindowIcon: { reviewed: true }
+  createWindowContainer: { skip: "QWindow is not bound" }
+
+QFrame:
+  drawFrame: { args: { painter: scoped } }
+
+QLabel:
+  setMovie: { args: { movie: keep }, reviewed: true, doc: "The label does not take ownership of the movie; it keeps the movie from being garbage collected." }
+  movie: { return: borrowed }
+  setBuddy: { reviewed: true }
+  buddy: { return: borrowed }
+  setNum(double): { name: SetNumFloat }
+
+QAbstractButton:
+  group: { return: borrowed }
+
+QPushButton:
+  setMenu: { args: { menu: keep }, reviewed: true, doc: "The button does not take ownership of the menu." }
+  menu: { return: borrowed }
+
+QToolButton:
+  setMenu: { args: { menu: keep }, reviewed: true, doc: "The button does not take ownership of the menu." }
+  menu: { return: borrowed }
+  defaultAction: { return: borrowed }
+  setDefaultAction: { args: { 0: keep }, reviewed: true }
+
+QButtonGroup:
+  addButton: { reviewed: true, doc: "The group does not take ownership of the button." }
+  removeButton: { reviewed: true }
+  setId: { reviewed: true }
+  id: { reviewed: true }
+  button: { return: borrowed }
+  buttons: { return: borrowed }
+  checkedButton: { return: borrowed }
+
+QLineEdit:
+  timerEvent: { reviewed: true }
+  QLineEdit(const QString&, QWidget*): { name: NewQLineEditWithText }
+  setValidator: { args: { 0: keep }, reviewed: true, doc: "The line edit does not take ownership of the validator." }
+  validator: { return: borrowed }
+  setCompleter: { args: { completer: keep }, reviewed: true }
+  completer: { return: borrowed }
+  setTextMargins(const QMargins&): { name: SetTextMargins }
+  addAction(const QIcon&, QLineEdit::ActionPosition): { name: AddActionIcon, return: parented }
+  addAction(QAction*, QLineEdit::ActionPosition): { args: { action: keep-each }, name: AddActionAt, reviewed: true }
+  createStandardContextMenu: { return: parented, doc: "Qt makes the menu a child of the widget and leaves it to the caller to delete (Qt docs): Delete() it when done, or it lives until the widget dies." }
+
+QTextEdit:
+  createMimeDataFromSelection: { return: transfer-to-go }
+  print: { reviewed: true }
+  setDocument: { args: { document: keep }, reviewed: true, doc: "The text edit does not take ownership of the document." }
+  document: { return: borrowed }
+  createStandardContextMenu(): { return: parented, doc: "Qt makes the menu a child of the widget and leaves it to the caller to delete (Qt docs): Delete() it when done, or it lives until the widget dies." }
+  createStandardContextMenu(const QPoint&): { name: CreateStandardContextMenuAt, return: parented, doc: "Qt makes the menu a child of the widget and leaves it to the caller to delete (Qt docs): Delete() it when done, or it lives until the widget dies." }
+
+QPlainTextEdit:
+  createMimeDataFromSelection: { return: transfer-to-go }
+  getPaintContext: { skip: "on purpose: QAbstractTextDocumentLayout, which uses the paint context, is not bound" }
+  print: { reviewed: true }
+  setDocument: { args: { document: keep }, reviewed: true }
+  document: { return: borrowed }
+  createStandardContextMenu(): { return: parented, doc: "Qt makes the menu a child of the widget and leaves it to the caller to delete (Qt docs): Delete() it when done, or it lives until the widget dies." }
+  createStandardContextMenu(const QPoint&): { name: CreateStandardContextMenuAt, return: parented, doc: "Qt makes the menu a child of the widget and leaves it to the caller to delete (Qt docs): Delete() it when done, or it lives until the widget dies." }
+
+QAbstractScrollArea:
+  setViewport: { args: { widget: transfer-to-cpp } }
+  setVerticalScrollBar: { args: { scrollbar: transfer-to-cpp } }
+  setHorizontalScrollBar: { args: { scrollbar: transfer-to-cpp } }
+  setCornerWidget: { args: { widget: transfer-to-cpp } }
+  addScrollBarWidget: { args: { widget: transfer-to-cpp } }
+  setupViewport: { reviewed: true }
+  viewport: { return: borrowed }
+  verticalScrollBar: { return: borrowed }
+  horizontalScrollBar: { return: borrowed }
+  cornerWidget: { return: borrowed }
+  scrollBarWidgets: { return: borrowed }
+
+QScrollArea:
+  setWidget: { args: { widget: transfer-to-cpp } }
+  takeWidget:
+    return: transfer-to-go
+    test: |
+      sa := qtwidgets.NewQScrollArea(nil)
+      sa.SetWidget(qtwidgets.NewQLabelWithText("x", nil))
+      x := sa.TakeWidget()
+      if x == nil || x.Ownership() != qtcore.Owned {
+      	t.Errorf("x: %v, want Owned", x.Ownership())
+      }
+      sa.Delete()
+      if !x.Alive() {
+      	t.Error("taken widget died with the scroll area")
+      }
+      x.Delete()
+  widget: { return: borrowed }
+  ensureWidgetVisible: { reviewed: true }
+
+QAbstractSpinBox:
+  setLineEdit: { args: { edit: transfer-to-cpp } } # the spin box takes ownership and deletes the old line edit
+  lineEdit: { return: borrowed }
+  validate: { args: { input: in-out, pos: in-out } }
+  fixup: { args: { input: in-out } }
+
+QDateTimeEdit:
+  setCalendarWidget: { args: { calendarWidget: keep }, reviewed: true, doc: "The editor does not take ownership of the calendar widget (Qt docs); it keeps it from being garbage collected, but parent it to free it with the editor." }
+  calendarWidget: { return: borrowed }
+
+QComboBox:
+  setLineEdit: { args: { edit: transfer-to-cpp } }
+  lineEdit: { return: borrowed }
+  setValidator: { args: { v: keep }, reviewed: true }
+  validator: { return: borrowed }
+  setCompleter: { args: { c: keep }, reviewed: true }
+  completer: { return: borrowed }
+  setItemDelegate: { args: { delegate: keep }, reviewed: true }
+  itemDelegate: { return: borrowed }
+  setModel: { args: { model: keep }, reviewed: true, doc: "The combo box does not take ownership of the model." }
+  model: { return: borrowed }
+  setView: { args: { itemView: transfer-to-cpp } }
+  view: { return: borrowed }
+  addItem(const QIcon&, const QString&, const QVariant&): { name: AddItemIcon }
+  insertItem(int, const QIcon&, const QString&, const QVariant&): { name: InsertItemIcon }
+
+QTabWidget:
+  setTabBar: { args: { tabBar: transfer-to-cpp } } # the tab widget takes ownership
+  addTab(QWidget*, const QString&): { name: AddTab, args: { widget: transfer-to-cpp } }
+  addTab(QWidget*, const QIcon&, const QString&): { name: AddTabIcon, args: { widget: transfer-to-cpp } }
+  insertTab(int, QWidget*, const QString&): { name: InsertTab, args: { widget: transfer-to-cpp } }
+  insertTab(int, QWidget*, const QIcon&, const QString&): { name: InsertTabIcon, args: { widget: transfer-to-cpp } }
+  setCornerWidget: { args: { w: transfer-to-cpp } }
+  cornerWidget: { return: borrowed }
+  currentWidget: { return: borrowed }
+  widget: { return: borrowed }
+  indexOf: { reviewed: true }
+  setCurrentWidget: { reviewed: true }
+  tabBar: { return: borrowed }
+  removeTab: { doc: "The page widget is not deleted; it stays a child of the tab widget." }
+
+QStackedWidget:
+  addWidget: { args: { w: transfer-to-cpp } }
+  insertWidget: { args: { w: transfer-to-cpp } }
+  removeWidget: { reviewed: true, doc: "The widget is not deleted and keeps the stacked widget as its parent." }
+  currentWidget: { return: borrowed }
+  widget: { return: borrowed }
+  indexOf: { reviewed: true }
+  setCurrentWidget: { reviewed: true }
+
+QToolBox:
+  addItem(QWidget*, const QString&): { name: AddItem, args: { widget: transfer-to-cpp } }
+  addItem(QWidget*, const QIcon&, const QString&): { name: AddItemIcon, args: { widget: transfer-to-cpp } }
+  insertItem(int, QWidget*, const QString&): { name: InsertItem, args: { widget: transfer-to-cpp } }
+  insertItem(int, QWidget*, const QIcon&, const QString&): { name: InsertItemIcon, args: { widget: transfer-to-cpp } }
+  currentWidget: { return: borrowed }
+  widget: { return: borrowed }
+  indexOf: { reviewed: true }
+  setCurrentWidget: { reviewed: true }
+
+QSplitter:
+  createHandle: { return: parented } # the handle is created with the splitter as parent
+  handle:
+    return: borrowed
+    doc: "The splitter owns its handles and does not notice one being deleted, so Go may not delete it."
+    test: |
+      sp := qtwidgets.NewQSplitter(nil)
+      defer sp.Delete()
+      sp.AddWidget(qtwidgets.NewQLabelWithText("a", nil))
+      sp.AddWidget(qtwidgets.NewQLabelWithText("b", nil))
+      h := sp.Handle(1)
+      if h == nil || h.Ownership() != qtcore.Borrowed || h.ParentWidget() != sp.AsQWidget() {
+        t.Errorf("Handle(1) = %v, want a Borrowed handle whose parent is the splitter", h)
+      }
+      if sp.Handle(5) != nil {
+        t.Error("Handle(5) of two widgets is not nil")
+      }
+  QSplitter(Qt::Orientation, QWidget*): { name: NewQSplitterWithOrientation }
+  addWidget: { args: { widget: transfer-to-cpp } }
+  insertWidget: { args: { widget: transfer-to-cpp } }
+  replaceWidget:
+    args: { widget: transfer-to-cpp }
+    return: transfer-to-go
+    doc: "The splitter sets the parent of the replaced widget to nil, so Go owns it."
+    test: |
+      sp := qtwidgets.NewQSplitter(nil)
+      old := qtwidgets.NewQLabelWithText("old", nil)
+      sp.AddWidget(old)
+      repl := qtwidgets.NewQLabelWithText("new", nil)
+      got := sp.ReplaceWidget(0, repl)
+      if got != old.AsQWidget() || old.Ownership() != qtcore.Owned {
+      	t.Errorf("replaced widget: %v, want Owned", old.Ownership())
+      }
+      if repl.Ownership() != qtcore.Parented {
+      	t.Errorf("new widget: %v, want Parented", repl.Ownership())
+      }
+      sp.Delete()
+      if repl.Alive() || !old.Alive() {
+      	t.Errorf("after delete: new alive=%v old alive=%v", repl.Alive(), old.Alive())
+      }
+      old.Delete()
+  widget: { return: borrowed }
+  indexOf: { reviewed: true }
+  getRange: { args: { 1: out, 2: out } }
+
+QMainWindow:
+  setCentralWidget: { args: { widget: transfer-to-cpp } }
+  takeCentralWidget:
+    return: transfer-to-go
+    test: |
+      mw := qtwidgets.NewQMainWindow(nil)
+      mw.SetCentralWidget(qtwidgets.NewQWidget(nil))
+      c := mw.TakeCentralWidget()
+      if c == nil || c.Ownership() != qtcore.Owned {
+      	t.Errorf("c: %v, want Owned", c.Ownership())
+      }
+      mw.Delete()
+      if !c.Alive() {
+      	t.Error("taken central widget died with the window")
+      }
+      c.Delete()
+  centralWidget: { return: borrowed }
+  setMenuBar: { args: { menubar: transfer-to-cpp } }
+  menuBar: { return: parented }
+  setMenuWidget: { args: { menubar: transfer-to-cpp } }
+  menuWidget: { return: borrowed }
+  setStatusBar: { args: { statusbar: transfer-to-cpp } }
+  statusBar: { return: parented }
+  addToolBar(Qt::ToolBarArea, QToolBar*): { name: AddToolBarArea, args: { toolbar: transfer-to-cpp } }
+  addToolBar(QToolBar*): { name: AddToolBar, args: { toolbar: transfer-to-cpp } }
+  addToolBar(const QString&): { name: AddToolBarTitle, return: parented }
+  insertToolBar: { args: { toolbar: transfer-to-cpp, before: borrowed } }
+  removeToolBar: { reviewed: true, doc: "The tool bar is hidden, not deleted, and keeps its parent." }
+  addDockWidget(Qt::DockWidgetArea, QDockWidget*): { name: AddDockWidget, args: { dockwidget: transfer-to-cpp } }
+  addDockWidget(Qt::DockWidgetArea, QDockWidget*, Qt::Orientation): { name: AddDockWidgetOriented, args: { dockwidget: transfer-to-cpp } }
+  removeDockWidget: { reviewed: true }
+  splitDockWidget: { reviewed: true }
+  tabifyDockWidget: { reviewed: true }
+  tabifiedDockWidgets: { reviewed: true, return: borrowed }
+  dockWidgetArea: { reviewed: true }
+  toolBarArea: { reviewed: true }
+  toolBarBreak: { reviewed: true }
+  insertToolBarBreak: { reviewed: true }
+  removeToolBarBreak: { reviewed: true }
+  restoreDockWidget: { reviewed: true }
+  resizeDocks: { reviewed: true }
+  createPopupMenu:
+    return: parented
+    doc: "Qt makes the menu a child of the main window and leaves it to the caller to delete: Delete() it when done, or it lives until the window dies. An override's menu becomes Parented too."
+    test: |
+      mw := qtwidgets.NewQMainWindow(nil)
+      mw.AddDockWidget(qtcore.LeftDockWidgetArea, qtwidgets.NewQDockWidgetWithTitle("dock", nil))
+      m := mw.CreatePopupMenu()
+      if m == nil || m.Ownership() != qtcore.Parented {
+      	t.Errorf("m: %v, want Parented", m.Ownership())
+      }
+      m.Delete()
+      mw.Delete()
+
+QMenuBar:
+  actionGeometry: { reviewed: true }
+  actionAt: { return: borrowed }
+  addMenu(QMenu*): { args: { menu: keep-each }, return: borrowed, doc: "The menu bar does not take ownership of the menu." }
+  addMenu(const QString&): { name: AddMenuTitle, return: parented }
+  addMenu(const QIcon&, const QString&): { name: AddMenuIcon, return: parented }
+  insertMenu: { args: { menu: keep-each }, reviewed: true, return: borrowed }
+  addSeparator: { return: parented }
+  insertSeparator: { return: parented, reviewed: true }
+  setCornerWidget: { args: { w: transfer-to-cpp } }
+  cornerWidget: { return: borrowed }
+  activeAction: { return: borrowed }
+  setActiveAction: { reviewed: true }
+
+QMenu:
+  setNoReplayFor: { reviewed: true }
+  addMenu(QMenu*): { args: { menu: keep-each }, return: borrowed, doc: "The menu does not take ownership of the submenu." }
+  addMenu(const QString&): { name: AddMenuTitle, return: parented }
+  addMenu(const QIcon&, const QString&): { name: AddMenuIcon, return: parented }
+  insertMenu: { args: { menu: keep-each }, reviewed: true, return: borrowed }
+  addSeparator: { return: parented }
+  insertSeparator: { return: parented, reviewed: true }
+  addSection(const QString&): { name: AddSection, return: parented }
+  addSection(const QIcon&, const QString&): { name: AddSectionIcon, return: parented }
+  insertSection(QAction*, const QString&): { name: InsertSection, return: parented, reviewed: true }
+  insertSection(QAction*, const QIcon&, const QString&): { name: InsertSectionIcon, return: parented, reviewed: true }
+  menuAction: { return: borrowed }
+  activeAction: { return: borrowed }
+  setActiveAction: { reviewed: true }
+  defaultAction: { return: borrowed }
+  setDefaultAction: { reviewed: true }
+  actionAt: { return: borrowed }
+  actionGeometry: { reviewed: true }
+  exec(): { return: borrowed }
+  exec(const QPoint&, QAction*): { name: ExecAt, return: borrowed, reviewed: true }
+  exec(const QList<QAction*>&, const QPoint&, QAction*, QWidget*): { name: QMenuExecActions, return: borrowed, reviewed: true }
+  popup: { reviewed: true }
+  showTearOffMenu(const QPoint&): { name: ShowTearOffMenuAt }
+  hideTearOffMenu: { reviewed: true }
+  menuInAction: { return: borrowed, reviewed: true }
+
+QToolBar:
+  addSeparator: { return: parented }
+  insertSeparator: { return: parented, reviewed: true }
+  addWidget: { args: { widget: transfer-to-cpp }, return: parented }
+  insertWidget: { args: { widget: transfer-to-cpp, before: borrowed }, return: parented }
+  widgetForAction: { return: borrowed, reviewed: true }
+  actionAt(int, int): { skip: "use the QPoint overload" }
+  actionAt: { return: borrowed }
+  actionGeometry: { reviewed: true }
+  toggleViewAction: { return: borrowed }
+
+QStatusBar:
+  addWidget: { args: { widget: transfer-to-cpp } }
+  insertWidget: { args: { widget: transfer-to-cpp } }
+  addPermanentWidget: { args: { widget: transfer-to-cpp } }
+  insertPermanentWidget: { args: { widget: transfer-to-cpp } }
+  removeWidget: { reviewed: true, doc: "The widget is hidden, not deleted, and keeps its parent." }
+
+QDockWidget:
+  setWidget: { args: { widget: transfer-to-cpp } }
+  widget: { return: borrowed }
+  setTitleBarWidget: { args: { widget: transfer-to-cpp } }
+  titleBarWidget: { return: borrowed }
+  toggleViewAction: { return: borrowed }
+
+QMessageBox:
+  addButton(QAbstractButton*, QMessageBox::ButtonRole): { name: AddButton, args: { button: transfer-to-cpp } }
+  addButton(const QString&, QMessageBox::ButtonRole): { name: AddButtonText, return: parented }
+  addButton(QMessageBox::StandardButton): { name: AddStandardButton, return: parented }
+  removeButton:
+    args: { button: transfer-to-go }
+    doc: "The button is not deleted; its parent is cleared
+    so Go owns it."
+    test: |
+      box := qtwidgets.NewQMessageBox(nil)
+      b := qtwidgets.NewQPushButtonWithText("x", nil)
+      box.AddButton(b, qtwidgets.QMessageBoxAcceptRole)
+      if got := b.Ownership(); got != qtcore.Parented {
+      	t.Errorf("after AddButton: %v, want Parented", got)
+      }
+      box.RemoveButton(b)
+      if b == nil || b.Ownership() != qtcore.Owned {
+      	t.Errorf("b: %v, want Owned", b.Ownership())
+      }
+      box.Delete()
+      if !b.Alive() {
+      	t.Error("removed button died with its old box")
+      }
+      b.Delete()
+  button: { return: borrowed }
+  buttons: { return: borrowed }
+  buttonRole: { reviewed: true }
+  standardButton: { reviewed: true }
+  defaultButton: { return: borrowed }
+  setDefaultButton(QPushButton*): { name: SetDefaultButton, reviewed: true }
+  setDefaultButton(QMessageBox::StandardButton): { name: SetDefaultStandardButton }
+  escapeButton: { return: borrowed }
+  setEscapeButton(QAbstractButton*): { name: SetEscapeButton, reviewed: true }
+  setEscapeButton(QMessageBox::StandardButton): { name: SetEscapeStandardButton }
+  clickedButton: { return: borrowed }
+  setCheckBox: { args: { cb: transfer-to-cpp } }
+  checkBox: { return: borrowed }
+  information(QWidget*, const QString&, const QString&, QMessageBox::StandardButtons, QMessageBox::StandardButton): { name: QMessageBoxInformation, reviewed: true }
+  question(QWidget*, const QString&, const QString&, QMessageBox::StandardButtons, QMessageBox::StandardButton): { name: QMessageBoxQuestion, reviewed: true }
+  warning(QWidget*, const QString&, const QString&, QMessageBox::StandardButtons, QMessageBox::StandardButton): { name: QMessageBoxWarning, reviewed: true }
+  critical(QWidget*, const QString&, const QString&, QMessageBox::StandardButtons, QMessageBox::StandardButton): { name: QMessageBoxCritical, reviewed: true }
+  information(QWidget*, const QString&, const QString&, QMessageBox::StandardButton, QMessageBox::StandardButton): { skip: "obsolete overload" }
+  question(QWidget*, const QString&, const QString&, QMessageBox::StandardButton, QMessageBox::StandardButton): { skip: "obsolete overload" }
+  warning(QWidget*, const QString&, const QString&, QMessageBox::StandardButton, QMessageBox::StandardButton): { skip: "obsolete overload" }
+  critical(QWidget*, const QString&, const QString&, QMessageBox::StandardButton, QMessageBox::StandardButton): { skip: "obsolete overload" }
+  about: { reviewed: true }
+  aboutQt: { reviewed: true }
+
+QDialogButtonBox:
+  QDialogButtonBox(QDialogButtonBox::StandardButtons, Qt::Orientation, QWidget*): { name: NewQDialogButtonBoxWithButtonsOriented }
+  addButton(QAbstractButton*, QDialogButtonBox::ButtonRole): { name: AddButton, args: { button: transfer-to-cpp } }
+  addButton(const QString&, QDialogButtonBox::ButtonRole): { name: AddButtonText, return: parented }
+  addButton(QDialogButtonBox::StandardButton): { name: AddStandardButton, return: parented }
+  removeButton:
+    args: { button: transfer-to-go }
+    doc: "The button is not deleted; its parent is cleared
+    so Go owns it."
+    test: |
+      box := qtwidgets.NewQDialogButtonBox(nil)
+      b := qtwidgets.NewQPushButtonWithText("x", nil)
+      box.AddButton(b, qtwidgets.QDialogButtonBoxAcceptRole)
+      if got := b.Ownership(); got != qtcore.Parented {
+      	t.Errorf("after AddButton: %v, want Parented", got)
+      }
+      box.RemoveButton(b)
+      if b == nil || b.Ownership() != qtcore.Owned {
+      	t.Errorf("b: %v, want Owned", b.Ownership())
+      }
+      box.Delete()
+      if !b.Alive() {
+      	t.Error("removed button died with its old box")
+      }
+      b.Delete()
+  button: { return: borrowed }
+  buttons: { return: borrowed }
+  buttonRole: { reviewed: true }
+  standardButton: { reviewed: true }
+
+QProgressDialog:
+  setLabel: { args: { label: transfer-to-cpp } }
+  setCancelButton: { args: { button: transfer-to-cpp } }
+  setBar: { args: { bar: transfer-to-cpp } }
+
+QLayout:
+  adoptLayout: { args: { layout: transfer-to-cpp } }
+  addChildWidget: { args: { w: transfer-to-cpp } }
+  addChildLayout: { args: { l: transfer-to-cpp } }
+  widgetEvent: { reviewed: true }
+  layout: { return: borrowed }
+  closestAcceptableSize: { reviewed: true }
+  addWidget: { args: { w: transfer-to-cpp } }
+  addItem: { args: { 0: transfer-to-cpp } }
+  removeItem:
+    args: { 0: transfer-to-go }
+    doc: "Go owns the item afterwards; deleting a widget item does not delete its widget."
+    test: |
+      w := qtwidgets.NewQWidget(nil)
+      lay := qtwidgets.NewQVBoxLayout(w)
+      sp := qtwidgets.NewQSpacerItemWithW(1, 1)
+      lay.AddItem(sp)
+      if got := sp.Ownership(); got != qtcore.Parented {
+      	t.Errorf("after AddItem: %v, want Parented", got)
+      }
+      lay.RemoveItem(sp)
+      if sp == nil || sp.Ownership() != qtcore.Owned {
+      	t.Errorf("sp: %v, want Owned", sp.Ownership())
+      }
+      sp.Delete()
+      w.Delete()
+  removeWidget: { reviewed: true, doc: "The widget is not deleted and keeps its parent widget." }
+  takeAt:
+    return: transfer-to-go
+    test: |
+      w := qtwidgets.NewQWidget(nil)
+      lay := qtwidgets.NewQVBoxLayout(w)
+      lbl := qtwidgets.NewQLabelWithText("x", nil)
+      lay.AddWidget(lbl)
+      it := lay.TakeAt(0)
+      if it == nil || it.Ownership() != qtcore.Owned {
+      	t.Errorf("it: %v, want Owned", it.Ownership())
+      }
+      it.Delete() // deleting the item does not delete its widget
+      if !lbl.Alive() || lbl.Ownership() != qtcore.Parented {
+      	t.Errorf("widget after its item was deleted: alive=%v %v", lbl.Alive(), lbl.Ownership())
+      }
+      w.Delete()
+      if lbl.Alive() {
+      	t.Error("widget alive after its parent was deleted")
+      }
+  itemAt: { return: borrowed }
+  replaceWidget:
+    args: { from: borrowed, to: transfer-to-cpp }
+    return: transfer-to-go
+    test: |
+      w := qtwidgets.NewQWidget(nil)
+      lay := qtwidgets.NewQVBoxLayout(w)
+      a := qtwidgets.NewQLabelWithText("a", nil)
+      lay.AddWidget(a)
+      b := qtwidgets.NewQLabelWithText("b", nil)
+      it := lay.ReplaceWidget(a, b)
+      if it == nil || it.Ownership() != qtcore.Owned {
+      	t.Errorf("it: %v, want Owned", it.Ownership())
+      }
+      if got := b.Ownership(); got != qtcore.Parented {
+      	t.Errorf("new widget: %v, want Parented", got)
+      }
+      it.Delete()
+      w.Delete()
+      if b.Alive() {
+      	t.Error("new widget alive after its parent was deleted")
+      }
+  setMenuBar: { args: { w: transfer-to-cpp } }
+  menuBar: { return: borrowed }
+  parentWidget: { return: borrowed }
+  indexOf(const QWidget*): { name: IndexOf, reviewed: true }
+  indexOf(const QLayoutItem*): { name: IndexOfItem, reviewed: true }
+  setAlignment(QWidget*, Qt::Alignment): { name: SetWidgetAlignment, reviewed: true }
+  setAlignment(QLayout*, Qt::Alignment): { name: SetLayoutAlignment, reviewed: true }
+  setContentsMargins(const QMargins&): { name: SetContentsMargins }
+  getContentsMargins: { args: { left: out, top: out, right: out, bottom: out } }
+
+QLayoutItem:
+  widget: { return: borrowed }
+  layout: { return: borrowed }
+  spacerItem: { return: borrowed }
+
+QWidgetItem:
+  QWidgetItem(QWidget*): { args: { w: borrowed } }
+
+QBoxLayout:
+  addWidget: { args: { 0: transfer-to-cpp } }
+  addLayout: { args: { layout: transfer-to-cpp } }
+  addSpacerItem: { args: { spacerItem: transfer-to-cpp } }
+  addItem: { args: { 0: transfer-to-cpp } }
+  insertWidget: { args: { widget: transfer-to-cpp } }
+  insertLayout: { args: { layout: transfer-to-cpp } }
+  insertSpacerItem: { args: { spacerItem: transfer-to-cpp } }
+  insertItem: { args: { 1: transfer-to-cpp } }
+  setStretchFactor(QWidget*, int): { name: SetStretchFactor, reviewed: true }
+  setStretchFactor(QLayout*, int): { name: SetLayoutStretchFactor, reviewed: true }
+  takeAt: { return: transfer-to-go }
+  itemAt: { return: borrowed }
+
+QGridLayout:
+  addWidget(QWidget*): { skip: "use AddWidget(w, row, column)" }
+  addWidget(QWidget*, int, int, Qt::Alignment): { name: AddWidget, args: { 0: transfer-to-cpp } }
+  addWidget(QWidget*, int, int, int, int, Qt::Alignment): { name: AddWidgetSpan, args: { 0: transfer-to-cpp } }
+  addLayout(QLayout*, int, int, Qt::Alignment): { name: AddLayout, args: { 0: transfer-to-cpp } }
+  addLayout(QLayout*, int, int, int, int, Qt::Alignment): { name: AddLayoutSpan, args: { 0: transfer-to-cpp } }
+  addItem(QLayoutItem*, int, int, int, int, Qt::Alignment): { name: AddItemAt, args: { item: transfer-to-cpp } }
+  itemAtPosition: { return: borrowed }
+  takeAt: { return: transfer-to-go }
+  itemAt: { return: borrowed }
+  getItemPosition: { args: { row: out, column: out, rowSpan: out, columnSpan: out } }
+
+QFormLayout:
+  itemAt(int, QFormLayout::ItemRole): { name: ItemAtRole, return: borrowed }
+  takeRow: { reviewed: true, doc: "The returned label and field items are no longer in the layout; their widgets keep their parent." }
+  getLayoutPosition: { args: { rowPtr: out, rolePtr: out }, reviewed: true }
+  getWidgetPosition: { args: { rowPtr: out, rolePtr: out }, reviewed: true }
+  labelForField(QWidget*): { name: LabelForField, return: borrowed, reviewed: true }
+  addRow(QWidget*, QWidget*): { name: AddRow, args: { label: transfer-to-cpp, field: transfer-to-cpp } }
+  addRow(QWidget*, QLayout*): { name: AddRowLayout, args: { label: transfer-to-cpp, field: transfer-to-cpp } }
+  addRow(const QString&, QWidget*): { name: AddRowText, args: { field: transfer-to-cpp } }
+  addRow(const QString&, QLayout*): { name: AddRowTextLayout, args: { field: transfer-to-cpp } }
+  addRow(QWidget*): { name: AddRowWidget, args: { widget: transfer-to-cpp } }
+  addRow(QLayout*): { name: AddRowSpanLayout, args: { layout: transfer-to-cpp } }
+  insertRow(int, QWidget*, QWidget*): { name: InsertRow, args: { label: transfer-to-cpp, field: transfer-to-cpp } }
+  insertRow(int, QWidget*, QLayout*): { name: InsertRowLayout, args: { label: transfer-to-cpp, field: transfer-to-cpp } }
+  insertRow(int, const QString&, QWidget*): { name: InsertRowText, args: { field: transfer-to-cpp } }
+  insertRow(int, const QString&, QLayout*): { name: InsertRowTextLayout, args: { field: transfer-to-cpp } }
+  insertRow(int, QWidget*): { name: InsertRowWidget, args: { widget: transfer-to-cpp } }
+  insertRow(int, QLayout*): { name: InsertRowSpanLayout, args: { layout: transfer-to-cpp } }
+  removeRow(int): { name: RemoveRow, doc: "Deletes the row's widgets and layouts." }
+  removeRow(QWidget*): { name: RemoveRowOf, reviewed: true }
+  removeRow(QLayout*): { name: RemoveRowOfLayout, reviewed: true }
+  setWidget: { args: { widget: transfer-to-cpp } }
+  setLayout: { args: { layout: transfer-to-cpp } }
+  setItem: { args: { item: transfer-to-cpp } }
+  addItem: { args: { item: transfer-to-cpp } }
+  itemAt: { return: borrowed }
+  takeAt: { return: transfer-to-go }
+  labelForField(QLayout*): { name: LabelForLayout, return: borrowed, reviewed: true }
+  setRowVisible(int, bool): { name: SetRowVisible }
+  setRowVisible(QWidget*, bool): { name: SetRowVisibleOf, reviewed: true }
+  setRowVisible(QLayout*, bool): { name: SetRowVisibleOfLayout, reviewed: true }
+  isRowVisible(int): { name: IsRowVisible }
+  isRowVisible(QWidget*): { name: IsRowVisibleOf, reviewed: true }
+  isRowVisible(QLayout*): { name: IsRowVisibleOfLayout, reviewed: true }
+  getItemPosition: { args: { rowPtr: out, rolePtr: out } }
+
+QStackedLayout:
+  QStackedLayout(QLayout*): { name: NewQStackedLayoutIn, args: { parentLayout: transfer-this }, doc: "Inserts the new layout into parentLayout, which then owns it." }
+  addWidget: { args: { w: transfer-to-cpp } }
+  insertWidget: { args: { w: transfer-to-cpp } }
+  addItem: { args: { item: transfer-to-cpp } }
+  currentWidget: { return: borrowed }
+  widget: { return: borrowed }
+  setCurrentWidget: { reviewed: true }
+  takeAt: { return: transfer-to-go }
+  itemAt: { return: borrowed }
+
+QAbstractItemView:
+  itemDelegateForIndex: { return: borrowed }
+  setModel: { args: { model: keep }, reviewed: true, doc: "The view does not take ownership of the model; it keeps the model from being garbage collected while the view lives." }
+  model: { return: borrowed }
+  setSelectionModel: { args: { selectionModel: keep }, reviewed: true }
+  selectionModel: { return: borrowed }
+  setItemDelegate: { args: { delegate: keep }, reviewed: true, doc: "The view does not take ownership of the delegate." }
+  itemDelegate: { return: borrowed }
+  setItemDelegateForRow: { args: { delegate: keep-each }, reviewed: true }
+  setItemDelegateForColumn: { args: { delegate: keep-each }, reviewed: true }
+  itemDelegateForRow: { return: borrowed }
+  itemDelegateForColumn: { return: borrowed }
+  setIndexWidget:
+    args: { widget: transfer-to-cpp }
+    test: |
+      view := qtwidgets.NewQListView(nil)
+      model := qtcore.NewQStringListModelWithStrings([]string{"a", "b"}, view)
+      view.SetModel(model)
+      w := qtwidgets.NewQLabelWithText("x", nil)
+      view.SetIndexWidget(model.Index(0, 0), w)
+      if got := w.Ownership(); got != qtcore.Parented {
+      	t.Errorf("widget: %v, want Parented", got)
+      }
+      view.Delete()
+      if w.Alive() {
+      	t.Error("index widget alive after the view was deleted")
+      }
+  indexWidget: { return: borrowed }
+
+QTreeView:
+  drawTree: { args: { painter: scoped } }
+  setHeader: { args: { header: transfer-to-cpp } }
+  header: { return: borrowed }
+
+QTableView:
+  setHorizontalHeader: { args: { header: transfer-to-cpp } }
+  setVerticalHeader: { args: { header: transfer-to-cpp } }
+  horizontalHeader: { return: borrowed }
+  verticalHeader: { return: borrowed }
+
+QListWidgetItem:
+  read: { reviewed: true }
+  write: { reviewed: true }
+  QListWidgetItem(QListWidget*, int): { args: { listview: transfer-this } }
+  QListWidgetItem(const QString&, QListWidget*, int): { args: { listview: transfer-this } }
+  QListWidgetItem(const QIcon&, const QString&, QListWidget*, int): { args: { listview: transfer-this } }
+  listWidget: { return: borrowed }
+  clone: { return: transfer-to-go }
+
+QListWidget:
+  mimeData: { return: transfer-to-go }
+  items: { return: borrowed, reviewed: true }
+  addItem(QListWidgetItem*): { name: AddItem, args: { item: transfer-to-cpp } }
+  addItem(const QString&): { name: AddItemText }
+  insertItem(int, QListWidgetItem*): { name: InsertItem, args: { item: transfer-to-cpp } }
+  insertItem(int, const QString&): { name: InsertItemText }
+  takeItem:
+    return: transfer-to-go
+    test: |
+      l := qtwidgets.NewQListWidget(nil)
+      l.AddItemText("a")
+      it := l.TakeItem(0)
+      if it == nil || it.Ownership() != qtcore.Owned {
+      	t.Errorf("it: %v, want Owned", it.Ownership())
+      }
+      it.Delete()
+      l.Delete()
+  item: { return: borrowed }
+  itemAt(const QPoint&): { name: ItemAt, return: borrowed }
+  itemAt(int, int): { skip: "use the QPoint overload" }
+  currentItem: { return: borrowed }
+  setCurrentItem(QListWidgetItem*): { name: SetCurrentItem, reviewed: true }
+  setCurrentItem(QListWidgetItem*, QItemSelectionModel::SelectionFlags): { name: SetCurrentItemWith, reviewed: true }
+  setCurrentRow(int, QItemSelectionModel::SelectionFlags): { name: SetCurrentRowWith }
+  row: { reviewed: true }
+  selectedItems: { return: borrowed }
+  findItems: { return: borrowed }
+  setItemWidget:
+    args: { widget: transfer-to-cpp, item: borrowed }
+    test: |
+      l := qtwidgets.NewQListWidget(nil)
+      it := qtwidgets.NewQListWidgetItemWithText("a", l)
+      x := qtwidgets.NewQLabelWithText("x", nil)
+      l.SetItemWidget(it, x)
+      if got := x.Ownership(); got != qtcore.Parented {
+      	t.Errorf("widget: %v, want Parented", got)
+      }
+      l.Delete()
+      if x.Alive() {
+      	t.Error("item widget alive after the list was deleted")
+      }
+  itemWidget: { return: borrowed, reviewed: true }
+  removeItemWidget: { reviewed: true, doc: "Deletes the widget." }
+  visualItemRect: { reviewed: true }
+  scrollToItem: { reviewed: true }
+  editItem: { reviewed: true }
+  openPersistentEditor: { reviewed: true }
+  closePersistentEditor: { reviewed: true }
+  isPersistentEditorOpen: { reviewed: true }
+  indexFromItem: { reviewed: true }
+  itemFromIndex: { return: borrowed }
+
+QTreeWidgetItem:
+  read: { reviewed: true }
+  write: { reviewed: true }
+  QTreeWidgetItem(QTreeWidget*, int): { name: NewQTreeWidgetItemIn, args: { treeview: transfer-this } }
+  QTreeWidgetItem(QTreeWidget*, const QStringList&, int): { name: NewQTreeWidgetItemInWithStrings, args: { treeview: transfer-this } }
+  QTreeWidgetItem(QTreeWidget*, QTreeWidgetItem*, int): { name: NewQTreeWidgetItemInAfter, args: { treeview: transfer-this, after: borrowed } }
+  QTreeWidgetItem(QTreeWidgetItem*, int): { name: NewQTreeWidgetItemUnder, args: { parent: transfer-this } }
+  QTreeWidgetItem(QTreeWidgetItem*, const QStringList&, int): { name: NewQTreeWidgetItemUnderWithStrings, args: { parent: transfer-this } }
+  QTreeWidgetItem(QTreeWidgetItem*, QTreeWidgetItem*, int): { name: NewQTreeWidgetItemUnderAfter, args: { parent: transfer-this, after: borrowed } }
+  QTreeWidgetItem(const QStringList&, int): { name: NewQTreeWidgetItemWithStrings }
+  addChild: { args: { child: transfer-to-cpp } }
+  insertChild: { args: { child: transfer-to-cpp } }
+  addChildren: { args: { children: transfer-to-cpp } }
+  insertChildren: { args: { children: transfer-to-cpp } }
+  takeChild:
+    return: transfer-to-go
+    test: |
+      p := qtwidgets.NewQTreeWidgetItem()
+      p.AddChild(qtwidgets.NewQTreeWidgetItem())
+      c := p.TakeChild(0)
+      if c == nil || c.Ownership() != qtcore.Owned {
+      	t.Errorf("c: %v, want Owned", c.Ownership())
+      }
+      c.Delete()
+      p.Delete()
+  takeChildren:
+    return: transfer-to-go
+    test: |
+      p := qtwidgets.NewQTreeWidgetItem()
+      p.AddChild(qtwidgets.NewQTreeWidgetItem())
+      l := p.TakeChildren()
+      if len(l) != 1 {
+      	t.Fatalf("got %d children", len(l))
+      }
+      if l[0] == nil || l[0].Ownership() != qtcore.Owned {
+      	t.Errorf("l[0]: %v, want Owned", l[0].Ownership())
+      }
+      l[0].Delete()
+      p.Delete()
+  removeChild:
+    args: { child: transfer-to-go }
+    doc: "The child is not deleted; Go owns it afterwards."
+    test: |
+      p := qtwidgets.NewQTreeWidgetItem()
+      c := qtwidgets.NewQTreeWidgetItem()
+      p.AddChild(c)
+      p.RemoveChild(c)
+      if c == nil || c.Ownership() != qtcore.Owned {
+      	t.Errorf("c: %v, want Owned", c.Ownership())
+      }
+      p.Delete()
+      if !c.Alive() {
+      	t.Error("removed child died with its old parent")
+      }
+      c.Delete()
+  child: { return: borrowed }
+  parent: { return: borrowed }
+  treeWidget: { return: borrowed }
+  indexOfChild: { reviewed: true }
+  clone: { return: transfer-to-go }
+
+QTreeWidget:
+  mimeData: { return: transfer-to-go }
+  addTopLevelItem: { args: { item: transfer-to-cpp } }
+  insertTopLevelItem: { args: { item: transfer-to-cpp } }
+  addTopLevelItems: { args: { items: transfer-to-cpp } }
+  insertTopLevelItems: { args: { items: transfer-to-cpp } }
+  takeTopLevelItem:
+    return: transfer-to-go
+    test: |
+      tw := qtwidgets.NewQTreeWidget(nil)
+      tw.AddTopLevelItem(qtwidgets.NewQTreeWidgetItem())
+      it := tw.TakeTopLevelItem(0)
+      if it == nil || it.Ownership() != qtcore.Owned {
+      	t.Errorf("it: %v, want Owned", it.Ownership())
+      }
+      it.Delete()
+      tw.Delete()
+  topLevelItem: { return: borrowed }
+  invisibleRootItem: { return: borrowed }
+  headerItem: { return: borrowed }
+  setHeaderItem: { args: { item: transfer-to-cpp } }
+  indexOfTopLevelItem: { reviewed: true }
+  currentItem: { return: borrowed }
+  setCurrentItem(QTreeWidgetItem*): { name: SetCurrentItem, reviewed: true }
+  setCurrentItem(QTreeWidgetItem*, int): { name: SetCurrentItemColumn, reviewed: true }
+  setCurrentItem(QTreeWidgetItem*, int, QItemSelectionModel::SelectionFlags): { name: SetCurrentItemWith, reviewed: true }
+  itemAt(const QPoint&): { name: ItemAt, return: borrowed }
+  itemAt(int, int): { skip: "use the QPoint overload" }
+  itemAbove: { return: borrowed, reviewed: true }
+  itemBelow: { return: borrowed, reviewed: true }
+  selectedItems: { return: borrowed }
+  findItems: { return: borrowed }
+  setItemWidget:
+    args: { widget: transfer-to-cpp, item: borrowed }
+    test: |
+      tw := qtwidgets.NewQTreeWidget(nil)
+      it := qtwidgets.NewQTreeWidgetItemIn(tw)
+      x := qtwidgets.NewQLabelWithText("x", nil)
+      tw.SetItemWidget(it, 0, x)
+      if got := x.Ownership(); got != qtcore.Parented {
+      	t.Errorf("widget: %v, want Parented", got)
+      }
+      tw.Delete()
+      if x.Alive() {
+      	t.Error("item widget alive after the tree was deleted")
+      }
+  itemWidget: { return: borrowed, reviewed: true }
+  removeItemWidget: { reviewed: true }
+  visualItemRect: { reviewed: true }
+  scrollToItem: { reviewed: true }
+  editItem: { reviewed: true }
+  openPersistentEditor: { reviewed: true }
+  closePersistentEditor: { reviewed: true }
+  isPersistentEditorOpen: { reviewed: true }
+  expandItem: { reviewed: true }
+  collapseItem: { reviewed: true }
+  indexFromItem: { reviewed: true }
+  itemFromIndex: { return: borrowed }
+
+QTableWidget:
+  mimeData: { return: transfer-to-go }
+  items: { return: borrowed, reviewed: true }
+  setItem: { args: { item: transfer-to-cpp } }
+  takeItem:
+    return: transfer-to-go
+    test: |
+      tb := qtwidgets.NewQTableWidgetWithRows(1, 1, nil)
+      tb.SetItem(0, 0, qtwidgets.NewQTableWidgetItemWithText("a"))
+      it := tb.TakeItem(0, 0)
+      if it == nil || it.Ownership() != qtcore.Owned {
+      	t.Errorf("it: %v, want Owned", it.Ownership())
+      }
+      it.Delete()
+      tb.Delete()
+  item: { return: borrowed }
+  setHorizontalHeaderItem: { args: { item: transfer-to-cpp } }
+  setVerticalHeaderItem: { args: { item: transfer-to-cpp } }
+  takeHorizontalHeaderItem:
+    return: transfer-to-go
+    test: |
+      tb := qtwidgets.NewQTableWidgetWithRows(1, 1, nil)
+      tb.SetHorizontalHeaderItem(0, qtwidgets.NewQTableWidgetItemWithText("a"))
+      it := tb.TakeHorizontalHeaderItem(0)
+      if it == nil || it.Ownership() != qtcore.Owned {
+      	t.Errorf("it: %v, want Owned", it.Ownership())
+      }
+      it.Delete()
+      tb.Delete()
+  takeVerticalHeaderItem:
+    return: transfer-to-go
+    test: |
+      tb := qtwidgets.NewQTableWidgetWithRows(1, 1, nil)
+      tb.SetVerticalHeaderItem(0, qtwidgets.NewQTableWidgetItemWithText("a"))
+      it := tb.TakeVerticalHeaderItem(0)
+      if it == nil || it.Ownership() != qtcore.Owned {
+      	t.Errorf("it: %v, want Owned", it.Ownership())
+      }
+      it.Delete()
+      tb.Delete()
+  horizontalHeaderItem: { return: borrowed }
+  verticalHeaderItem: { return: borrowed }
+  setCellWidget: { args: { widget: transfer-to-cpp } }
+  cellWidget: { return: borrowed }
+  setItemPrototype: { args: { item: transfer-to-cpp } }
+  itemPrototype: { return: borrowed }
+  currentItem: { return: borrowed }
+  setCurrentItem(QTableWidgetItem*): { name: SetCurrentItem, reviewed: true }
+  setCurrentItem(QTableWidgetItem*, QItemSelectionModel::SelectionFlags): { name: SetCurrentItemWith, reviewed: true }
+  setCurrentCell(int, int, QItemSelectionModel::SelectionFlags): { name: SetCurrentCellWith }
+  itemAt(const QPoint&): { name: ItemAt, return: borrowed }
+  itemAt(int, int): { skip: "use the QPoint overload" }
+  selectedItems: { return: borrowed }
+  findItems: { return: borrowed }
+  row: { reviewed: true }
+  column: { reviewed: true }
+  visualItemRect: { reviewed: true }
+  scrollToItem: { reviewed: true }
+  editItem: { reviewed: true }
+  openPersistentEditor: { reviewed: true }
+  closePersistentEditor: { reviewed: true }
+  isPersistentEditorOpen: { reviewed: true }
+  removeCellWidget: { doc: "Deletes the cell widget." }
+  indexFromItem: { reviewed: true }
+  itemFromIndex: { return: borrowed }
+
+QTableWidgetItem:
+  read: { reviewed: true }
+  write: { reviewed: true }
+  tableWidget: { return: borrowed }
+  clone: { return: transfer-to-go }
+
+QCompleter:
+  activated(const QModelIndex&): { name: ActivatedIndex }
+  highlighted(const QModelIndex&): { name: HighlightedIndex }
+  QCompleter(QAbstractItemModel*, QObject*): { name: NewQCompleterWithModel, args: { model: keep:model } }
+  setPopup: { args: { popup: transfer-to-cpp } }
+  popup: { return: borrowed }
+  setWidget: { reviewed: true }
+  widget: { return: borrowed }
+  setModel: { args: { c: keep:model }, reviewed: true }
+  model: { return: borrowed }
+  completionModel: { return: borrowed }
+
+QWidgetAction:
+  createWidget: { return: parented } # the widget is created with the container as parent; deleteWidget frees it
+  createdWidgets: { return: borrowed }
+  setDefaultWidget: { args: { w: transfer-to-cpp } }
+  defaultWidget: { return: borrowed }
+  requestWidget:
+    return: parented
+    reviewed: true
+    doc: "The widget is created with the given parent (or is the default widget reparented to it)."
+    test: |
+      a := qtwidgets.NewQWidgetAction(nil)
+      a.SetDefaultWidget(qtwidgets.NewQLabelWithText("x", nil))
+      p := qtwidgets.NewQWidget(nil)
+      x := a.RequestWidget(p)
+      if x == nil || x.Ownership() != qtcore.Parented {
+      	t.Fatalf("widget: %v, want Parented", x.Ownership())
+      }
+      p.Delete()
+      if x.Alive() {
+      	t.Error("requested widget alive after its parent was deleted")
+      }
+      a.Delete()
+  releaseWidget: { reviewed: true }
+
+QSystemTrayIcon:
+  showMessage(const QString&, const QString&, const QIcon&, int): { name: ShowMessageIcon }
+  showMessage(const QString&, const QString&, QSystemTrayIcon::MessageIcon, int): { name: ShowMessage }
+  setContextMenu: { args: { menu: keep }, reviewed: true, doc: "The tray icon does not take ownership of the menu." }
+  contextMenu: { return: borrowed }
+
+QMdiArea:
+  addSubWindow: { args: { widget: transfer-to-cpp }, return: parented }
+  removeSubWindow:
+    args: { widget: transfer-to-go }
+    test: |
+      area := qtwidgets.NewQMdiArea(nil)
+      sub := area.AddSubWindow(qtwidgets.NewQLabelWithText("x", nil))
+      area.RemoveSubWindow(sub)
+      if sub == nil || sub.Ownership() != qtcore.Owned {
+      	t.Errorf("sub: %v, want Owned", sub.Ownership())
+      }
+      area.Delete()
+      if !sub.Alive() {
+      	t.Error("removed sub-window died with the area")
+      }
+      sub.Delete()
+  currentSubWindow: { return: borrowed }
+  activeSubWindow: { return: borrowed }
+  subWindowList: { return: borrowed }
+  setActiveSubWindow: { reviewed: true }
+
+QMdiSubWindow:
+  maximizedButtonsWidget: { return: borrowed }
+  maximizedSystemMenuIconWidget: { return: borrowed }
+  setWidget: { args: { widget: transfer-to-cpp } }
+  widget: { return: borrowed }
+  mdiArea: { return: borrowed }
+  setSystemMenu: { args: { systemMenu: transfer-to-cpp } }
+  systemMenu: { return: borrowed }
+
+QGraphicsScene:
+  addRect(const QRectF&, const QPen&, const QBrush&):
+    name: AddRect
+    return: parented
+    created: true
+    cpp: "[&] { auto i = new qute_QGraphicsRectItem($0); $self->addItem(i); return i; }()"
+  addEllipse(const QRectF&, const QPen&, const QBrush&):
+    name: AddEllipse
+    return: parented
+    created: true
+    cpp: "[&] { auto i = new qute_QGraphicsEllipseItem($0); $self->addItem(i); return i; }()"
+  addLine(const QLineF&, const QPen&):
+    return: parented
+    created: true
+    cpp: "[&] { auto i = new qute_QGraphicsLineItem($0); $self->addItem(i); return i; }()"
+  addPath(const QPainterPath&, const QPen&, const QBrush&):
+    return: parented
+    created: true
+    cpp: "[&] { auto i = new qute_QGraphicsPathItem($0); $self->addItem(i); return i; }()"
+  addPolygon(const QPolygonF&, const QPen&, const QBrush&):
+    return: parented
+    created: true
+    cpp: "[&] { auto i = new qute_QGraphicsPolygonItem($0); $self->addItem(i); return i; }()"
+  addPixmap(const QPixmap&):
+    return: parented
+    created: true
+    cpp: "[&] { auto i = new qute_QGraphicsPixmapItem($0); $self->addItem(i); return i; }()"
+  addSimpleText(const QString&, const QFont&):
+    return: parented
+    created: true
+    cpp: "[&] { auto i = new qute_QGraphicsSimpleTextItem($0); $self->addItem(i); return i; }()"
+  addWidget: { args: { widget: transfer-to-cpp }, return: parented, doc: "The scene owns the proxy, and the proxy owns the widget." }
+  activeWindow: { return: borrowed }
+  setActiveWindow: { reviewed: true }
+  setSceneRect(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  items(const QPointF&, Qt::ItemSelectionMode, Qt::SortOrder, const QTransform&): { name: ItemsAt }
+  items(const QRectF&, Qt::ItemSelectionMode, Qt::SortOrder, const QTransform&): { name: ItemsIn }
+  items(const QPolygonF&, Qt::ItemSelectionMode, Qt::SortOrder, const QTransform&): { name: ItemsInPolygon }
+  items(const QPainterPath&, Qt::ItemSelectionMode, Qt::SortOrder, const QTransform&): { name: ItemsInPath }
+  items(qreal, qreal, qreal, qreal, Qt::ItemSelectionMode, Qt::SortOrder, const QTransform&): { skip: "use the QRectF overload" }
+  itemAt(qreal, qreal, const QTransform&): { skip: "use the QPointF overload" }
+  setSelectionArea(const QPainterPath&, Qt::ItemSelectionOperation, Qt::ItemSelectionMode, const QTransform&): { name: SetSelectionAreaWith }
+  update(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  update(const QRectF&): { name: Update, full: UpdateRect }
+  invalidate(qreal, qreal, qreal, qreal, QGraphicsScene::SceneLayers): { skip: "use the QRectF overload" }
+  invalidate(const QRectF&, QGraphicsScene::SceneLayers): { name: Invalidate, full: InvalidateRect }
+  render: { reviewed: true }
+  activePanel: { return: borrowed }
+  setActivePanel: { reviewed: true }
+  sendEvent: { reviewed: true }
+  addItem: { args: { item: transfer-to-cpp } }
+  removeItem:
+    args: { item: transfer-to-go }
+    doc: "Ownership passes back to the caller
+    so Go owns the item."
+    test: |
+      sc := qtwidgets.NewQGraphicsScene(nil)
+      r := qtwidgets.NewQGraphicsRectItem(nil)
+      sc.AddItem(r)
+      if got := r.Ownership(); got != qtcore.Parented {
+      	t.Errorf("after AddItem: %v, want Parented", got)
+      }
+      sc.RemoveItem(r)
+      if r == nil || r.Ownership() != qtcore.Owned {
+      	t.Errorf("r: %v, want Owned", r.Ownership())
+      }
+      sc.Delete()
+      if !r.Alive() {
+      	t.Error("removed item died with the scene")
+      }
+      r.Delete()
+  addRect(qreal, qreal, qreal, qreal, const QPen&, const QBrush&): { skip: "use the QRectF overload" }
+  addEllipse(qreal, qreal, qreal, qreal, const QPen&, const QBrush&): { skip: "use the QRectF overload" }
+  addText: { return: parented }
+  itemAt: { return: borrowed }
+  items: { return: borrowed }
+  selectedItems: { return: borrowed }
+  focusItem: { return: borrowed }
+  mouseGrabberItem: { return: borrowed }
+  setFocusItem: { reviewed: true }
+  collidingItems: { reviewed: true, return: borrowed }
+  views: { return: borrowed }
+  createItemGroup: { skip: "QGraphicsItemGroup is not bound" }
+  destroyItemGroup: { skip: "QGraphicsItemGroup is not bound" }
+  setStyle:
+    args: { style: transfer-to-cpp }
+    reviewed: true
+    doc: "The scene reparents the style to itself and deletes the style it replaces (Qt docs), so never pass a style something else owns, such as QApplicationStyle()."
+    test: |
+      recv := qtwidgets.NewQGraphicsScene(nil)
+      s := qtwidgets.QStyleFactoryCreate("Fusion")
+      recv.SetStyle(s)
+      if got := s.Ownership(); got != qtcore.Parented {
+        t.Errorf("style: %v, want Parented", got)
+      }
+      recv.Delete()
+      if s.Alive() {
+        t.Error("style alive after its scene was deleted")
+      }
+  style: { return: borrowed }
+
+QGraphicsView:
+  setSceneRect(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  centerOn(qreal, qreal): { skip: "use the QPointF overload" }
+  centerOn(const QGraphicsItem*): { name: CenterOnItem }
+  ensureVisible(qreal, qreal, qreal, qreal, int, int): { skip: "use the QRectF overload" }
+  ensureVisible(const QGraphicsItem*, int, int): { name: EnsureVisibleItem }
+  fitInView(qreal, qreal, qreal, qreal, Qt::AspectRatioMode): { skip: "use the QRectF overload" }
+  fitInView(const QGraphicsItem*, Qt::AspectRatioMode): { name: FitInViewItem }
+  items(const QPoint&): { name: ItemsAt }
+  items(int, int): { skip: "use the QPoint overload" }
+  items(const QRect&, Qt::ItemSelectionMode): { name: ItemsIn }
+  items(int, int, int, int, Qt::ItemSelectionMode): { skip: "use the QRect overload" }
+  items(const QPolygon&, Qt::ItemSelectionMode): { name: ItemsInPolygon }
+  items(const QPainterPath&, Qt::ItemSelectionMode): { name: ItemsInPath }
+  itemAt(int, int): { skip: "use the QPoint overload" }
+  mapToScene(const QRect&): { name: MapToSceneRect }
+  mapToScene(const QPolygon&): { name: MapToScenePolygon }
+  mapToScene(const QPainterPath&): { name: MapToScenePath }
+  mapFromScene(const QRectF&): { name: MapFromSceneRect }
+  mapFromScene(const QPolygonF&): { name: MapFromScenePolygon }
+  mapFromScene(const QPainterPath&): { name: MapFromScenePath }
+  mapToScene(int, int): { skip: "use the QPoint overload" }
+  mapToScene(int, int, int, int): { skip: "use the QRect overload" }
+  mapFromScene(qreal, qreal): { skip: "use the QPointF overload" }
+  mapFromScene(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  QGraphicsView(QGraphicsScene*, QWidget*): { name: NewQGraphicsViewWithScene, args: { scene: keep:scene } }
+  centerOn: { reviewed: true }
+  ensureVisible: { reviewed: true }
+  fitInView: { reviewed: true }
+  render: { reviewed: true }
+  setScene: { args: { scene: keep:scene }, reviewed: true, doc: "The view does not take ownership of the scene." }
+  scene: { return: borrowed }
+  itemAt: { return: borrowed }
+  items: { return: borrowed }
+
+QGraphicsItem:
+  setGraphicsEffect: { args: { effect: transfer-to-cpp }, doc: "The item takes ownership of the effect." }
+  graphicsEffect: { return: borrowed }
+  setGroup: { args: { group: transfer-this }, doc: "The item becomes a child of the group." }
+  group: { return: borrowed }
+  paint: { reviewed: true }
+  setTransformations: { reviewed: true, doc: "The item does not take ownership of the transformations." }
+  transformations: { return: borrowed }
+  setPos(qreal, qreal): { skip: "use the QPointF overload" }
+  ensureVisible(qreal, qreal, qreal, qreal, int, int): { skip: "use the QRectF overload" }
+  setTransformOriginPoint(qreal, qreal): { skip: "use the QPointF overload" }
+  isObscured(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  update(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  update(const QRectF&): { full: UpdateRect }
+  mapToItem(const QGraphicsItem*, const QRectF&): { name: MapToItemRect }
+  mapToItem(const QGraphicsItem*, const QPolygonF&): { name: MapToItemPolygon }
+  mapToItem(const QGraphicsItem*, const QPainterPath&): { name: MapToItemPath }
+  mapToItem(const QGraphicsItem*, qreal, qreal): { skip: "use the QPointF overload" }
+  mapToItem(const QGraphicsItem*, qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapRectToItem(const QGraphicsItem*, qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapToParent(const QRectF&): { name: MapToParentRect }
+  mapToParent(const QPolygonF&): { name: MapToParentPolygon }
+  mapToParent(const QPainterPath&): { name: MapToParentPath }
+  mapToParent(qreal, qreal): { skip: "use the QPointF overload" }
+  mapToParent(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapRectToParent(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapToScene(const QRectF&): { name: MapToSceneRect }
+  mapToScene(const QPolygonF&): { name: MapToScenePolygon }
+  mapToScene(const QPainterPath&): { name: MapToScenePath }
+  mapToScene(qreal, qreal): { skip: "use the QPointF overload" }
+  mapToScene(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapRectToScene(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapFromItem(const QGraphicsItem*, const QRectF&): { name: MapFromItemRect }
+  mapFromItem(const QGraphicsItem*, const QPolygonF&): { name: MapFromItemPolygon }
+  mapFromItem(const QGraphicsItem*, const QPainterPath&): { name: MapFromItemPath }
+  mapFromItem(const QGraphicsItem*, qreal, qreal): { skip: "use the QPointF overload" }
+  mapFromItem(const QGraphicsItem*, qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapRectFromItem(const QGraphicsItem*, qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapFromParent(const QRectF&): { name: MapFromParentRect }
+  mapFromParent(const QPolygonF&): { name: MapFromParentPolygon }
+  mapFromParent(const QPainterPath&): { name: MapFromParentPath }
+  mapFromParent(qreal, qreal): { skip: "use the QPointF overload" }
+  mapFromParent(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapRectFromParent(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapFromScene(const QRectF&): { name: MapFromSceneRect }
+  mapFromScene(const QPolygonF&): { name: MapFromScenePolygon }
+  mapFromScene(const QPainterPath&): { name: MapFromScenePath }
+  mapFromScene(qreal, qreal): { skip: "use the QPointF overload" }
+  mapFromScene(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  mapRectFromScene(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  isVisibleTo: { reviewed: true }
+  itemTransform: { args: { ok: out }, reviewed: true }
+  isObscuredBy: { reviewed: true }
+  mapToItem: { reviewed: true }
+  mapFromItem: { reviewed: true }
+  mapRectToItem: { reviewed: true }
+  mapRectFromItem: { reviewed: true }
+  setParentItem: { args: { parent: transfer-this } }
+  parentItem: { return: borrowed }
+  topLevelItem: { return: borrowed }
+  childItems: { return: borrowed }
+  scene: { return: borrowed }
+  focusItem: { return: borrowed }
+  focusProxy: { return: borrowed }
+  setFocusProxy: { reviewed: true }
+  focusScopeItem: { return: borrowed }
+  panel: { return: borrowed }
+  parentObject: { return: borrowed }
+  parentWidget: { return: borrowed }
+  toGraphicsObject: { return: borrowed }
+  topLevelWidget: { return: borrowed }
+  window: { return: borrowed }
+  collidingItems: { return: borrowed }
+  collidesWithItem: { reviewed: true }
+  isAncestorOf: { reviewed: true }
+  commonAncestorItem: { return: borrowed, reviewed: true }
+  isBlockedByModalPanel: { reviewed: true, no-full: "the panel comes back through a pointer to an object pointer, which out rules do not cover; use Panel and PanelModality of the items" }
+  stackBefore: { reviewed: true }
+  installSceneEventFilter: { reviewed: true }
+  removeSceneEventFilter: { reviewed: true }
+
+QStyle:
+  combinedLayoutSpacing: { reviewed: true }
+  layoutSpacing: { reviewed: true }
+  standardIcon: { reviewed: true }
+  standardPixmap: { reviewed: true }
+  styleHint: { reviewed: true }
+  sizeFromContents: { reviewed: true }
+  pixelMetric: { reviewed: true }
+  subControlRect: { reviewed: true }
+  hitTestComplexControl: { reviewed: true }
+  subElementRect: { reviewed: true }
+  drawComplexControl: { reviewed: true }
+  drawControl: { reviewed: true }
+  drawPrimitive: { reviewed: true }
+  polish(QApplication*): { name: PolishApplication }
+  unpolish(QApplication*): { name: UnpolishApplication }
+  polish: { reviewed: true }
+  unpolish: { reviewed: true }
+  drawItemText: { reviewed: true }
+  drawItemPixmap: { reviewed: true }
+  proxy: { return: borrowed }
+  polish(QPalette&): { args: { palette: in-out }, doc: "Qt adjusts the palette it is given, so pass the palette to start from; the result is the polished copy." }
+
+QAbstractItemDelegate:
+  updateEditorGeometry: { reviewed: true }
+  editorEvent: { reviewed: true }
+  helpEvent: { reviewed: true }
+  paint: { reviewed: true }
+  createEditor:
+    return: parented
+    reviewed: true
+    doc: "The editor is created as a child of parent."
+    test: |
+      view := qtwidgets.NewQListView(nil)
+      model := qtcore.NewQStringListModelWithStrings([]string{"a"}, view)
+      d := qtwidgets.NewQStyledItemDelegate(view)
+      ed := d.CreateEditor(view, qtwidgets.NewQStyleOptionViewItem(), model.Index(0, 0))
+      if ed == nil {
+      	t.Fatal("no editor")
+      }
+      if got := ed.Ownership(); got != qtcore.Parented {
+      	t.Errorf("editor: %v, want Parented", got)
+      }
+      view.Delete()
+      if ed.Alive() {
+      	t.Error("editor alive after its parent was deleted")
+      }
+  destroyEditor: { reviewed: true }
+  setEditorData: { reviewed: true }
+  setModelData: { reviewed: true }
+  handleEditorEvent: { reviewed: true }
+  commitData: { reviewed: true }
+  closeEditor: { reviewed: true }
+
+QFileDialog:
+  getOpenFileName: { args: { selectedFilter: in-out }, reviewed: true }
+  getOpenFileNames: { args: { selectedFilter: in-out }, reviewed: true }
+  getSaveFileName: { args: { selectedFilter: in-out }, reviewed: true }
+  getOpenFileUrl: { args: { selectedFilter: in-out }, reviewed: true }
+  getOpenFileUrls: { args: { selectedFilter: in-out }, reviewed: true }
+  getSaveFileUrl: { args: { selectedFilter: in-out }, reviewed: true }
+  saveFileContent: { reviewed: true }
+  getOpenFileContent: { reviewed: true }
+  getExistingDirectoryUrl: { reviewed: true }
+  getExistingDirectory: { reviewed: true }
+  setIconProvider: { args: { provider: keep }, reviewed: true, doc: "The dialog does not take ownership of the provider; it keeps the provider from being garbage collected." }
+  iconProvider: { return: borrowed }
+  setItemDelegate: { args: { delegate: keep }, reviewed: true, doc: "QFileDialog does not take ownership of the delegate (Qt docs)." }
+  itemDelegate: { return: borrowed }
+  setProxyModel: { args: { model: transfer-to-cpp }, doc: "The file dialog takes ownership of the proxy model (Qt docs)." }
+  proxyModel: { return: borrowed }
+
+QGraphicsTextItem:
+  paint: { reviewed: true }
+  isObscuredBy: { reviewed: true }
+  setDocument: { args: { document: keep }, reviewed: true, doc: "Qt does not document a transfer of ownership; the item keeps the document from being garbage collected." }
+  document: { return: borrowed }
+
+QInputDialog:
+  getText: { args: { ok: out }, reviewed: true }
+  getMultiLineText: { args: { ok: out }, reviewed: true }
+  getItem: { args: { ok: out }, reviewed: true }
+  getInt: { args: { ok: out }, reviewed: true }
+  getDouble: { args: { ok: out }, reviewed: true }
+
+QScrollBar:
+  QScrollBar(Qt::Orientation, QWidget*): { name: NewQScrollBarWithOrientation }
+  createStandardContextMenu: { return: parented, doc: "Qt makes the menu a child of the widget and leaves it to the caller to delete (Qt docs): Delete() it when done, or it lives until the widget dies." }
+
+QTabBar:
+  addTab(const QIcon&, const QString&): { name: AddTabIcon }
+  insertTab(int, const QIcon&, const QString&): { name: InsertTabIcon }
+  setTabButton:
+    args: { widget: transfer-to-cpp }
+    doc: "The tab bar takes ownership of the widget and deletes it when the tab bar is destroyed (Qt docs)."
+    test: |
+      bar := qtwidgets.NewQTabBar(nil)
+      bar.AddTab("one")
+      b := qtwidgets.NewQPushButtonWithText("x", nil)
+      bar.SetTabButton(0, qtwidgets.QTabBarRightSide, b)
+      if got := b.Ownership(); got != qtcore.Parented {
+      	t.Errorf("button: %v, want Parented", got)
+      }
+      bar.Delete()
+      if b.Alive() {
+      	t.Error("tab button alive after the tab bar was deleted")
+      }
+  tabButton: { return: borrowed }
+
+QCommandLinkButton:
+  QCommandLinkButton(const QString&, const QString&, QWidget*): { name: NewQCommandLinkButtonWithDescription }
+
+QHeaderView:
+  "resizeSections()": { name: ResizeSectionsToHints, doc: "Resizes the sections according to their size hints." }
+  logicalIndexAt(int, int): { skip: "use the QPoint overload" }
+  logicalIndexAt(const QPoint&): { name: LogicalIndexAtPoint }
+  setSectionResizeMode(QHeaderView::ResizeMode): { name: SetSectionResizeModeAll }
+  setSectionResizeMode(int, QHeaderView::ResizeMode): { name: SetSectionResizeMode }
+
+QLCDNumber:
+  checkOverflow(int): { name: CheckOverflowInt }
+  display(int): { name: DisplayInt }
+  display(double): { name: DisplayFloat }
+
+QSettings:
+
+QGraphicsEllipseItem:
+  setRect(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+
+QGraphicsRectItem:
+  setRect(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+
+QGraphicsPixmapItem:
+  setOffset(qreal, qreal): { skip: "use the QPointF overload" }
+
+QItemEditorFactory:
+  createEditor:
+    return: parented
+    reviewed: true
+    doc: "The editor is created as a child of parent."
+    test: |
+      f := qtwidgets.NewQItemEditorFactory()
+      parent := qtwidgets.NewQWidget(nil)
+      ed := f.CreateEditor(int(qtcore.QMetaTypeQString), parent)
+      if ed == nil {
+      	t.Fatal("no editor")
+      }
+      if got := ed.Ownership(); got != qtcore.Parented {
+      	t.Errorf("editor: %v, want Parented", got)
+      }
+      parent.Delete()
+      if ed.Alive() {
+      	t.Error("editor alive after its parent was deleted")
+      }
+      f.Delete()
+  setDefaultFactory: { args: { factory: transfer-to-cpp }, doc: "Qt keeps and later deletes the default factory." }
+  defaultFactory:
+    return: borrowed
+    reviewed: true
+    doc: "Qt's global factory: it lives until SetDefaultFactory replaces (and deletes) it, so do not keep it past that."
+
+QStyledItemDelegate:
+  setItemEditorFactory: { args: { factory: keep }, reviewed: true, doc: "The delegate does not take ownership of the factory." }
+  itemEditorFactory: { return: borrowed }
+
+QGraphicsItemGroup:
+  addToGroup: { args: { item: transfer-to-cpp }, doc: "The item becomes a child of the group." }
+  removeFromGroup: { reviewed: true, doc: "The item is reparented to the group's parent, which keeps owning it." }
+
+QGraphicsProxyWidget:
+  newProxyWidget: { return: parented, reviewed: true } # the new proxy is a child of this one; the widget is only read
+  subWidgetRect: { reviewed: true }
+  createProxyForChildWidget:
+    reviewed: true
+    return: parented
+    doc: "child must be a child of the proxied widget."
+    test: |
+      sc := qtwidgets.NewQGraphicsScene(nil)
+      outer := qtwidgets.NewQWidget(nil)
+      inner := qtwidgets.NewQPushButtonWithText("x", outer)
+      proxy := sc.AddWidget(outer)
+      res := proxy.CreateProxyForChildWidget(inner)
+      if res == nil {
+      	t.Fatal("returned nil")
+      }
+      if got := res.Ownership(); got != qtcore.Parented {
+      	t.Errorf("result: %v, want Parented", got)
+      }
+      sc.Delete()
+      if res.Alive() {
+      	t.Error("child proxy alive after the scene was deleted")
+      }
+  setWidget: { args: { widget: transfer-to-cpp }, doc: "The proxy takes ownership of the widget." }
+  widget: { return: borrowed }
+
+QGraphicsLinearLayout:
+  QGraphicsLinearLayout(QGraphicsLayoutItem*):
+    args: { parent: transfer-this }
+    doc: "A QGraphicsWidget parent installs and owns the layout; a layout parent does not."
+    test: |
+      w := qtwidgets.NewQGraphicsWidget(nil)
+      lay := qtwidgets.NewQGraphicsLinearLayout(w)
+      if got := lay.Ownership(); got != qtcore.Parented {
+      	t.Errorf("with a widget parent: %v, want Parented", got)
+      }
+      w.Delete()
+      if lay.Alive() {
+      	t.Error("layout alive after its widget was deleted")
+      }
+  QGraphicsLinearLayout(Qt::Orientation, QGraphicsLayoutItem*):
+    args: { parent: transfer-this }
+    doc: "A QGraphicsWidget parent installs and owns the layout; a layout parent does not."
+    test: |
+      w := qtwidgets.NewQGraphicsWidget(nil)
+      lay := qtwidgets.NewQGraphicsLinearLayoutWithOrientation(qtcore.Horizontal, w)
+      if got := lay.Ownership(); got != qtcore.Parented {
+      	t.Errorf("with a widget parent: %v, want Parented", got)
+      }
+      w.Delete()
+      if lay.Alive() {
+      	t.Error("layout alive after its widget was deleted")
+      }
+  insertItem: { args: { item: transfer-to-cpp } }
+  setStretchFactor: { reviewed: true }
+  stretchFactor: { reviewed: true }
+  addItem: { args: { item: transfer-to-cpp }, doc: "The layout takes ownership of the item." }
+  removeItem:
+    args: { item: transfer-to-go }
+    doc: "The item is not destroyed; ownership passes to the caller (Qt docs)."
+    test: |
+      lay := qtwidgets.NewQGraphicsLinearLayout(nil)
+      w := qtwidgets.NewQGraphicsWidget(nil)
+      lay.AddItem(w)
+      if got := w.Ownership(); got != qtcore.Parented {
+      	t.Errorf("after AddItem: %v, want Parented", got)
+      }
+      lay.RemoveItem(w)
+      if got := w.Ownership(); got != qtcore.Owned {
+      	t.Errorf("after RemoveItem: %v, want Owned", got)
+      }
+      lay.Delete()
+      if !w.Alive() {
+      	t.Error("removed item died with the layout")
+      }
+      w.Delete()
+  setAlignment: { reviewed: true }
+  alignment: { reviewed: true }
+
+QGraphicsGridLayout:
+  QGraphicsGridLayout(QGraphicsLayoutItem*):
+    args: { parent: transfer-this }
+    doc: "A QGraphicsWidget parent installs and owns the layout; a layout parent does not."
+    test: |
+      w := qtwidgets.NewQGraphicsWidget(nil)
+      lay := qtwidgets.NewQGraphicsGridLayout(w)
+      if got := lay.Ownership(); got != qtcore.Parented {
+      	t.Errorf("with a widget parent: %v, want Parented", got)
+      }
+      w.Delete()
+      if lay.Alive() {
+      	t.Error("layout alive after its widget was deleted")
+      }
+  itemAt(int, int): { name: ItemAtCell, return: borrowed }
+  addItem: { args: { item: transfer-to-cpp }, doc: "The layout takes ownership of the item." }
+  removeItem:
+    args: { item: transfer-to-go }
+    doc: "The item is not destroyed; ownership passes to the caller (Qt docs)."
+    test: |
+      lay := qtwidgets.NewQGraphicsGridLayout(nil)
+      w := qtwidgets.NewQGraphicsWidget(nil)
+      lay.AddItem(w, 0, 0)
+      if got := w.Ownership(); got != qtcore.Parented {
+      	t.Errorf("after AddItem: %v, want Parented", got)
+      }
+      lay.RemoveItem(w)
+      if got := w.Ownership(); got != qtcore.Owned {
+      	t.Errorf("after RemoveItem: %v, want Owned", got)
+      }
+      lay.Delete()
+      if !w.Alive() {
+      	t.Error("removed item died with the layout")
+      }
+      w.Delete()
+  setAlignment: { reviewed: true }
+  alignment: { reviewed: true }
+
+QGraphicsLayout:
+  addChildLayoutItem: { reviewed: true } # reparents the item's graphics item; the layout item stays where it is
+  widgetEvent: { reviewed: true }
+  itemAt: { return: borrowed }
+
+QGraphicsWidget:
+  style: { return: borrowed }
+  setStyle:
+    args: { style: keep }
+    reviewed: true
+    doc: "QGraphicsWidget does not take ownership of the style (Qt docs); it keeps the style from being garbage collected."
+    test: |
+      recv := qtwidgets.NewQGraphicsWidget(nil)
+      s := qtwidgets.QStyleFactoryCreate("Fusion")
+      recv.SetStyle(s)
+      if !rt.KeepsArg(unsafe.Pointer(recv), unsafe.Pointer(s)) {
+        t.Error("style not kept")
+      }
+      defer s.Delete()
+      recv.Delete()
+  focusWidget: { return: borrowed }
+  addAction: { args: { action: keep-each }, reviewed: true }
+  addActions: { reviewed: true }
+  insertActions: { reviewed: true }
+  insertAction: { args: { action: keep-each }, reviewed: true }
+  removeAction: { args: { action: release }, reviewed: true }
+  actions: { return: borrowed }
+  paint: { reviewed: true }
+  paintWindowFrame: { reviewed: true }
+  setTabOrder: { reviewed: true }
+  setLayout: { args: { layout: transfer-to-cpp }, doc: "The widget takes ownership of the layout." }
+  layout: { return: borrowed }
+  getContentsMargins: { args: { left: out, top: out, right: out, bottom: out } }
+  getWindowFrameMargins: { args: { left: out, top: out, right: out, bottom: out } }
+
+QGraphicsLayoutItem:
+  setGraphicsItem: { args: { item: keep } } # stored, not owned
+  parentLayoutItem: { return: borrowed }
+  setParentLayoutItem: { reviewed: true }
+  graphicsItem: { return: borrowed }
+  getContentsMargins: { args: { left: out, top: out, right: out, bottom: out } }
+
+QStyleOption:
+  initFrom: { reviewed: true }
+
+QFontDialog:
+  getFont: { args: { ok: out }, reviewed: true } # parent only centres the dialog during the call
+
+QStyleFactory:
+  create: { return: transfer-to-go }
+
+QDialog:
+  adjustPosition: { reviewed: true }
+
+QGraphicsEffect:
+  drawSource: { args: { painter: scoped } }
+
+QGraphicsSceneDragDropEvent:
+  setMimeData: { reviewed: true } # the event only records the pointer
+  mimeData: { return: borrowed }
+  setSource: { reviewed: true } # the event only records the pointer
+  source: { return: borrowed }
+
+QGraphicsSceneEvent:
+  setWidget: { reviewed: true } # the event only records the pointer
+  widget: { return: borrowed }
+
+QSplitterHandle:
+  splitter: { return: borrowed }
+
+QColorDialog:
+  getColor: { reviewed: true }
+
+QProxyStyle:
+  baseStyle: { return: borrowed }
+  setBaseStyle: { args: { style: transfer-to-cpp } } # the proxy takes ownership of its base style
+  QProxyStyle(QStyle*): { args: { style: transfer-to-cpp } } # the proxy takes ownership of its base style
+
+QRubberBand:
+  QRubberBand: { args: { 1: transfer-this } }
+
+QToolTip:
+  showText: { reviewed: true }
+
+QColumnView:
+  previewWidget: { return: borrowed }
+  setPreviewWidget: { args: { widget: transfer-to-cpp }, doc: "The view takes ownership of the widget and deletes it when a new one is set or the view is deleted." }
+  initializeColumn: { reviewed: true }
+  createColumn: { return: transfer-to-go, doc: "Returns a new view for a column; a Go override's result is owned by the column view." }
+
+QDataWidgetMapper:
+  setModel: { args: { model: keep }, reviewed: true, doc: "The mapper does not take ownership of the model." }
+  model: { return: borrowed }
+  setItemDelegate: { args: { delegate: keep }, reviewed: true, doc: "The mapper does not take ownership of the delegate." }
+  itemDelegate: { return: borrowed }
+  addMapping: { reviewed: true } # the mapper tracks its widgets with QPointer and does not own them
+  removeMapping: { reviewed: true }
+  mappedSection: { reviewed: true }
+  mappedPropertyName: { reviewed: true }
+  mappedWidgetAt: { return: borrowed }
+
+QErrorMessage:
+  qtHandler: { return: borrowed, doc: "The handler's dialog is created and owned by Qt." }
+
+QFocusFrame:
+  setWidget: { args: { widget: keep }, reviewed: true }
+  widget: { return: borrowed }
+
+QGestureEvent:
+  QGestureEvent: { args: { gestures: borrowed }, doc: "The event does not own the gestures; keep them alive while the event lives." }
+  gestures: { return: borrowed }
+  gesture: { return: borrowed }
+  activeGestures: { return: borrowed }
+  canceledGestures: { return: borrowed }
+  setAccepted(QGesture*, bool): { reviewed: true }
+  accept(QGesture*): { reviewed: true }
+  ignore(QGesture*): { reviewed: true }
+  isAccepted(QGesture*): { reviewed: true }
+  setWidget: { reviewed: true }
+  widget: { return: borrowed }
+
+QGestureRecognizer:
+  create: { args: { target: borrowed }, return: transfer-to-go, doc: "Returns a new gesture; Qt's gesture manager owns what it gets from an override.", test: "skip: QGestureRecognizer is abstract, and a snippet cannot declare the override; covered by subclass_test.go" }
+  recognize: { reviewed: true }
+  reset: { reviewed: true }
+  registerRecognizer: { args: { recognizer: transfer-to-cpp }, doc: "Qt takes ownership of the recognizer." }
+
+QGraphicsAnchorLayout:
+  QGraphicsAnchorLayout(QGraphicsLayoutItem*):
+    args: { parent: transfer-this }
+    doc: "A QGraphicsWidget parent installs and owns the layout; a layout parent does not."
+    test: |
+      w := qtwidgets.NewQGraphicsWidget(nil)
+      lay := qtwidgets.NewQGraphicsAnchorLayout(w)
+      if got := lay.Ownership(); got != qtcore.Parented {
+      	t.Errorf("with a widget parent: %v, want Parented", got)
+      }
+      w.Delete()
+      if lay.Alive() {
+      	t.Error("layout alive after its widget was deleted")
+      }
+  addAnchor: { args: { firstItem: transfer-to-cpp, secondItem: transfer-to-cpp }, return: borrowed, doc: "Items not yet in the layout are added to it, and the layout takes ownership of them (passing the layout itself is fine). The anchor is owned by the layout." }
+  anchor: { args: { firstItem: borrowed, secondItem: borrowed }, return: borrowed }
+  addCornerAnchors: { args: { firstItem: transfer-to-cpp, secondItem: transfer-to-cpp }, doc: "Items not yet in the layout are added to it, and the layout takes ownership of them." }
+  addAnchors: { args: { firstItem: transfer-to-cpp, secondItem: transfer-to-cpp }, doc: "Items not yet in the layout are added to it, and the layout takes ownership of them." }
+
+QGraphicsItemAnimation:
+  item: { return: borrowed }
+  setItem: { args: { item: keep }, reviewed: true, doc: "The animation does not take ownership of the item." }
+  timeLine: { return: borrowed }
+  setTimeLine: { args: { timeLine: keep }, reviewed: true, doc: "The animation does not take ownership of the time line." }
+
+QItemDelegate:
+  itemEditorFactory: { return: borrowed }
+  setItemEditorFactory: { args: { factory: keep }, reviewed: true, doc: "The delegate does not take ownership of the factory." }
+  drawBackground: { reviewed: true }
+  textRectangle: { reviewed: true }
+  doLayout: { skip: "takes QRect pointers it reads and writes, which the generator does not map; use the style option rectangles" }
+
+QScroller:
+  target: { return: borrowed }
+  hasScroller: { reviewed: true }
+  scroller(QObject*): { args: { target: borrowed }, return: borrowed, doc: "Qt creates and owns the scroller; it is deleted with its target." }
+  grabGesture: { reviewed: true }
+  grabbedGesture: { reviewed: true }
+  ungrabGesture: { reviewed: true }
+  activeScrollers: { return: borrowed }
+
+QSplashScreen:
+  QSplashScreen(QScreen*, const QPixmap&, Qt::WindowFlags): { reviewed: true }
+  finish: { reviewed: true } # waits for the widget during the call only
+
+QStylePainter:
+  QStylePainter(QWidget*): { args: { w: keep:device }, reviewed: true, doc: "Painting ends when the painter is deleted; call End() or Delete() before the handler returns." }
+  QStylePainter(QPaintDevice*, QWidget*): { args: { pd: keep:device, w: keep:widget }, reviewed: true, doc: "Painting ends when the painter is deleted; call End() or Delete() before the handler returns." }
+  begin(QWidget*): { args: { w: keep:device }, reviewed: true }
+  begin(QPaintDevice*, QWidget*): { args: { pd: keep:device, w: keep:widget }, reviewed: true }
+  style: { return: borrowed }
+
+QUndoView:
+  QUndoView(QUndoStack*, QWidget*): { args: { stack: keep:stack } }
+  QUndoView(QUndoGroup*, QWidget*): { args: { group: keep:group } }
+  stack: { return: borrowed }
+  group: { return: borrowed }
+  setStack: { args: { stack: keep:stack }, reviewed: true, doc: "The view does not take ownership of the stack." }
+  setGroup: { args: { group: keep:group }, reviewed: true, doc: "The view does not take ownership of the group." }
+
+QWhatsThis:
+  createAction: { args: { parent: borrowed }, return: transfer-to-go, doc: "The action is a child of parent; with a nil parent the caller owns it." }
+  showText: { reviewed: true }
+
+QWidgetItemV2:
+  QWidgetItemV2(QWidget*): { args: { widget: borrowed } }
+
+QWizard:
+  addPage: { args: { page: transfer-to-cpp }, doc: "The wizard takes ownership of the page." }
+  setPage: { args: { page: transfer-to-cpp }, doc: "The wizard takes ownership of the page." }
+  page: { return: borrowed }
+  currentPage: { return: borrowed }
+  setButton: { args: { button: transfer-to-cpp }, doc: "The wizard takes ownership of the button and deletes the one it replaces." }
+  button: { return: borrowed }
+  setSideWidget:
+    args: { widget: transfer-to-cpp }
+    doc: "The wizard takes the widget. Qt reparents it into the wizard when the wizard lays itself out (when shown); until then, if the wizard dies first, the widget goes back to Go (Owned)."
+    test: |
+      // laid out (shown): Qt parents the widget into the wizard
+      w := qtwidgets.NewQWizard(nil)
+      w.SetWizardStyle(qtwidgets.QWizardClassicStyle)
+      w.AddPage(qtwidgets.NewQWizardPage(nil))
+      side := qtwidgets.NewQWidget(nil)
+      w.SetSideWidget(side)
+      w.Show()
+      if side.ParentWidget() == nil {
+      	t.Error("side widget has no parent after the wizard was shown")
+      }
+      if got := side.Ownership(); got != qtcore.Parented {
+      	t.Errorf("side widget: %v, want Parented", got)
+      }
+      w.Delete()
+      if side.Alive() {
+      	t.Error("side widget alive after its wizard was deleted")
+      }
+      // never laid out: Qt leaves it parentless and Go gets it back
+      w2 := qtwidgets.NewQWizard(nil)
+      w2.SetWizardStyle(qtwidgets.QWizardClassicStyle)
+      side2 := qtwidgets.NewQWidget(nil)
+      w2.SetSideWidget(side2)
+      w2.Delete()
+      if side2.Alive() && side2.Ownership() != qtcore.Owned {
+      	t.Errorf("unparented side widget after the wizard died: %v, want Owned", side2.Ownership())
+      }
+      if side2.Alive() {
+      	side2.Delete()
+      }
+  sideWidget: { return: borrowed }
+
+QWizardPage:
+  registerField: { reviewed: true }
+  wizard: { return: borrowed }

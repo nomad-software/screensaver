@@ -1,0 +1,5 @@
+# Classes bound in package qtopenglwidgets. See qtcore.yaml for options.
+module: QtOpenGLWidgets
+package: qtopenglwidgets
+classes:
+  QOpenGLWidget: {}

@@ -1,0 +1,4 @@
+# Ownership overlays for qtopenglwidgets. See spec/overlays/qtwidgets.yaml for the rules.
+
+QOpenGLWidget:
+  context: { return: borrowed }

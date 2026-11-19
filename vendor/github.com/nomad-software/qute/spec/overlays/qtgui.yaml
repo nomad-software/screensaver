@@ -1,0 +1,993 @@
+# Ownership overlays for qtgui. See spec/overlays/qtwidgets.yaml for the rules.
+
+QGuiApplication:
+  inputMethod: { return: borrowed }
+  styleHints: { return: borrowed }
+  allWindows: { return: borrowed }
+  topLevelWindows: { return: borrowed }
+  focusWindow: { return: borrowed }
+  modalWindow: { return: borrowed }
+  topLevelAt: { return: borrowed }
+  clipboard: { return: borrowed }
+  primaryScreen: { return: borrowed }
+  screens: { return: borrowed }
+  screenAt: { return: borrowed }
+  focusObject: { return: borrowed }
+
+QPainter:
+  drawLines(const QList<QLineF>&): { name: DrawLineSegmentsF }
+  drawLines(const QList<QLine>&): { name: DrawLineSegments }
+  drawLines(const QLineF*, int): { skip: "use DrawLineSegmentsF" }
+  drawLines(const QLine*, int): { skip: "use DrawLineSegments" }
+  drawLines(const QPointF*, int): { skip: "use DrawLinesF" }
+  drawLines(const QPoint*, int): { skip: "use DrawLines" }
+  drawPoints(const QPointF*, int): { skip: "use DrawPointsF" }
+  drawPoints(const QPoint*, int): { skip: "use DrawPoints" }
+  drawRects(const QRectF*, int): { skip: "use DrawRectsF" }
+  drawRects(const QRect*, int): { skip: "use DrawRects" }
+  drawPolyline(const QPointF*, int): { skip: "use DrawPolylineF" }
+  drawPolyline(const QPoint*, int): { skip: "use DrawPolyline" }
+  drawPolygon(const QPointF*, int, Qt::FillRule): { skip: "use DrawPolygonF" }
+  drawPolygon(const QPoint*, int, Qt::FillRule): { skip: "use DrawPolygon" }
+  drawConvexPolygon(const QPointF*, int): { skip: "use DrawConvexPolygonF" }
+  drawConvexPolygon(const QPoint*, int): { skip: "use DrawConvexPolygon" }
+  fillRect(const QRect&, QGradient::Preset): { name: FillRectPreset }
+  fillRect(const QRectF&, QGradient::Preset): { name: FillRectPresetF }
+  fillRect(int, int, int, int, QGradient::Preset): { skip: "use FillRectPreset" }
+  drawTextItem: { reviewed: true }
+  boundingRect(const QRectF&, const QString&, const QTextOption&): { name: BoundingRectTextF }
+  QPainter(QPaintDevice*): { name: NewQPainterOn, args: { 0: keep:device }, doc: "Painting ends when the painter is deleted; call End() or Delete() before the handler returns. PaintOn is cheaper for a painter used within one call: it ends and frees the painter itself." }
+  begin: { args: { 0: keep:device }, reviewed: true }
+  end: { release-slot: device, reviewed: true, doc: "An inactive painter no longer uses its device, so End() drops the painter's reference to it: the device may be deleted afterwards." }
+  device: { return: borrowed }
+  setPen(const QColor&): { name: SetPenColor }
+  setPen(const QPen&): { name: SetPen }
+  setPen(Qt::PenStyle): { name: SetPenStyle }
+  setBrush(const QBrush&): { name: SetBrush }
+  setBrush(Qt::BrushStyle): { name: SetBrushStyle }
+  setBrush(QColor): { name: SetBrushColor }
+  setBrush(Qt::GlobalColor): { skip: "use SetBrushColor" }
+  setBrushOrigin(int, int): { skip: "use SetBrushOrigin" }
+  setBrushOrigin(const QPoint&): { name: SetBrushOrigin }
+  setBrushOrigin(const QPointF&): { name: SetBrushOriginF }
+  setClipRect(const QRectF&, Qt::ClipOperation): { name: SetClipRectF }
+  setClipRect(const QRect&, Qt::ClipOperation): { name: SetClipRect }
+  setClipRect(int, int, int, int, Qt::ClipOperation): { skip: "use SetClipRect" }
+  translate(const QPointF&): { name: TranslateF }
+  translate(const QPoint&): { name: TranslatePoint }
+  translate(qreal, qreal): { name: Translate }
+  setWindow(const QRect&): { name: SetWindow }
+  setWindow(int, int, int, int): { skip: "use SetWindow" }
+  setViewport(const QRect&): { name: SetViewport }
+  setViewport(int, int, int, int): { skip: "use SetViewport" }
+  drawPoint(const QPointF&): { name: DrawPointF }
+  drawPoint(const QPoint&): { name: DrawPoint }
+  drawPoint(int, int): { skip: "use DrawPoint" }
+  drawPoints(const QPolygonF&): { name: DrawPointsF }
+  drawPoints(const QPolygon&): { name: DrawPoints }
+  drawLine(const QLineF&): { skip: "QLineF is not bound" }
+  drawLine(const QLine&): { skip: "QLine is not bound" }
+  drawLine(int, int, int, int): { name: DrawLine }
+  drawLine(const QPoint&, const QPoint&): { name: DrawLinePoints }
+  drawLine(const QPointF&, const QPointF&): { name: DrawLineF }
+  drawLines(const QList<QPointF>&): { name: DrawLinesF }
+  drawLines(const QList<QPoint>&): { name: DrawLines }
+  drawRect(const QRectF&): { name: DrawRectF }
+  drawRect(int, int, int, int): { skip: "use DrawRect" }
+  drawRect(const QRect&): { name: DrawRect }
+  drawRects(const QList<QRectF>&): { name: DrawRectsF }
+  drawRects(const QList<QRect>&): { name: DrawRects }
+  drawEllipse(const QRectF&): { name: DrawEllipseF }
+  drawEllipse(const QRect&): { name: DrawEllipse }
+  drawEllipse(int, int, int, int): { skip: "use DrawEllipse" }
+  drawEllipse(const QPointF&, qreal, qreal): { name: DrawEllipseAtF }
+  drawEllipse(const QPoint&, int, int): { name: DrawEllipseAt }
+  drawPolyline(const QPolygonF&): { name: DrawPolylineF }
+  drawPolyline(const QPolygon&): { name: DrawPolyline }
+  drawPolygon(const QPolygonF&, Qt::FillRule): { name: DrawPolygonF }
+  drawPolygon(const QPolygon&, Qt::FillRule): { name: DrawPolygon }
+  drawConvexPolygon(const QPolygonF&): { name: DrawConvexPolygonF }
+  drawConvexPolygon(const QPolygon&): { name: DrawConvexPolygon }
+  drawArc(const QRectF&, int, int): { name: DrawArcF }
+  drawArc(const QRect&, int, int): { name: DrawArc }
+  drawArc(int, int, int, int, int, int): { skip: "use DrawArc" }
+  drawPie(const QRectF&, int, int): { name: DrawPieF }
+  drawPie(const QRect&, int, int): { name: DrawPie }
+  drawPie(int, int, int, int, int, int): { skip: "use DrawPie" }
+  drawChord(const QRectF&, int, int): { name: DrawChordF }
+  drawChord(const QRect&, int, int): { name: DrawChord }
+  drawChord(int, int, int, int, int, int): { skip: "use DrawChord" }
+  drawRoundedRect(const QRectF&, qreal, qreal, Qt::SizeMode): { name: DrawRoundedRectF }
+  drawRoundedRect(const QRect&, qreal, qreal, Qt::SizeMode): { name: DrawRoundedRect }
+  drawRoundedRect(int, int, int, int, qreal, qreal, Qt::SizeMode): { skip: "use DrawRoundedRect" }
+  drawTiledPixmap(const QRectF&, const QPixmap&, const QPointF&): { name: DrawTiledPixmapF }
+  drawTiledPixmap(const QRect&, const QPixmap&, const QPoint&): { name: DrawTiledPixmap }
+  drawTiledPixmap(int, int, int, int, const QPixmap&, int, int): { skip: "use DrawTiledPixmap" }
+  drawPixmap(const QRectF&, const QPixmap&, const QRectF&): { name: DrawPixmapPartF }
+  drawPixmap(const QRect&, const QPixmap&, const QRect&): { name: DrawPixmapPart }
+  drawPixmap(const QPointF&, const QPixmap&, const QRectF&): { skip: "use DrawPixmapPartF" }
+  drawPixmap(const QPoint&, const QPixmap&, const QRect&): { skip: "use DrawPixmapPart" }
+  drawPixmap(const QPointF&, const QPixmap&): { name: DrawPixmapF }
+  drawPixmap(const QPoint&, const QPixmap&): { name: DrawPixmap }
+  drawPixmap(const QRect&, const QPixmap&): { name: DrawPixmapIn }
+  drawPixmap(int, int, const QPixmap&): { skip: "use DrawPixmap" }
+  drawPixmap(int, int, int, int, const QPixmap&): { skip: "use DrawPixmapIn" }
+  drawPixmap(int, int, int, int, const QPixmap&, int, int, int, int): { skip: "use DrawPixmapPart" }
+  drawPixmap(int, int, const QPixmap&, int, int, int, int): { skip: "use DrawPixmapPart" }
+  drawImage(const QRectF&, const QImage&, const QRectF&, Qt::ImageConversionFlags): { name: DrawImagePartF }
+  drawImage(const QRect&, const QImage&, const QRect&, Qt::ImageConversionFlags): { name: DrawImagePart }
+  drawImage(const QPointF&, const QImage&, const QRectF&, Qt::ImageConversionFlags): { skip: "use DrawImagePartF" }
+  drawImage(const QPoint&, const QImage&, const QRect&, Qt::ImageConversionFlags): { skip: "use DrawImagePart" }
+  drawImage(const QRectF&, const QImage&): { name: DrawImageInF }
+  drawImage(const QRect&, const QImage&): { name: DrawImageIn }
+  drawImage(const QPointF&, const QImage&): { name: DrawImageF }
+  drawImage(const QPoint&, const QImage&): { name: DrawImage }
+  drawImage(int, int, const QImage&, int, int, int, int, Qt::ImageConversionFlags): { skip: "use DrawImage" }
+  drawText(const QPointF&, const QString&): { name: DrawTextF }
+  drawText(const QPoint&, const QString&): { name: DrawText }
+  drawText(int, int, const QString&): { skip: "use DrawText" }
+  drawText(const QPointF&, const QString&, int, int): { skip: "internal overload" }
+  drawText(const QRectF&, int, const QString&, QRectF*): { name: DrawTextInF, args: { br: out } }
+  drawText(const QRect&, int, const QString&, QRect*): { name: DrawTextIn, args: { br: out } }
+  drawText(int, int, int, int, int, const QString&, QRect*): { skip: "use DrawTextIn" }
+  drawText(const QRectF&, const QString&, const QTextOption&): { skip: "QTextOption is not bound" }
+  boundingRect(const QRectF&, int, const QString&): { name: BoundingRectF }
+  boundingRect(const QRect&, int, const QString&): { name: BoundingRect }
+  boundingRect(int, int, int, int, int, const QString&): { skip: "use BoundingRect" }
+  fillRect(const QRectF&, const QBrush&): { name: FillRectBrushF }
+  fillRect(const QRect&, const QBrush&): { name: FillRectBrush }
+  fillRect(int, int, int, int, const QBrush&): { skip: "use FillRectBrush" }
+  fillRect(const QRectF&, const QColor&): { name: FillRectF }
+  fillRect(const QRect&, const QColor&): { name: FillRect }
+  fillRect(int, int, int, int, const QColor&): { skip: "use FillRect" }
+  fillRect(int, int, int, int, Qt::GlobalColor): { skip: "use FillRect" }
+  fillRect(const QRect&, Qt::GlobalColor): { skip: "use FillRect" }
+  fillRect(const QRectF&, Qt::GlobalColor): { skip: "use FillRectF" }
+  fillRect(int, int, int, int, Qt::BrushStyle): { skip: "use FillRectBrush" }
+  fillRect(const QRect&, Qt::BrushStyle): { skip: "use FillRectBrush" }
+  fillRect(const QRectF&, Qt::BrushStyle): { skip: "use FillRectBrushF" }
+  eraseRect(const QRectF&): { name: EraseRectF }
+  eraseRect(const QRect&): { name: EraseRect }
+  eraseRect(int, int, int, int): { skip: "use EraseRect" }
+
+QPen:
+  QPen(Qt::PenStyle): { name: NewQPenWithStyle }
+  QPen(const QColor&): { name: NewQPenWithColor }
+
+QBrush:
+  QBrush(Qt::BrushStyle): { name: NewQBrushWithStyle }
+  QBrush(const QColor&, Qt::BrushStyle): { name: NewQBrushWithColor }
+  QBrush(Qt::GlobalColor, Qt::BrushStyle): { skip: "use NewQBrushWithColor" }
+  QBrush(const QColor&, const QPixmap&): { name: NewQBrushWithColorPixmap }
+  QBrush(Qt::GlobalColor, const QPixmap&): { skip: "use NewQBrushWithColorPixmap" }
+  setColor(Qt::GlobalColor): { skip: "use SetColor" }
+
+QImage:
+  convertToFormat(QImage::Format, const QList<QRgb>&, Qt::ImageConversionFlags): { name: ConvertToFormatWithColorTable }
+  load(const QString&, const char*): { name: Load, error: true }
+  load(QIODevice*, const char*): { name: LoadFrom, error: true, reviewed: true }
+  save(const QString&, const char*, int): { name: Save, error: true }
+  save(QIODevice*, const char*, int): { name: SaveTo, error: true, reviewed: true }
+  copy(int, int, int, int): { skip: "use Copy(rect)" }
+  valid(const QPoint&): { skip: "use Valid(x, y)" }
+  pixelIndex(const QPoint&): { skip: "use PixelIndex(x, y)" }
+  pixel(const QPoint&): { skip: "use Pixel(x, y)" }
+  setPixel(const QPoint&, uint): { skip: "use SetPixel(x, y, v)" }
+  pixelColor(const QPoint&): { skip: "use PixelColor(x, y)" }
+  setPixelColor(const QPoint&, const QColor&): { skip: "use SetPixelColor(x, y, c)" }
+  fill(const QColor&): { name: FillColor }
+  fill(Qt::GlobalColor): { skip: "use FillColor" }
+  scaled(int, int, Qt::AspectRatioMode, Qt::TransformationMode): { name: Scaled }
+  scaled(const QSize&, Qt::AspectRatioMode, Qt::TransformationMode): { skip: "use Scaled(w, h)" }
+  QImage(uchar*, int, int, QImage::Format, QImageCleanupFunction, void*): { skip: "on purpose: use NewQImageFromBytes (copies) or the const uchar * overload (NewQImageOverMemory*), which never writes into memory the image does not own" }
+  QImage(uchar*, int, int, qsizetype, QImage::Format, QImageCleanupFunction, void*): { skip: "on purpose: use NewQImageFromBytes (copies) or the const uchar * overload (NewQImageOverMemory*), which never writes into memory the image does not own" }
+  QImage(const uchar*, int, int, QImage::Format, QImageCleanupFunction, void*): { name: NewQImageOverMemory, doc: "Escape hatch: the image reads data in place without copying it, after this call returns. The buffer must stay valid and unchanged for the image's life, and must be C memory or Go memory pinned with runtime.Pinner until the image is gone (unpinned Go memory breaks the cgo pointer rules and may be freed under the image). NewQImageFromBytes copies instead; Copy() detaches an image from its buffer." }
+  QImage(const uchar*, int, int, qsizetype, QImage::Format, QImageCleanupFunction, void*): { name: NewQImageOverMemoryBytesPerLine, doc: "Escape hatch: the image reads data in place without copying it, after this call returns. The buffer must stay valid and unchanged for the image's life, and must be C memory or Go memory pinned with runtime.Pinner until the image is gone (unpinned Go memory breaks the cgo pointer rules and may be freed under the image). NewQImageFromBytes copies instead; Copy() detaches an image from its buffer." }
+
+QPixmap:
+  fromImageReader: { reviewed: true }
+  QPixmap(const QSize&): { skip: "use NewQPixmapWithW(w, h)" }
+  load: { error: true }
+  save(const QString&, const char*, int): { name: Save, error: true }
+  save(QIODevice*, const char*, int): { name: SaveTo, error: true, reviewed: true }
+  scaled(int, int, Qt::AspectRatioMode, Qt::TransformationMode): { name: Scaled }
+  scaled(const QSize&, Qt::AspectRatioMode, Qt::TransformationMode): { skip: "use Scaled(w, h)" }
+  copy(int, int, int, int): { skip: "use Copy(rect)" }
+  scroll(int, int, int, int, int, int, QRegion*): { skip: "out parameter" }
+  scroll(int, int, const QRect&, QRegion*): { name: Scroll }
+
+QIcon:
+  QIcon(QIconEngine*): { args: { engine: transfer-to-cpp }, doc: "The icon takes ownership of the engine; it is deleted with the last copy of the icon." }
+  pixmap(const QSize&, QIcon::Mode, QIcon::State): { name: Pixmap }
+  pixmap(int, int, QIcon::Mode, QIcon::State): { skip: "use Pixmap(size)" }
+  pixmap(int, QIcon::Mode, QIcon::State): { name: PixmapExtent }
+  pixmap(const QSize&, qreal, QIcon::Mode, QIcon::State): { name: PixmapScaled }
+  paint(QPainter*, const QRect&, Qt::Alignment, QIcon::Mode, QIcon::State): { name: Paint, reviewed: true }
+  paint(QPainter*, int, int, int, int, Qt::Alignment, QIcon::Mode, QIcon::State): { skip: "use Paint(painter, rect)" }
+  fromTheme(const QString&): { name: QIconFromTheme }
+  fromTheme(const QString&, const QIcon&): { name: QIconFromThemeOr }
+  fromTheme(QIcon::ThemeIcon): { name: QIconFromThemeIcon }
+  fromTheme(QIcon::ThemeIcon, const QIcon&): { name: QIconFromThemeIconOr }
+  hasThemeIcon(const QString&): { name: QIconHasThemeIcon }
+  hasThemeIcon(QIcon::ThemeIcon): { name: QIconHasThemeIconEnum }
+
+QKeySequence:
+  QKeySequence(int, int, int, int): { name: NewQKeySequenceWithKeyCode }
+  QKeySequence(QKeySequence::StandardKey): { name: NewQKeySequenceStandard }
+
+QAction:
+  showStatusText: { reviewed: true }
+  setActionGroup: { reviewed: true }
+  actionGroup: { return: borrowed }
+  setShortcuts(QKeySequence::StandardKey): { name: SetStandardShortcuts }
+  associatedObjects: { return: borrowed }
+
+QActionGroup:
+  addAction(QAction*): { args: { a: keep-each }, return: borrowed, doc: "The group does not take ownership of the action." }
+  addAction(const QString&): { name: AddActionText, return: parented }
+  addAction(const QIcon&, const QString&): { name: AddActionIcon, return: parented }
+  removeAction: { args: { a: release }, reviewed: true }
+  checkedAction: { return: borrowed }
+  actions: { return: borrowed }
+
+QShortcut:
+  QShortcut(QKeySequence::StandardKey, QObject*, const char*, const char*, Qt::ShortcutContext): { name: NewQShortcutStandard }
+  setKeys(QKeySequence::StandardKey): { name: SetStandardKeys }
+  setKeys(const QList<QKeySequence>&): { name: SetKeys }
+
+QClipboard:
+  setMimeData:
+    args: { data: transfer-to-cpp }
+    doc: "The clipboard takes ownership of data."
+    test: |
+      cb := qtgui.QGuiApplicationClipboard()
+      d := qtcore.NewQMimeData()
+      cb.SetMimeData(d)
+      if got := d.Ownership(); got != qtcore.Parented {
+      	t.Errorf("data: %v, want Parented", got)
+      }
+      cb.SetMimeData(qtcore.NewQMimeData()) // replacing deletes the old data
+      if d.Alive() {
+      	t.Error("old clipboard data alive after it was replaced")
+      }
+  mimeData: { return: borrowed }
+  text(QString&, QClipboard::Mode): { args: { subtype: in-out }, doc: "subtype is read (the MIME subtype wanted, or empty for any) and set to the subtype found." }
+
+QStandardItemModel:
+  appendRow(const QList<QStandardItem*>&): { name: AppendRowItems, args: { items: transfer-to-cpp } }
+  appendRow(QStandardItem*): { name: AppendRow, args: { item: transfer-to-cpp } }
+  appendColumn: { args: { items: transfer-to-cpp } }
+  insertRow(int, const QList<QStandardItem*>&): { name: InsertRowItems, args: { items: transfer-to-cpp } }
+  insertRow(int, QStandardItem*): { name: InsertRowItem, args: { item: transfer-to-cpp } }
+  insertColumn(int, const QList<QStandardItem*>&): { name: InsertColumnItems, args: { items: transfer-to-cpp } }
+  setItem(int, int, QStandardItem*): { name: SetItem, args: { item: transfer-to-cpp } }
+  setItem(int, QStandardItem*): { name: SetItemRow, args: { item: transfer-to-cpp } }
+  setHorizontalHeaderItem: { args: { item: transfer-to-cpp } }
+  setVerticalHeaderItem: { args: { item: transfer-to-cpp } }
+  takeItem:
+    return: transfer-to-go
+    test: |
+      m := qtgui.NewQStandardItemModel(nil)
+      m.AppendRow(qtgui.NewQStandardItemWithText("a"))
+      x := m.TakeItem(0)
+      if x == nil || x.Ownership() != qtcore.Owned {
+      	t.Errorf("x: %v, want Owned", x.Ownership())
+      }
+      x.Delete()
+      m.Delete()
+  takeRow:
+    return: transfer-to-go
+    test: |
+      m := qtgui.NewQStandardItemModel(nil)
+      m.AppendRow(qtgui.NewQStandardItemWithText("a"))
+      l := m.TakeRow(0)
+      if len(l) != 1 {
+      	t.Fatalf("got %d items", len(l))
+      }
+      if l[0] == nil || l[0].Ownership() != qtcore.Owned {
+      	t.Errorf("l[0]: %v, want Owned", l[0].Ownership())
+      }
+      l[0].Delete()
+      m.Delete()
+  takeColumn:
+    return: transfer-to-go
+    test: |
+      m := qtgui.NewQStandardItemModel(nil)
+      m.AppendRow(qtgui.NewQStandardItemWithText("a"))
+      l := m.TakeColumn(0)
+      if len(l) != 1 {
+      	t.Fatalf("got %d items", len(l))
+      }
+      if l[0] == nil || l[0].Ownership() != qtcore.Owned {
+      	t.Errorf("l[0]: %v, want Owned", l[0].Ownership())
+      }
+      l[0].Delete()
+      m.Delete()
+  takeHorizontalHeaderItem:
+    return: transfer-to-go
+    test: |
+      m := qtgui.NewQStandardItemModelWithRows(1, 1, nil)
+      m.SetHorizontalHeaderItem(0, qtgui.NewQStandardItemWithText("h"))
+      x := m.TakeHorizontalHeaderItem(0)
+      if x == nil || x.Ownership() != qtcore.Owned {
+      	t.Errorf("x: %v, want Owned", x.Ownership())
+      }
+      x.Delete()
+      m.Delete()
+  takeVerticalHeaderItem:
+    return: transfer-to-go
+    test: |
+      m := qtgui.NewQStandardItemModelWithRows(1, 1, nil)
+      m.SetVerticalHeaderItem(0, qtgui.NewQStandardItemWithText("h"))
+      x := m.TakeVerticalHeaderItem(0)
+      if x == nil || x.Ownership() != qtcore.Owned {
+      	t.Errorf("x: %v, want Owned", x.Ownership())
+      }
+      x.Delete()
+      m.Delete()
+  setItemPrototype: { args: { item: transfer-to-cpp } }
+  itemPrototype: { return: borrowed }
+  item: { return: borrowed }
+  invisibleRootItem: { return: borrowed }
+  itemFromIndex: { return: borrowed }
+  horizontalHeaderItem: { return: borrowed }
+  verticalHeaderItem: { return: borrowed }
+  findItems: { return: borrowed }
+  indexFromItem: { reviewed: true }
+
+QStandardItem:
+  read: { reviewed: true }
+  write: { reviewed: true }
+  appendRow(const QList<QStandardItem*>&): { name: AppendRowItems, args: { items: transfer-to-cpp } }
+  appendRow(QStandardItem*): { name: AppendRow, args: { item: transfer-to-cpp } }
+  appendRows: { args: { items: transfer-to-cpp } }
+  appendColumn: { args: { items: transfer-to-cpp } }
+  insertRow(int, const QList<QStandardItem*>&): { name: InsertRowItems, args: { items: transfer-to-cpp } }
+  insertRow(int, QStandardItem*): { name: InsertRowItem, args: { item: transfer-to-cpp } }
+  insertRows(int, const QList<QStandardItem*>&): { name: InsertRowsItems, args: { items: transfer-to-cpp } }
+  insertRows(int, int): { name: InsertRows }
+  insertColumn: { args: { items: transfer-to-cpp } }
+  setChild(int, int, QStandardItem*): { name: SetChild, args: { item: transfer-to-cpp } }
+  setChild(int, QStandardItem*): { name: SetChildRow, args: { item: transfer-to-cpp } }
+  takeChild:
+    return: transfer-to-go
+    test: |
+      p := qtgui.NewQStandardItemWithText("p")
+      p.AppendRow(qtgui.NewQStandardItemWithText("c"))
+      c := p.TakeChild(0)
+      if c == nil || c.Ownership() != qtcore.Owned {
+      	t.Errorf("c: %v, want Owned", c.Ownership())
+      }
+      c.Delete()
+      p.Delete()
+  takeRow:
+    return: transfer-to-go
+    test: |
+      p := qtgui.NewQStandardItemWithText("p")
+      p.AppendRow(qtgui.NewQStandardItemWithText("c"))
+      l := p.TakeRow(0)
+      if len(l) != 1 {
+      	t.Fatalf("got %d items", len(l))
+      }
+      if l[0] == nil || l[0].Ownership() != qtcore.Owned {
+      	t.Errorf("l[0]: %v, want Owned", l[0].Ownership())
+      }
+      l[0].Delete()
+      p.Delete()
+  takeColumn:
+    return: transfer-to-go
+    test: |
+      p := qtgui.NewQStandardItemWithText("p")
+      p.AppendRow(qtgui.NewQStandardItemWithText("c"))
+      l := p.TakeColumn(0)
+      if len(l) != 1 {
+      	t.Fatalf("got %d items", len(l))
+      }
+      if l[0] == nil || l[0].Ownership() != qtcore.Owned {
+      	t.Errorf("l[0]: %v, want Owned", l[0].Ownership())
+      }
+      l[0].Delete()
+      p.Delete()
+  child: { return: borrowed }
+  parent: { return: borrowed }
+  model: { return: borrowed }
+  clone: { return: transfer-to-go, reviewed: true } # with a parent the clone is Parented (rule 3)
+
+QTextDocument:
+  createObject: { return: parented } # an override creates the object with the document as parent
+  print: { reviewed: true }
+  frameAt: { return: borrowed }
+  rootFrame: { return: borrowed }
+  objectForFormat: { return: borrowed }
+  object: { return: borrowed }
+  drawContents: { reviewed: true }
+  clone: { return: transfer-to-go, reviewed: true } # with a parent the clone is Parented (rule 3)
+  documentLayout: { skip: "QAbstractTextDocumentLayout is not bound" }
+
+QFont:
+  QFont(const QFont&, const QPaintDevice*): { name: NewQFontFor, reviewed: true }
+
+QGlyphRun:
+  setRawData: { skip: "on purpose: low-level font internals" }
+
+QFontMetrics:
+  size: { no-full: "tabArray is an input array of tab stops, which Qt reads up to a zero; pass tabStops instead" }
+  boundingRect(const QString&, const QTextOption&): { name: BoundingRectWithOption }
+  QFontMetrics(const QFont&, const QPaintDevice*): { name: NewQFontMetricsFor, reviewed: true }
+  horizontalAdvance(QChar): { name: HorizontalAdvanceChar }
+  boundingRect(QChar): { name: BoundingRectChar }
+  boundingRect(const QString&): { name: BoundingRect }
+  boundingRect(const QRect&, int, const QString&, int, int*): { name: BoundingRectIn, no-full: "tabArray is an input array of tab stops, which Qt reads up to a zero; pass tabStops instead" }
+  boundingRect(int, int, int, int, int, const QString&, int, int*): { skip: "use BoundingRectIn" }
+
+QCursor:
+  pos(const QScreen*): { name: QCursorPosOn, reviewed: true }
+  setPos(QScreen*, int, int): { skip: "use QCursorSetPosOn" }
+  setPos(QScreen*, const QPoint&): { name: QCursorSetPosOn, reviewed: true }
+  setPos(int, int): { skip: "use QCursorSetPos(point)" }
+  setPos(const QPoint&): { name: QCursorSetPos }
+
+QScreen:
+  virtualSiblings: { return: borrowed }
+  virtualSiblingAt: { return: borrowed }
+
+QDropEvent:
+  QDropEvent: { args: { data: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+  source: { return: borrowed }
+  mimeData: { return: borrowed }
+
+QPointerEvent:
+  QPointerEvent: { args: { dev: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+  pointingDevice: { return: borrowed }
+  passiveGrabbers: { return: borrowed }
+  exclusiveGrabber: { return: borrowed }
+  setExclusiveGrabber: { reviewed: true }
+  addPassiveGrabber: { reviewed: true }
+  removePassiveGrabber: { reviewed: true }
+
+QSinglePointEvent:
+  exclusivePointGrabber: { return: borrowed }
+  setExclusivePointGrabber: { reviewed: true }
+
+QPainterPath:
+  moveTo(qreal, qreal): { skip: "use the QPointF overload" }
+  lineTo(qreal, qreal): { skip: "use the QPointF overload" }
+  arcMoveTo(qreal, qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  arcTo(qreal, qreal, qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  cubicTo(qreal, qreal, qreal, qreal, qreal, qreal): { skip: "use the QPointF overload" }
+  quadTo(qreal, qreal, qreal, qreal): { skip: "use the QPointF overload" }
+  addRect(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  addEllipse(qreal, qreal, qreal, qreal): { skip: "use the QRectF overload" }
+  addEllipse(const QPointF&, qreal, qreal): { name: AddEllipseAt }
+  addText(qreal, qreal, const QFont&, const QString&): { skip: "use the QPointF overload" }
+  addRoundedRect(qreal, qreal, qreal, qreal, qreal, qreal, Qt::SizeMode): { skip: "use the QRectF overload" }
+  contains(const QRectF&): { name: ContainsRect }
+  contains(const QPainterPath&): { name: ContainsPath }
+  translate(qreal, qreal): { skip: "use the QPointF overload" }
+  translate(const QPointF&): { name: Translate }
+  translated(qreal, qreal): { skip: "use the QPointF overload" }
+  translated(const QPointF&): { name: Translated }
+  intersects(const QPainterPath&): { name: IntersectsPath }
+
+QPalette:
+  QPalette(const QColor&): { name: NewQPaletteWithButton }
+  QPalette(Qt::GlobalColor): { skip: "use NewQPaletteWithButton" }
+  QPalette(const QColor&, const QColor&): { name: NewQPaletteWithButtonWindow }
+  QPalette(const QColor&, const QColor&, const QColor&, const QColor&, const QColor&, const QColor&, const QColor&): { name: NewQPaletteWithColors }
+  setColor(QPalette::ColorGroup, QPalette::ColorRole, const QColor&): { name: SetGroupColor }
+  setColor(QPalette::ColorRole, const QColor&): { name: SetColor }
+  setBrush(QPalette::ColorRole, const QBrush&): { name: SetBrush }
+  setBrush(QPalette::ColorGroup, QPalette::ColorRole, const QBrush&): { name: SetGroupBrush }
+  color(QPalette::ColorGroup, QPalette::ColorRole): { name: GroupColor }
+  color(QPalette::ColorRole): { name: Color }
+  brush(QPalette::ColorGroup, QPalette::ColorRole): { name: GroupBrush }
+  brush(QPalette::ColorRole): { name: Brush }
+
+QRegion:
+  contains(const QRect&): { name: ContainsRect }
+  translate(int, int): { skip: "use the QPoint overload" }
+  translate(const QPoint&): { name: Translate }
+  translated(int, int): { skip: "use the QPoint overload" }
+  translated(const QPoint&): { name: Translated }
+  united(const QRect&): { name: UnitedRect }
+  intersected(const QRect&): { name: IntersectedRect }
+  intersects(const QRect&): { name: IntersectsRect }
+
+QTransform:
+  inverted: { args: { invertible: out } }
+  QTransform(Qt::Initialization): { skip: "internal" }
+  QTransform(): { name: NewQTransform }
+  QTransform(qreal, qreal, qreal, qreal, qreal, qreal): { name: NewQTransformAffine }
+  QTransform(qreal, qreal, qreal, qreal, qreal, qreal, qreal, qreal, qreal): { name: NewQTransformProjective }
+  map(const QPointF&): { name: MapF }
+  map(const QPolygonF&): { name: MapPolygonF }
+  map(const QPolygon&): { name: MapPolygon }
+  map(const QRegion&): { name: MapRegion }
+  map(const QPainterPath&): { name: MapPath }
+  mapRect(const QRectF&): { name: MapRectF }
+  quadToQuad: { args: { result: out } }
+  quadToSquare: { args: { result: out } }
+  squareToQuad: { args: { result: out } }
+  map(int, int, int*, int*): { args: { tx: out, ty: out } }
+  map(qreal, qreal, qreal*, qreal*): { args: { tx: out, ty: out } }
+
+QDoubleValidator:
+  setRange(double, double, int): { name: SetRangeDecimals }
+  setRange(double, double): { name: SetRange }
+
+QMovie:
+  setDevice: { args: { device: keep:device }, reviewed: true }
+  device: { return: borrowed }
+  QMovie(QIODevice*, const QByteArray&, QObject*):
+    name: NewQMovieWithDevice
+    args: { device: "keep:device" }
+    reviewed: true
+    doc: "The device must not be nil; the movie does not take ownership of it."
+    test: |
+      root := qtcore.NewQObject(nil)
+      f := qtcore.NewQFileWithName("missing.gif", nil)
+      x := qtgui.NewQMovieWithDevice(f, nil, root)
+      if got := x.Ownership(); got != qtcore.Parented {
+      	t.Errorf("with parent: %v, want Parented", got)
+      }
+      root.Delete()
+      if x.Alive() {
+      	t.Error("still alive after its parent was deleted")
+      }
+      f.Delete()
+
+QTextFrame:
+  QTextFrame(QTextDocument*):
+    args: { doc: transfer-this }
+    doc: "The document owns the frame; doc must not be nil."
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      f := qtgui.NewQTextFrame(doc)
+      if got := f.Ownership(); got != qtcore.Parented {
+      	t.Errorf("frame: %v, want Parented", got)
+      }
+      doc.Delete()
+      if f.Alive() {
+      	t.Error("frame alive after its document was deleted")
+      }
+  childFrames: { return: borrowed }
+  parentFrame: { return: borrowed }
+
+QTextCursor:
+  insertList(const QTextListFormat&):
+    name: InsertList
+    return: parented
+    reviewed: true
+    doc: "The document owns the new object."
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      cur := qtgui.NewQTextCursorWithTextDocument(doc)
+      x := cur.InsertList(qtgui.NewQTextListFormat())
+      if x == nil {
+      	t.Fatal("returned nil")
+      }
+      if got := x.Ownership(); got != qtcore.Parented {
+      	t.Errorf("result: %v, want Parented", got)
+      }
+      doc.Delete()
+      if x.Alive() {
+      	t.Error("result alive after its document was deleted")
+      }
+  insertList(QTextListFormat::Style):
+    name: InsertListStyle
+    return: parented
+    reviewed: true
+    doc: "The document owns the new object."
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      cur := qtgui.NewQTextCursorWithTextDocument(doc)
+      x := cur.InsertListStyle(qtgui.QTextListFormatListDisc)
+      if x == nil {
+      	t.Fatal("returned nil")
+      }
+      if got := x.Ownership(); got != qtcore.Parented {
+      	t.Errorf("result: %v, want Parented", got)
+      }
+      doc.Delete()
+      if x.Alive() {
+      	t.Error("result alive after its document was deleted")
+      }
+  createList(const QTextListFormat&):
+    name: CreateList
+    return: parented
+    reviewed: true
+    doc: "The document owns the new object."
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      cur := qtgui.NewQTextCursorWithTextDocument(doc)
+      x := cur.CreateList(qtgui.NewQTextListFormat())
+      if x == nil {
+      	t.Fatal("returned nil")
+      }
+      if got := x.Ownership(); got != qtcore.Parented {
+      	t.Errorf("result: %v, want Parented", got)
+      }
+      doc.Delete()
+      if x.Alive() {
+      	t.Error("result alive after its document was deleted")
+      }
+  createList(QTextListFormat::Style):
+    name: CreateListStyle
+    return: parented
+    reviewed: true
+    doc: "The document owns the new object."
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      cur := qtgui.NewQTextCursorWithTextDocument(doc)
+      x := cur.CreateListStyle(qtgui.QTextListFormatListDisc)
+      if x == nil {
+      	t.Fatal("returned nil")
+      }
+      if got := x.Ownership(); got != qtcore.Parented {
+      	t.Errorf("result: %v, want Parented", got)
+      }
+      doc.Delete()
+      if x.Alive() {
+      	t.Error("result alive after its document was deleted")
+      }
+  insertTable(int, int, const QTextTableFormat&):
+    name: InsertTableWithFormat
+    return: parented
+    reviewed: true
+    doc: "The document owns the new object."
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      cur := qtgui.NewQTextCursorWithTextDocument(doc)
+      x := cur.InsertTableWithFormat(2, 2, qtgui.NewQTextTableFormat())
+      if x == nil {
+      	t.Fatal("returned nil")
+      }
+      if got := x.Ownership(); got != qtcore.Parented {
+      	t.Errorf("result: %v, want Parented", got)
+      }
+      doc.Delete()
+      if x.Alive() {
+      	t.Error("result alive after its document was deleted")
+      }
+  insertTable(int, int):
+    name: InsertTable
+    return: parented
+    reviewed: true
+    doc: "The document owns the new object."
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      cur := qtgui.NewQTextCursorWithTextDocument(doc)
+      x := cur.InsertTable(2, 2)
+      if x == nil {
+      	t.Fatal("returned nil")
+      }
+      if got := x.Ownership(); got != qtcore.Parented {
+      	t.Errorf("result: %v, want Parented", got)
+      }
+      doc.Delete()
+      if x.Alive() {
+      	t.Error("result alive after its document was deleted")
+      }
+  QTextCursor(QTextDocument*): { args: { document: keep:document }, kept-delete: allow, reviewed: true, doc: "The cursor keeps the document from being garbage collected; deleting the document makes the cursor null, which Qt handles." }
+  QTextCursor(QTextFrame*): { reviewed: true, doc: "The frame belongs to its document; keep the document alive while the cursor is used." }
+  currentList: { return: borrowed }
+  currentTable: { return: borrowed }
+  currentFrame: { return: borrowed }
+  document: { return: borrowed }
+  insertFrame:
+    return: parented
+    reviewed: true
+    doc: "The document owns the new frame."
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      cur := qtgui.NewQTextCursorWithTextDocument(doc)
+      f := cur.InsertFrame(qtgui.NewQTextFrameFormat())
+      if f == nil {
+      	t.Fatal("no frame")
+      }
+      if got := f.Ownership(); got != qtcore.Parented {
+      	t.Errorf("frame: %v, want Parented", got)
+      }
+      doc.Delete()
+      if f.Alive() {
+      	t.Error("frame alive after its document was deleted")
+      }
+  selectedTableCells: { args: { firstRow: out, numRows: out, firstColumn: out, numColumns: out } }
+
+QRadialGradient:
+  QRadialGradient(const QPointF&, qreal): { name: NewQRadialGradientAt }
+  QRadialGradient(const QPointF&, qreal, const QPointF&): { name: NewQRadialGradientWithFocal }
+  QRadialGradient(const QPointF&, qreal, const QPointF&, qreal): { name: NewQRadialGradientExtended }
+
+QFontDatabase:
+  systemFont: { name: QFontDatabaseGetSystemFont }
+
+QEventPoint:
+  QEventPoint: { reviewed: true } # pointing devices live as long as the application
+  device: { return: borrowed }
+
+QImageReader:
+  QImageReader(QIODevice*, const QByteArray&): { args: { device: keep:device }, reviewed: true }
+  setDevice: { args: { device: keep:device }, reviewed: true }
+  device: { return: borrowed }
+  imageFormat: { reviewed: true }
+
+QInputDevice:
+  devices: { return: borrowed }
+  primaryKeyboard: { return: borrowed }
+
+QInputEvent:
+  QInputEvent: { args: { m_dev: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+  device: { return: borrowed }
+
+QPdfWriter:
+  QPdfWriter(QIODevice*): { args: { device: keep }, reviewed: true }
+
+QPicture:
+  play: { reviewed: true }
+  load: { reviewed: true }
+  save: { reviewed: true }
+
+QPointingDevice:
+  primaryPointingDevice: { return: borrowed }
+
+QTextBlock:
+  userData: { return: borrowed }
+  setUserData:
+    args: { data: transfer-to-cpp }
+    doc: "The document takes ownership of data and deletes the block's previous user data. Embed QTextBlockUserDataBase in a Go type to store Go state per block; GoValue returns it."
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      doc.SetPlainText("a")
+      data := qtgui.NewQTextBlockUserData()
+      doc.FirstBlock().SetUserData(data)
+      if got := data.Ownership(); got != qtcore.Parented {
+      	t.Errorf("data: %v, want Parented", got)
+      }
+      doc.Delete()
+      if data.Alive() {
+      	t.Error("user data alive after its document was deleted")
+      }
+  document: { return: borrowed }
+  textList: { return: borrowed }
+
+QTextDocumentFragment:
+  fromHtml: { reviewed: true } # the document is only read during the call
+  QTextDocumentFragment(const QTextDocument*): { reviewed: true }
+
+QTextObject:
+  document: { return: borrowed }
+
+QWindow:
+  parent: { return: borrowed }
+  setParent: { args: { parent: transfer-this } }
+  setTransientParent: { reviewed: true }
+  transientParent: { return: borrowed }
+  isAncestorOf: { reviewed: true }
+  screen: { return: borrowed }
+  setScreen: { reviewed: true }
+  focusObject: { return: borrowed }
+  fromWinId: { return: borrowed }
+
+QOffscreenSurface:
+  QOffscreenSurface(QScreen*, QObject*): { args: { screen: borrowed } }
+  screen: { return: borrowed }
+  setScreen: { reviewed: true }
+
+QOpenGLContext:
+  setShareContext: { args: { shareContext: keep }, reviewed: true }
+  setScreen: { reviewed: true }
+  shareContext: { return: borrowed }
+  shareGroup: { return: borrowed }
+  screen: { return: borrowed }
+  makeCurrent: { reviewed: true }
+  swapBuffers: { reviewed: true }
+  surface: { return: borrowed }
+  functions: { return: borrowed, doc: "The context owns the function table." }
+  extraFunctions: { return: borrowed, doc: "The context owns the function table." }
+  currentContext: { return: borrowed }
+  areSharing: { reviewed: true }
+  globalShareContext: { return: borrowed }
+  openGLModuleType: { name: QOpenGLContextModuleType }
+
+QOpenGLContextGroup:
+  shares: { return: borrowed }
+  currentContextGroup: { return: borrowed }
+
+QOpenGLExtraFunctions:
+  QOpenGLExtraFunctions(QOpenGLContext*):
+    args: { context: keep }
+    test: |
+      ctx := qtgui.NewQOpenGLContext(nil)
+      defer ctx.Delete()
+      surf := qtgui.NewQOffscreenSurfaceWithScreen(nil, nil)
+      defer surf.Delete()
+      surf.Create()
+      if !ctx.Create() || !ctx.MakeCurrent(surf) {
+        t.Log("no OpenGL context on this platform; the keep rule is not exercised")
+        return
+      }
+      defer ctx.DoneCurrent()
+      x := qtgui.NewQOpenGLExtraFunctionsWithOpenGLContext(ctx)
+      if !rt.KeepsArg(unsafe.Pointer(x), unsafe.Pointer(ctx)) {
+        t.Error("context not kept by the function table")
+      }
+      x.Delete()
+
+QOpenGLFunctions:
+  QOpenGLFunctions(QOpenGLContext*):
+    args: { context: keep }
+    test: |
+      ctx := qtgui.NewQOpenGLContext(nil)
+      defer ctx.Delete()
+      surf := qtgui.NewQOffscreenSurfaceWithScreen(nil, nil)
+      defer surf.Delete()
+      surf.Create()
+      if !ctx.Create() || !ctx.MakeCurrent(surf) {
+        t.Log("no OpenGL context on this platform; the keep rule is not exercised")
+        return
+      }
+      defer ctx.DoneCurrent()
+      x := qtgui.NewQOpenGLFunctionsWithOpenGLContext(ctx)
+      if !rt.KeepsArg(unsafe.Pointer(x), unsafe.Pointer(ctx)) {
+        t.Error("context not kept by the function table")
+      }
+      x.Delete()
+
+QQuaternion:
+  getAxisAndAngle(float*, float*, float*, float*): { args: { x: out, y: out, z: out, angle: out } }
+  getEulerAngles: { args: { pitch: out, yaw: out, roll: out } }
+
+QValidator:
+  validate: { args: { 0: in-out, 1: in-out } }
+  fixup: { args: { 0: in-out } }
+
+QMatrix4x4:
+  inverted: { args: { invertible: out } }
+  copyDataTo: { skip: "on purpose: Qt writes 16 floats through the pointer; use CopyDataTo in qmatrix4x4_manual.go" }
+
+QActionEvent:
+  QActionEvent: { args: { action: keep:action, before: keep:before }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+  before: { return: borrowed }
+  action: { return: borrowed }
+
+QTouchEvent:
+  QTouchEvent: { args: { device: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+  target: { return: borrowed }
+
+QInputMethodEventAttribute:
+  "Attribute(QInputMethodEvent::AttributeType, int, int, QVariant)": { name: NewQInputMethodEventAttributeWithValue }
+
+QSyntaxHighlighter:
+  document: { return: borrowed }
+  setDocument:
+    args: { doc: keep } # stored, not owned
+    test: |
+      doc := qtgui.NewQTextDocument(nil)
+      h := &struct{ qtgui.QSyntaxHighlighterBase }{}
+      qtgui.NewQSyntaxHighlighterWith(h, nil)
+      h.SetDocument(doc)
+      if !rt.KeepsArg(unsafe.Pointer(h.QSyntaxHighlighter), unsafe.Pointer(doc)) {
+      	t.Error("doc: not kept by the highlighter")
+      }
+      h.Delete()
+      doc.Delete()
+  currentBlockUserData: { return: borrowed }
+  setCurrentBlockUserData:
+    args: { data: transfer-to-cpp }
+    doc: "The document takes ownership of data; see QTextBlock.SetUserData. Call it only from HighlightBlock: outside it there is no current block and Qt ignores data."
+    test: "skip: only valid inside highlightBlock, which a snippet cannot override; covered by subclass_test.go"
+
+QChildWindowEvent:
+  QChildWindowEvent: { args: { childWindow: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+  child: { return: borrowed }
+
+QScreenOrientationChangeEvent:
+  QScreenOrientationChangeEvent:
+    args: { screen: keep }
+    doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives."
+    test: |
+      s := qtgui.QGuiApplicationPrimaryScreen()
+      e := qtgui.NewQScreenOrientationChangeEventWithScreen(s, qtcore.LandscapeOrientation)
+      if !rt.KeepsArg(unsafe.Pointer(e), unsafe.Pointer(s)) {
+      	t.Error("screen: not kept by the event")
+      }
+      if e.Screen() != s {
+      	t.Error("Screen() is not the screen given")
+      }
+      e.Delete()
+  screen: { return: borrowed }
+
+QDesktopServices:
+  setUrlHandler: { skip: "calls a Qt slot by name, which a Go object does not have (cgo builds run no moc)" }
+  unsetUrlHandler: { skip: "only undoes SetUrlHandler, which is not bound" }
+
+QDrag:
+  QDrag(QObject*): { args: { dragSource: transfer-this }, doc: "The drag source becomes the drag's parent." }
+  setMimeData: { args: { data: transfer-to-cpp }, doc: "The drag takes ownership of the data and deletes any data set before." }
+  mimeData: { return: borrowed }
+  source: { return: borrowed }
+  target: { return: borrowed }
+
+QFileSystemModel:
+  index(const QString&, int): { name: IndexOfPath }
+  setIconProvider: { args: { provider: keep }, reviewed: true, doc: "The model does not take ownership of the icon provider." }
+  iconProvider: { return: borrowed }
+
+QFontMetricsF:
+  size: { no-full: "tabArray is an input array of tab stops, which Qt reads up to a zero; pass tabStops instead" }
+  boundingRect(const QRectF&, int, const QString&, int, int*): { no-full: "tabArray is an input array of tab stops, which Qt reads up to a zero; pass tabStops instead" }
+  QFontMetricsF(const QFont&, const QPaintDevice*): { reviewed: true } # the device is read during the call only
+
+QIconEngine:
+  paint: { reviewed: true }
+  clone: { required: "it clones the engine when a copy of its icon is changed, and uses the result unchecked", return: transfer-to-go, doc: "Returns a new engine; the caller owns it. A Go override's result is owned by the C++ caller.", test: "skip: QIconEngine is abstract, and a snippet cannot declare the override; covered by subclass_test.go" }
+  read: { reviewed: true }
+  write: { reviewed: true }
+
+QImageWriter:
+  QImageWriter(QIODevice*, const QByteArray&): { args: { device: keep:device }, reviewed: true }
+  setDevice: { args: { device: keep:device }, reviewed: true }
+  device: { return: borrowed }
+
+QPainterStateGuard:
+  QPainterStateGuard(QPainter*, QPainterStateGuard::InitialState): { args: { painter: keep }, reviewed: true, doc: "The guard restores the painter when it is deleted; Delete() it (defer g.Delete()) before the painter ends." }
+
+QTextDocumentWriter:
+  QTextDocumentWriter(QIODevice*, const QByteArray&): { args: { device: keep:device }, reviewed: true }
+  setDevice: { args: { device: keep:device }, reviewed: true }
+  device: { return: borrowed }
+  write(const QTextDocument*): { reviewed: true }
+
+QUndoCommand:
+  mergeWith: { reviewed: true }
+  child: { return: borrowed }
+
+QUndoGroup:
+  addStack: { args: { stack: keep-each }, reviewed: true, doc: "The group does not take ownership of the stack." }
+  removeStack: { args: { stack: release }, reviewed: true }
+  stacks: { return: borrowed }
+  activeStack: { return: borrowed }
+  setActiveStack: { reviewed: true }
+  createUndoAction: { args: { parent: borrowed }, return: transfer-to-go, doc: "The action is a child of parent; with a nil parent the caller owns it." }
+  createRedoAction: { args: { parent: borrowed }, return: transfer-to-go, doc: "The action is a child of parent; with a nil parent the caller owns it." }
+
+QUndoStack:
+  push: { args: { cmd: transfer-to-cpp }, doc: "The stack takes ownership of the command; a command merged into the previous one is deleted at once." }
+  createUndoAction: { args: { parent: borrowed }, return: transfer-to-go, doc: "The action is a child of parent; with a nil parent the caller owns it." }
+  createRedoAction: { args: { parent: borrowed }, return: transfer-to-go, doc: "The action is a child of parent; with a nil parent the caller owns it." }
+  command: { return: borrowed }
+
+QDragEnterEvent:
+  QDragEnterEvent: { args: { data: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+
+QDragMoveEvent:
+  QDragMoveEvent: { args: { data: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+
+QEnterEvent:
+  QEnterEvent: { name: NewQEnterEvent, args: { device: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+
+QHoverEvent:
+  QHoverEvent: { name: NewQHoverEvent, args: { device: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+
+QKeyEvent:
+  "QKeyEvent(Type, int, Qt::KeyboardModifiers, const QString&, bool, quint16)": { name: NewQKeyEvent }
+  "QKeyEvent(Type, int, Qt::KeyboardModifiers, quint32, quint32, quint32, const QString&, bool, quint16, const QInputDevice*)": { name: NewQKeyEventNative, args: { device: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+
+QMouseEvent:
+  "QMouseEvent(Type, const QPointF&, const QPointF&, Qt::MouseButton, Qt::MouseButtons, Qt::KeyboardModifiers, const QPointingDevice*)": { name: NewQMouseEvent }
+  "QMouseEvent(Type, const QPointF&, const QPointF&, const QPointF&, Qt::MouseButton, Qt::MouseButtons, Qt::KeyboardModifiers, const QPointingDevice*)": { name: NewQMouseEventWithScenePos }
+  "QMouseEvent(Type, const QPointF&, const QPointF&, const QPointF&, Qt::MouseButton, Qt::MouseButtons, Qt::KeyboardModifiers, Qt::MouseEventSource, const QPointingDevice*)": { name: NewQMouseEventWithSource }
+  QMouseEvent: { args: { device: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+
+QNativeGestureEvent:
+  QNativeGestureEvent: { args: { dev: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+
+QShortcutEvent:
+  "QShortcutEvent(const QKeySequence&, const QShortcut*, bool)": { name: NewQShortcutEventForShortcut, args: { shortcut: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+
+QTabletEvent:
+  QTabletEvent: { args: { device: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }
+
+QWheelEvent:
+  QWheelEvent: { name: NewQWheelEvent, args: { device: keep }, doc: "The event stores the pointer without owning it; it keeps the object from being garbage collected while it lives." }

@@ -1,0 +1,10 @@
+# Ownership overlays for qtsvgwidgets. See spec/overlays/qtwidgets.yaml for the rules.
+
+QSvgWidget:
+  renderer: { return: borrowed, doc: "The renderer belongs to the widget." }
+
+QGraphicsSvgItem:
+  QGraphicsSvgItem: { args: { parentItem: transfer-this } } # a child item is freed with its parent
+  setSharedRenderer: { args: { renderer: keep:renderer }, reviewed: true, doc: "The item does not take ownership of the renderer; it keeps the renderer from being garbage collected." }
+  renderer: { return: borrowed }
+  paint: { reviewed: true }

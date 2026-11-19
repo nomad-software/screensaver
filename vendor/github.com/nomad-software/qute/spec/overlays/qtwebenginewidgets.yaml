@@ -1,0 +1,24 @@
+# Ownership overlays for qtwebenginewidgets. See spec/overlays/qtwidgets.yaml for the rules.
+
+QWebEngineView:
+  createWindow: { return: borrowed } # Qt does not take ownership; show the new view (which pins it)
+  QWebEngineView(QWebEngineProfile*, QWidget*): { name: NewQWebEngineViewWithProfile, args: { profile: keep:profile }, kept-delete: guard, reviewed: true, doc: "The view's page keeps using the profile, so the view keeps it alive; deleting the profile while the view lives panics." }
+  QWebEngineView(QWebEnginePage*, QWidget*): { name: NewQWebEngineViewWithPage, args: { page: keep:page }, reviewed: true, doc: "The view does not take ownership of the page." }
+  setPage: { args: { page: keep:page }, reviewed: true, doc: "The view does not take ownership of the page; its parent still owns it. A previous page that is the view's child is deleted." }
+  page: { return: borrowed, doc: "The page belongs to the view (or to whoever passed it to SetPage)." }
+  history: { return: borrowed, doc: "The history belongs to the page." }
+  settings: { return: borrowed, doc: "The settings belong to the page." }
+  pageAction: { return: borrowed, doc: "The action belongs to the page." }
+  createStandardContextMenu:
+    return: transfer-to-go
+    cpp: "($self->lastContextMenuRequest() ? $self->createStandardContextMenu() : nullptr)"
+    doc: "The menu is the caller's (Qt sets it to delete itself on close). Call it from ContextMenuEvent: without a pending context-menu request it returns nil (Qt itself would crash)."
+    test: |
+      view := qtwebenginewidgets.NewQWebEngineView(nil)
+      if m := view.CreateStandardContextMenu(); m != nil {
+      	t.Errorf("menu without a context-menu request: %v, want nil", m)
+      }
+      view.Delete()
+  lastContextMenuRequest: { return: borrowed, doc: "The request belongs to the view and is replaced by the next context menu." }
+  forPage: { return: borrowed, reviewed: true }
+  print: { skip: "on purpose: QtPrintSupport is not bound" }
