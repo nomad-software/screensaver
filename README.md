@@ -129,6 +129,9 @@ again, as it builds the previews into itself.
 ### `screensaver-digital-rain`
 ![](screen/saver/digital_rain/assets/images/preview.gif)
 
+### `screensaver-digital-rain-glitched`
+![](screen/saver/digital_rain_glitched/assets/images/preview.gif)
+
 ### `screensaver-game-of-life`
 ![](screen/saver/game_of_life/assets/images/preview.gif)
 
