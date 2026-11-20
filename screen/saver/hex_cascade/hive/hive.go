@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	cellsHigh    = 18    // About how many cells fit the height of the screen.
-	firstWave    = 0.4   // When the first wave begins, in seconds.
-	minWaveGap   = 4.2   // The least time between waves, in seconds.
-	maxWaveGap   = 6.0   // The most time between waves, in seconds.
-	shuffleRate  = 0.006 // The share of cells that shuffle each second.
-	shuffleTime  = 0.55  // How long a shuffle takes, in seconds.
-	maxFrameTime = 0.1   // The longest step taken at once, in seconds.
+	cellsHigh    = 20   // About how many cells fit the height of the screen.
+	firstWave    = 0.4  // When the first wave begins, in seconds.
+	minWaveGap   = 5.0  // The least time between waves, in seconds.
+	maxWaveGap   = 5.0  // The most time between waves, in seconds.
+	shuffleRate  = 0.00 // The share of cells that shuffle each second.
+	shuffleTime  = 0.55 // How long a shuffle takes, in seconds.
+	maxFrameTime = 0.1  // The longest step taken at once, in seconds.
 )
 
 var (

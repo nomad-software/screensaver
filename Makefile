@@ -9,9 +9,6 @@ LDFLAGS := -s -w
 build:
 	go build -ldflags "$(LDFLAGS)" -o $(BINARY) ./manager
 
-run: build
-	./$(BINARY)
-
 # Every run of the tests has a timeout, so that one that hangs fails with
 # the stacks of what it was waiting on, rather than waiting for ever.
 TEST_TIMEOUT := 5m

@@ -3,7 +3,6 @@ package main
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/nomad-software/screensaver/screen/saver"
-	"github.com/nomad-software/screensaver/screen/saver/hex_cascade/assets"
 	"github.com/nomad-software/screensaver/screen/saver/hex_cascade/hive"
 	"github.com/nomad-software/screensaver/screen/saver/hex_cascade/tile"
 )
@@ -16,8 +15,8 @@ func main() {
 
 	hive := hive.New(width, height)
 
-	shader := assets.NewShaderCollection()
-	glow := shader.Glow(width, height, hive.Radius()*0.7)
+	// shader := assets.NewShaderCollection()
+	// glow := shader.Glow(width, height, hive.Radius()*0.7)
 
 	buffer := rl.LoadRenderTexture(int32(width), int32(height))
 	defer rl.UnloadRenderTexture(buffer)
@@ -56,7 +55,7 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
-		rl.BeginShaderMode(glow)
+		// rl.BeginShaderMode(glow)
 
 		// Draw the texture buffer to the screen.
 		// The negative texture height is important because raylib's render
@@ -68,7 +67,7 @@ func main() {
 			rl.White,
 		)
 
-		rl.EndShaderMode()
+		// rl.EndShaderMode()
 
 		rl.EndDrawing()
 	}
